@@ -152,11 +152,11 @@ curl -s https://nebari-dev.github.io/nebari-design/r/registry.json   # list the 
 The only data source is the JSON the Python collector writes under
 `../data/` (shapes in `nebari_pulse/summary.py`, types in `src/lib/summary.ts`):
 
-| File | Hook | Page |
-| --- | --- | --- |
-| `summary.json` | `useSummary()` | Downloads: products with series grouped by source and type |
-| `repos.json` | `useRepos()` | Releases, Repos, Traffic |
-| `products/<id>.json` | `useProduct(id)` | one product in full; `null` on 404 |
+| File                 | Hook             | Page                                                       |
+| -------------------- | ---------------- | ---------------------------------------------------------- |
+| `summary.json`       | `useSummary()`   | Downloads: products with series grouped by source and type |
+| `repos.json`         | `useRepos()`     | Releases, Repos, Traffic                                   |
+| `products/<id>.json` | `useProduct(id)` | one product in full; `null` on 404                         |
 
 Each is fetched once and never refetched. Everything on screen is derived
 in `useMemo` from `src/lib/summary.ts` helpers, from the finest series the
