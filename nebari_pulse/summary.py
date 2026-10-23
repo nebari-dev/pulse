@@ -2,7 +2,7 @@
 
 Shape:
     {
-      "generated_at": ISO timestamp,
+      "generated_at": "YYYY-MM-DD" (collection date, UTC),
       "sources": {<source>: {"kind": "daily"|"cumulative", "artifacts": N}},
       "products": [
         {
@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 from . import store
@@ -78,7 +78,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
             }
         )
     return {
-        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "generated_at": today.isoformat(),
         "sources": {
             s: {"kind": "daily" if s in DAILY_SOURCES else "cumulative", "artifacts": n}
             for s, n in sorted(source_counts.items())
