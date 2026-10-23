@@ -8,7 +8,8 @@ Classic, Nebari Infrastructure Core (NIC), the operator, Nebi, Landing, and
 the packs. For each it collects **downloads** (Quay, PyPI, conda-forge,
 GitHub Releases), **repository health**, **release cadence**, **star
 history**, **contributors** and **GitHub traffic** from the product's
-repos, plus **documentation traffic** for the docs sites.
+repos, plus **documentation traffic** for the three docs sites: nebari.dev,
+classic.nebari.dev and packs.nebari.dev.
 
 A GitHub Action runs the collector every day at 06:20 UTC and commits the
 results under `data/`, so the repo is the database. That matters because
@@ -26,7 +27,7 @@ Pulse snapshots it.
 | `/releases` | Release cadence per product: latest release and age, releases in the period, median gap over the last year, releases per week, and a feed with prereleases marked. |
 | `/repos` | Repository health: stars and stars gained, open issues and PRs, PRs merged in 30 days, authors in 30 days, last push, with new and active contributors over time and open issues and PRs over time. |
 | `/traffic` | GitHub traffic: unique visitors and cloners for the last 14 days with change vs. the 14 before, totals, and daily history for all tracked repos. |
-| `/docs` | Documentation traffic: visits and page views per docs site over time, and each site's top pages for the last 7 days. |
+| `/docs` | Documentation traffic for the three docs sites (Nebari docs, Nebari Classic docs, Software Packs docs): visits per site with change vs. the previous period, visits over time by site, and one full-width table per site of its top pages over the last 7 days. |
 
 Filters (range, product or pack, artifact type, source) and the table
 search live in the URL, so any view can be shared as a link.
