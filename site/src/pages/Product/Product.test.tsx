@@ -69,6 +69,11 @@ describe('Product', () => {
     expect(screen.getByText('60 views in all')).toBeInTheDocument();
     expect(screen.getByText('Recent releases')).toBeInTheDocument();
     expect(screen.getByText('Stars over time')).toBeInTheDocument();
+    expect(
+      screen.getByRole('figure', {
+        name: 'Nebari Operator open issues and pull requests, daily',
+      }),
+    ).toBeInTheDocument();
     // 90-day window ending Oct 11 starts Jul 14: 0 → 42 stars.
     expect(screen.getByText('1 repo, +42 90 days')).toBeInTheDocument();
     expect(screen.getByText('prerelease')).toBeInTheDocument();

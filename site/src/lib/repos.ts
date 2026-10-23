@@ -5,6 +5,7 @@
 import {
   addDays,
   diffDays,
+  type HealthPoint,
   type Point,
   type Product,
   type Release,
@@ -250,4 +251,67 @@ export function daysSincePush(repo: Repo, asOf: string): number | null {
 /** Name of the repo without its owner. */
 export function repoName(repo: string): string {
   return repo.split('/')[1] ?? repo;
+}
+
+// ---- open work ---------------------------------------------------------------
+
+/** Chart row: date plus the two counts (index signature for TrendChart). */
+export type OpenWorkPoint = {
+  date: string;
+  open_issues: number;
+  open_prs: number;
+} & Record<string, number | string>;
+
+/** First and last health snapshot dates across repos, or null without any. */
+export function healthRange(
+  repos: Repo[],
+): { start: string; end: string } | null {
+  let start = '';
+  let end = '';
+  for (const r of repos) {
+    const first = r.health_series[0];
+    const last = r.health_series.at(-1);
+    if (first && (!start || first.date < start)) start = first.date;
+    if (last && last.date > end) end = last.date;
+  }
+  return start ? { start, end } : null;
+}
+
+/**
+ * Open issues and PRs summed across repos per day in [start, end]. Each repo
+ * carries its last known snapshot forward, so a day one repo missed does
+ * not read as a drop. Days before a repo's first snapshot count it as 0.
+ */
+export function openWorkSeries(
+  repos: Repo[],
+  start: string,
+  end: string,
+): OpenWorkPoint[] {
+  const out: OpenWorkPoint[] = [];
+  for (let d = start; d <= end; d = addDays(d, 1)) {
+    let open_issues = 0;
+    let open_prs = 0;
+    for (const r of repos) {
+      let last: HealthPoint | undefined;
+      for (const h of r.health_series) {
+        if (h.date > d) break;
+        last = h;
+      }
+      open_issues += last?.open_issues ?? 0;
+      open_prs += last?.open_prs ?? 0;
+    }
+    out.push({ date: d, open_issues, open_prs });
+  }
+  return out;
+}
+
+/** A repo's open issues per snapshot inside [start, end], for a sparkline. */
+export function openIssuesPoints(
+  repo: Repo,
+  start: string,
+  end: string,
+): Point[] {
+  return repo.health_series
+    .filter((h) => h.date >= start && h.date <= end && h.open_issues !== null)
+    .map((h) => ({ date: h.date, count: h.open_issues ?? 0 }));
 }

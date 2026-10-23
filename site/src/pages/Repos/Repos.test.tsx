@@ -43,6 +43,24 @@ describe('Repos', () => {
     expect(
       screen.getByText('across 1 repos, +12 in 30 days'),
     ).toBeInTheDocument();
+    // Contributors: ecosystem tile and per-repo authors column.
+    expect(screen.getByText('Contributors, 30 days')).toBeInTheDocument();
+    expect(within(row).getByText('3')).toBeInTheDocument();
+    expect(
+      screen.getByRole('figure', {
+        name: /First-time contributors per quarter/,
+      }),
+    ).toBeInTheDocument();
+    // Open work over time, from the health snapshots.
+    expect(
+      screen.getByRole('figure', { name: /Open issues and pull requests/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Daily snapshots since Oct 1, 2026/),
+    ).toBeInTheDocument();
+    expect(
+      within(row).getByRole('img', { name: /open issues, last 90 days/ }),
+    ).toBeInTheDocument();
   });
 
   it('filters by search', async () => {
