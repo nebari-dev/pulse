@@ -1,4 +1,6 @@
 import { Activity, Github, Moon, Sun } from 'lucide-react';
+import logoDark from '@/assets/nebari-logo_dark.svg';
+import logoLight from '@/assets/nebari-logo_light.svg';
 import { Button } from '@/components/ui/button';
 import {
   MenuBarActions,
@@ -13,10 +15,16 @@ function Header() {
   const { isDarkMode, setThemeMode } = useTheme();
   return (
     <NavigationMenu className="h-14 justify-between border-border bg-header pl-4 text-header-foreground">
-      <MenuBarBrand href="/" aria-label="Pulse home" className="gap-2">
-        <Activity className="size-5 text-primary" aria-hidden="true" />
-        <span className="font-semibold text-base tracking-tight">Pulse</span>
-        <span className="text-muted-foreground text-sm">Nebari metrics</span>
+      <MenuBarBrand href="/" aria-label="Pulse home" className="gap-3">
+        <img
+          src={isDarkMode ? logoDark : logoLight}
+          alt="Nebari"
+          className="h-8 w-auto"
+        />
+        <span className="flex items-center gap-1.5 border-border border-l pl-3">
+          <Activity className="size-4 text-primary" aria-hidden="true" />
+          <span className="font-semibold text-base tracking-tight">Pulse</span>
+        </span>
       </MenuBarBrand>
       <MenuBarActions className="gap-2">
         <Button

@@ -9,9 +9,10 @@ import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useSummary } from '@/hooks/useSummary';
 import { formatCompact, formatDate } from '@/lib/format';
 import {
+  artifactsOf,
   between,
   chartRows,
-  compare,
+  compareArtifacts,
   earliestDate,
   hasDataIn,
   latestDate,
@@ -43,7 +44,11 @@ function useOverview(summary: Summary | undefined) {
       const series = productSeries(product, params.source);
       return {
         product,
-        comparison: compare(series, start, end, earliest),
+        comparison: compareArtifacts(
+          artifactsOf(product, params.source),
+          start,
+          end,
+        ),
         share: 0,
         points: between(series, start, end),
       };
@@ -66,11 +71,10 @@ function useOverview(summary: Summary | undefined) {
       });
     }
 
-    const overall = compare(
-      sumSeries(Object.values(bySource)),
+    const overall = compareArtifacts(
+      products.flatMap((p) => artifactsOf(p, params.source)),
       start,
       end,
-      earliest,
     );
     return {
       asOf,

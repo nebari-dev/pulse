@@ -3,6 +3,7 @@ import {
   bucketWeekly,
   chartRows,
   compare,
+  compareArtifacts,
   fillDaily,
   platformOf,
   sumSeries,
@@ -102,6 +103,34 @@ describe('series', () => {
       { date: '2026-10-22', x: 2, y: 5 },
     ]);
   });
+});
+
+it('compares only artifacts that existed in the previous period', () => {
+  const old = {
+    source: 'pypi' as const,
+    ref: 'x',
+    totals: { '7d': 0, '30d': 0, '90d': 0, all: 0 },
+    latest_cumulative: null,
+    latest_items: null,
+    series: [
+      { date: '2026-10-19', count: 10 },
+      { date: '2026-10-20', count: 10 },
+      { date: '2026-10-21', count: 11 },
+      { date: '2026-10-22', count: 11 },
+    ],
+  };
+  const young = {
+    ...old,
+    source: 'quay' as const,
+    series: [{ date: '2026-10-22', count: 500 }],
+  };
+  const c = compareArtifacts([old, young], '2026-10-21', '2026-10-22');
+  expect(c.current).toBe(522); // everything counts now
+  expect(c.previous).toBe(20); // only `old` existed before
+  expect(c.delta).toBeCloseTo(0.1); // 22 vs 20, `young` excluded
+  expect(
+    compareArtifacts([young], '2026-10-21', '2026-10-22').delta,
+  ).toBeNull();
 });
 
 it('extracts a platform from release asset names', () => {
