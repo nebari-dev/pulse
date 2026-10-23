@@ -8,7 +8,7 @@ import { defineConfig, type Plugin } from 'vite';
 const DATA_DIR = path.resolve(__dirname, '../data');
 /** The files the dashboard fetches: the index, the repos file, and one file per product. */
 const DATA_PATTERN =
-  /^\/data\/(summary\.json|repos\.json|products\/[A-Za-z0-9._-]+\.json)$/;
+  /^\/data\/(summary\.json|repos\.json|docs\.json|products\/[A-Za-z0-9._-]+\.json)$/;
 
 /**
  * Serve the collector's JSON at /data/* in dev and copy it into dist/data on
@@ -34,7 +34,7 @@ function collectorData(): Plugin {
     closeBundle() {
       const out = path.resolve(__dirname, 'dist/data');
       fs.mkdirSync(path.join(out, 'products'), { recursive: true });
-      for (const f of ['summary.json', 'repos.json']) {
+      for (const f of ['summary.json', 'repos.json', 'docs.json']) {
         fs.copyFileSync(path.join(DATA_DIR, f), path.join(out, f));
       }
       for (const f of fs.readdirSync(path.join(DATA_DIR, 'products'))) {

@@ -23,6 +23,10 @@
 #                    product. Independent of the download sources above.
 #
 # kind: product (core platform piece) | pack (software pack).
+#
+# docs: documentation sites, measured at the Cloudflare edge (zone
+# analytics: HTML page views and visits per host, plus top paths). Needs
+# CLOUDFLARE_ANALYTICS_TOKEN with Zone:Read and Analytics:Read on the zone.
 
 downloads:
   quay_namespace: nebari   # scanned for repos not listed below -> data/untracked.json
@@ -272,3 +276,13 @@ downloads:
     - nebari/datascience-spin-poc_render-applications
     - nebari/software-pack-template-auth-fastapi-example
     - nebari/volume-nfs
+
+docs:
+  cloudflare_zone: nebari.dev
+  sites:
+    - id: docs
+      name: Nebari docs
+      hosts: [nebari.dev, www.nebari.dev]
+    - id: classic-docs
+      name: Nebari Classic docs
+      hosts: [classic.nebari.dev]

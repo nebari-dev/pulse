@@ -1,8 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import type { ProductDetail, ReposFile, Summary } from '@/lib/summary';
+import type {
+  DocsFile,
+  ProductDetail,
+  ReposFile,
+  Summary,
+} from '@/lib/summary';
 
 export const SUMMARY_URL = '/data/summary.json';
 export const REPOS_URL = '/data/repos.json';
+export const DOCS_URL = '/data/docs.json';
 export const productUrl = (id: string) =>
   `/data/products/${encodeURIComponent(id)}.json`;
 
@@ -49,6 +55,15 @@ export function useProduct(id: string | undefined) {
         throw new Error(`Could not load product ${id}: ${res.status}`);
       return (await res.json()) as ProductDetail;
     },
+    ...STATIC,
+  });
+}
+
+/** docs.json: documentation site traffic from the Cloudflare edge. */
+export function useDocs() {
+  return useQuery({
+    queryKey: ['docs'],
+    queryFn: () => fetchJson<DocsFile>(DOCS_URL),
     ...STATIC,
   });
 }

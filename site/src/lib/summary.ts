@@ -228,6 +228,27 @@ export interface Summary {
   repos: { count: number; traffic: number };
 }
 
+/** Documentation site traffic from Cloudflare zone analytics (docs.json). */
+export interface DocsTrafficPoint {
+  date: string;
+  pageviews: number;
+  visits: number;
+}
+export interface DocsSite {
+  id: string;
+  name: string;
+  hosts: string[];
+  /** Daily, summed over the site's hosts. */
+  series: DocsTrafficPoint[];
+  /** Top paths over the last 7 days, biggest first. */
+  top_pages: Array<{ path: string; pageviews: number }>;
+  top_pages_date: string | null;
+}
+export interface DocsFile {
+  generated_at: string;
+  sites: DocsSite[];
+}
+
 /** A product with only its repos (repos.json). */
 export interface ProductRepos extends ProductBase {
   repos: Repo[];

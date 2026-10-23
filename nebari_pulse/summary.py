@@ -59,6 +59,13 @@ Index shape (summary.json):
 Repos shape (repos.json): {"generated_at", "products": [{"id", "name",
 "kind", "repos": [...]}]}.
 
+Docs shape (docs.json), from Cloudflare zone analytics:
+    {"generated_at",
+     "sites": [{"id", "name", "hosts",
+                "series": [{"date", "pageviews", "visits"}],   # summed over hosts
+                "top_pages": [{"path", "pageviews"}],           # latest 7-day snapshot
+                "top_pages_date": "YYYY-MM-DD" | null}]}
+
 Daily sources (quay, pypi) contribute their rows directly. Cumulative
 sources (conda, github_releases) contribute the day-over-day delta
 between snapshots, attributed to the later snapshot date; the first
@@ -78,7 +85,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from . import store
-from .config import DownloadsConfig
+from .config import DocsConfig, DownloadsConfig
 
 DAILY_SOURCES = ("quay", "pypi")
 CUMULATIVE_SOURCES = ("conda", "github_releases")
@@ -437,3 +444,40 @@ def _as_list(series: Series) -> list[dict]:
 
 def window_start(today: date, days: int) -> date:
     return today - timedelta(days=days - 1)
+
+
+DOCS_FILE = "docs.json"
+
+
+def build_docs(cfg: DocsConfig, data_dir: Path, today: date) -> dict:
+    sites = []
+    for site in cfg.sites:
+        by_date: dict[str, dict[str, int]] = defaultdict(lambda: {"pageviews": 0, "visits": 0})
+        for r in store.read(store.path_for(data_dir, "docs", "traffic", site.id)):
+            by_date[r["date"]]["pageviews"] += int(r["pageviews"] or 0)
+            by_date[r["date"]]["visits"] += int(r["visits"] or 0)
+        pages = store.read(store.path_for(data_dir, "docs", "pages", site.id))
+        latest = max((r["date"] for r in pages), default=None)
+        top = sorted(
+            (
+                {"path": r["path"], "pageviews": int(r["pageviews"] or 0)}
+                for r in pages
+                if r["date"] == latest
+            ),
+            key=lambda r: -r["pageviews"],
+        )
+        sites.append(
+            {
+                "id": site.id,
+                "name": site.name,
+                "hosts": list(site.hosts),
+                "series": [{"date": d, **v} for d, v in sorted(by_date.items())],
+                "top_pages": top,
+                "top_pages_date": latest,
+            }
+        )
+    return {"generated_at": today.isoformat(), "sites": sites}
+
+
+def write_docs(docs: dict, data_dir: Path) -> Path:
+    return _write(data_dir / DOCS_FILE, docs)

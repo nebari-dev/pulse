@@ -38,7 +38,7 @@ pulse-dashboard/
 │   │   ├── anomalies.ts   # single-day spike detection + chart marker notes
 │   │   └── format.ts
 │   ├── hooks/
-│   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id) over /data/*.json
+│   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id), useDocs over /data/*.json
 │   │   ├── useDashboardParams.ts # range/kind/type/source filters + search (q) in the URL
 │   ├── components/
 │   │   ├── ui/            # Nebari components (installed via shadcn — managed)
@@ -54,6 +54,7 @@ pulse-dashboard/
 │   │   ├── Releases/      # /releases — cadence per product + release feed
 │   │   ├── Repos/         # /repos — health table per repo
 │   │   ├── Traffic/       # /traffic — GitHub views/clones
+│   │   ├── Docs/          # /docs — documentation site visits and top pages (Cloudflare)
 │   │   └── NotFound/
 │   │       ├── NotFound.tsx
 │   │       ├── NotFound.test.tsx

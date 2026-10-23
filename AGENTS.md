@@ -66,9 +66,11 @@ nebari_pulse/
     conda.py                 cumulative per-file totals from anaconda.org, snapshotted daily
     github_releases.py       cumulative per-asset download_count, snapshotted daily
     github_repos.py          repo health (GraphQL), release tags/dates, traffic, stars, contributors (REST)
+    cloudflare_docs.py       docs site visits/page views and top paths from Cloudflare zone analytics
 data/
   downloads/<source>/<artifact>.csv
   repos/health|releases|traffic|stars|contributors/<owner>__<name>.csv
+  docs/traffic|pages/<site>.csv
   summary.json               index: products with totals + series per (source, kind)
   repos.json                 every product's repos: health, traffic, releases
   products/<id>.json         one product in full: artifacts with series + items, repos
@@ -90,6 +92,8 @@ site/                        see site/AGENTS.md
 | repos/releases | `tag,published_at,prerelease` | one row per release tag |
 | repos/traffic | `date,views,unique_views,clones,unique_clones` | daily |
 | repos/stars | `date,stars` | cumulative; backfilled once from the stargazers API (timestamp per star), then today's count from the health snapshot |
+| docs/traffic | `date,host,pageviews,visits` | daily, HTML 200s to browsers at the Cloudflare edge; refetched for 30 days each run |
+| docs/pages | `date,path,pageviews` | daily snapshot of the top 200 paths over the last 7 days |
 | repos/contributors | `date,author,commits` | per author per day on the default branch; bots excluded; author is a login or `email:<address>`; backfilled once, then the latest month refetched |
 
 Rules the collector relies on:
@@ -157,6 +161,7 @@ so each page loads only what it shows:
 | File | Loaded by | Carries |
 |---|---|---|
 | `summary.json` | Downloads page (`useSummary`) | every product: totals + series grouped by (source, artifact kind), with `since` per group |
+| `docs.json` | Docs page (`useDocs`) | per documentation site: daily visits and page views, top pages snapshot |
 | `repos.json` | Releases, Repos, Traffic (`useRepos`) | every product's repos: latest health, health series, traffic, stars, contributors, releases; plus ecosystem contributors (active, monthly, new per quarter) |
 | `products/<id>.json` | product page (`useProduct`) | one product in full: each artifact's series and latest items (with per-item totals, for version adoption), plus repos |
 
@@ -176,7 +181,9 @@ groups and full artifacts.
   collector, commits `data/` as `pulse-bot`, then dispatches `deploy.yml`
   explicitly (pushes made with the Actions token do not trigger workflows).
 - Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` for deploys;
-  `PULSE_GITHUB_TOKEN` (optional) for traffic. Without it, traffic is
+  `PULSE_GITHUB_TOKEN` (optional) for repo traffic; `CLOUDFLARE_ANALYTICS_TOKEN`
+  (optional, Zone:Read + Analytics:Read on nebari.dev) for docs traffic, with
+  `CLOUDFLARE_API_TOKEN` as the fallback if it carries those scopes. Without it, traffic is
   skipped with a note and the Traffic page explains why.
 
 ## Conventions

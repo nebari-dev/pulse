@@ -38,6 +38,7 @@ export const NAV = [
     label: 'Traffic',
     match: (p: string) => p.startsWith('/traffic'),
   },
+  { to: '/docs', label: 'Docs', match: (p: string) => p.startsWith('/docs') },
 ];
 
 function Header() {

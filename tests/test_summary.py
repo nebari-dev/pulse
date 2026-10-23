@@ -289,3 +289,43 @@ def test_pypi_breakdown_is_grouped_per_dimension_and_category(tmp_path: Path):
         "system": [{"category": "Linux", "series": [{"date": "2026-10-22", "count": 6}]}],
     }
     assert next(a for a in arts if a["source"] == "quay")["breakdown"] is None
+
+
+def test_docs_summary_sums_hosts_and_takes_latest_pages(tmp_path: Path):
+    from nebari_pulse.config import DocsConfig, DocsSite
+
+    cfg = DocsConfig(
+        cloudflare_zone="nebari.dev",
+        sites=(DocsSite("docs", "Docs", ("nebari.dev", "www.nebari.dev")),),
+    )
+    store.upsert(
+        store.path_for(tmp_path, "docs", "traffic", "docs"),
+        ["date", "host", "pageviews", "visits"],
+        ["date", "host"],
+        [
+            {"date": "2026-10-21", "host": "nebari.dev", "pageviews": 100, "visits": 30},
+            {"date": "2026-10-21", "host": "www.nebari.dev", "pageviews": 10, "visits": 3},
+            {"date": "2026-10-22", "host": "nebari.dev", "pageviews": 80, "visits": 25},
+        ],
+    )
+    store.upsert(
+        store.path_for(tmp_path, "docs", "pages", "docs"),
+        ["date", "path", "pageviews"],
+        ["date", "path"],
+        [
+            {"date": "2026-10-22", "path": "/", "pageviews": 9},
+            {"date": "2026-10-23", "path": "/", "pageviews": 50},
+            {"date": "2026-10-23", "path": "/faq/", "pageviews": 70},
+        ],
+    )
+    out = summary.build_docs(cfg, tmp_path, TODAY)
+    site = out["sites"][0]
+    assert site["hosts"] == ["nebari.dev", "www.nebari.dev"]
+    assert site["series"] == [
+        {"date": "2026-10-21", "pageviews": 110, "visits": 33},
+        {"date": "2026-10-22", "pageviews": 80, "visits": 25},
+    ]
+    assert site["top_pages"] == [{"path": "/faq/", "pageviews": 70}, {"path": "/", "pageviews": 50}]
+    assert site["top_pages_date"] == "2026-10-23"
+    path = summary.write_docs(out, tmp_path)
+    assert path.name == "docs.json" and json.loads(path.read_text())["sites"][0]["id"] == "docs"
