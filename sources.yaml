@@ -215,15 +215,6 @@ downloads:
       quay:
         - nebari/charts/nebari-nebi-pack
 
-    - id: nexus-pack
-      name: Nexus Pack
-      kind: pack
-      repos:
-        - nebari-dev/nebari-nexus-pack
-      quay:
-        - nebari/charts/nebari-nexus
-        - nebari/nebari-nexus-api
-
     - id: provenance-collector-pack
       name: Provenance Collector
       kind: pack
@@ -271,6 +262,9 @@ downloads:
   # Quay repos in the namespace that are intentionally not tracked
   # (experiments, templates). They are excluded from data/untracked.json.
   quay_ignore:
+    # Nexus Pack is archived (nebari-dev/nebari-nexus-pack is no longer public).
+    - nebari/charts/nebari-nexus
+    - nebari/nebari-nexus-api
     - nebari/charts/my-pack
     - nebari/datascience-spin-poc
     - nebari/datascience-spin-poc_render-applications
