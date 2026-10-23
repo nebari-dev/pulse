@@ -26,9 +26,15 @@ describe('Traffic', () => {
     const row = (
       await screen.findByRole('link', { name: /nebari-operator/ })
     ).closest('tr') as HTMLElement;
-    expect(within(row).getByText('60')).toBeInTheDocument(); // views 10+20+30
-    expect(within(row).getByText('6')).toBeInTheDocument(); // clones 2*3
-    expect(screen.getByText('Views, last 14 days')).toBeInTheDocument();
+    const cells = within(row)
+      .getAllByRole('cell')
+      .map((c) => c.textContent);
+    // unique visitors 5+10+15, unique cloners 1*3, then views and clones
+    expect(cells.slice(2, 6)).toEqual(['30', '3', '60', '6']);
+    expect(
+      screen.getByText('Unique visitors, last 14 days'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Total clones')).toBeInTheDocument();
     // Repos without traffic are left out rather than shown as zero.
     expect(
       screen.queryByRole('link', { name: /infrastructure-core/ }),

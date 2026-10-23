@@ -74,15 +74,15 @@ const CHARTS: Array<{
   {
     title: 'Views',
     metrics: [
-      { metric: 'views', color: 'var(--chart-1)' },
-      { metric: 'unique_views', color: 'var(--chart-3)' },
+      { metric: 'views', color: 'var(--chart-3)' },
+      { metric: 'unique_views', color: 'var(--chart-1)' },
     ],
   },
   {
     title: 'Clones',
     metrics: [
-      { metric: 'clones', color: 'var(--chart-4)' },
-      { metric: 'unique_clones', color: 'var(--chart-5)' },
+      { metric: 'clones', color: 'var(--chart-5)' },
+      { metric: 'unique_clones', color: 'var(--chart-4)' },
     ],
   },
 ];
@@ -111,7 +111,7 @@ function useTraffic(summary: Summary | undefined) {
           uniqueViews: trafficTotal([repo], 'unique_views', start, end),
           clones: trafficTotal([repo], 'clones', start, end),
           uniqueClones: trafficTotal([repo], 'unique_clones', start, end),
-          points: trafficSeries([repo], 'views').filter(
+          points: trafficSeries([repo], 'unique_views').filter(
             (p) => p.date >= start && p.date <= end,
           ),
         })),
@@ -134,10 +134,21 @@ function useTraffic(summary: Summary | undefined) {
       start,
       end,
       rows,
-      views: compare(trafficSeries(repos, 'views'), start, end, range.start),
-      clones: compare(trafficSeries(repos, 'clones'), start, end, range.start),
-      uniqueViews: trafficTotal(repos, 'unique_views', start, end),
-      uniqueClones: trafficTotal(repos, 'unique_clones', start, end),
+      // Uniques lead: total clones include CI checkouts and mirrors.
+      uniqueViews: compare(
+        trafficSeries(repos, 'unique_views'),
+        start,
+        end,
+        range.start,
+      ),
+      uniqueClones: compare(
+        trafficSeries(repos, 'unique_clones'),
+        start,
+        end,
+        range.start,
+      ),
+      views: trafficTotal(repos, 'views', start, end),
+      clones: trafficTotal(repos, 'clones', start, end),
       charts,
     };
   }, [summary, params.kind]);
@@ -154,7 +165,7 @@ function Traffic() {
   const { data, error, isPending } = useSummary();
   const { params, setParams, view } = useTraffic(data);
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
-    key: 'views',
+    key: 'uniqueClones',
     dir: 'desc',
   });
 
@@ -268,34 +279,34 @@ function Traffic() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile
-          label="Views, last 14 days"
-          value={formatCompact(view.views.current)}
-          delta={view.views.delta}
+          label="Unique visitors, last 14 days"
+          value={formatCompact(view.uniqueViews.current)}
+          delta={view.uniqueViews.delta}
           hint={
-            view.views.delta === null
+            view.uniqueViews.delta === null
               ? 'no full previous period yet'
               : 'vs. previous 14 days'
           }
         />
         <StatTile
-          label="Unique visitors"
-          value={formatCompact(view.uniqueViews)}
+          label="Unique cloners, last 14 days"
+          value={formatCompact(view.uniqueClones.current)}
+          delta={view.uniqueClones.delta}
+          hint={
+            view.uniqueClones.delta === null
+              ? 'no full previous period yet'
+              : 'vs. previous 14 days'
+          }
+        />
+        <StatTile
+          label="Total views"
+          value={formatCompact(view.views)}
           hint="summed per repo per day"
         />
         <StatTile
-          label="Clones, last 14 days"
-          value={formatCompact(view.clones.current)}
-          delta={view.clones.delta}
-          hint={
-            view.clones.delta === null
-              ? 'no full previous period yet'
-              : 'vs. previous 14 days'
-          }
-        />
-        <StatTile
-          label="Unique cloners"
-          value={formatCompact(view.uniqueClones)}
-          hint={windowLabel}
+          label="Total clones"
+          value={formatCompact(view.clones)}
+          hint={`${windowLabel} · includes CI and mirrors`}
         />
       </div>
 
@@ -322,11 +333,11 @@ function Traffic() {
           <TableRow>
             {head('repo', 'Repository')}
             <TableHead>Product</TableHead>
+            {head('uniqueViews', 'Unique visitors', RIGHT)}
+            {head('uniqueClones', 'Unique cloners', RIGHT)}
             {head('views', 'Views', RIGHT)}
-            {head('uniqueViews', 'Unique', RIGHT)}
             {head('clones', 'Clones', RIGHT)}
-            {head('uniqueClones', 'Unique', RIGHT)}
-            <TableHead>Views trend</TableHead>
+            <TableHead>Visitors trend</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -360,21 +371,21 @@ function Traffic() {
                 </Link>
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {formatNumber(r.views)}
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground tabular-nums">
                 {formatNumber(r.uniqueViews)}
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {formatNumber(r.clones)}
+                {formatNumber(r.uniqueClones)}
               </TableCell>
               <TableCell className="text-right text-muted-foreground tabular-nums">
-                {formatNumber(r.uniqueClones)}
+                {formatNumber(r.views)}
+              </TableCell>
+              <TableCell className="text-right text-muted-foreground tabular-nums">
+                {formatNumber(r.clones)}
               </TableCell>
               <TableCell>
                 <Sparkline
                   points={r.points}
-                  label={`${r.repo.repo} views, last 14 days`}
+                  label={`${r.repo.repo} unique visitors, last 14 days`}
                 />
               </TableCell>
             </TableRow>
