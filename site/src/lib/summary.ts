@@ -260,11 +260,18 @@ export function compareArtifacts(
     (a) => a.series.length > 0 && a.series[0].date <= prevStart,
   );
   const previous = sum(covered, prevStart, prevEnd);
+  const current = sum(artifacts, start, end);
+  const currentCovered = sum(covered, start, end);
+  // A delta over a sliver of the total (e.g. PyPI only, while Quay has no
+  // prior window yet) would misdescribe the headline number; withhold it.
+  const representative = current === 0 || currentCovered / current >= 0.9;
   return {
-    current: sum(artifacts, start, end),
+    current,
     previous,
     delta:
-      previous > 0 ? (sum(covered, start, end) - previous) / previous : null,
+      representative && previous > 0
+        ? (currentCovered - previous) / previous
+        : null,
   };
 }
 

@@ -122,14 +122,20 @@ it('compares only artifacts that existed in the previous period', () => {
   const young = {
     ...old,
     source: 'quay' as const,
-    series: [{ date: '2026-10-22', count: 500 }],
+    series: [{ date: '2026-10-22', count: 2 }],
   };
   const c = compareArtifacts([old, young], '2026-10-21', '2026-10-22');
-  expect(c.current).toBe(522); // everything counts now
+  expect(c.current).toBe(24); // everything counts now
   expect(c.previous).toBe(20); // only `old` existed before
   expect(c.delta).toBeCloseTo(0.1); // 22 vs 20, `young` excluded
   expect(
     compareArtifacts([young], '2026-10-21', '2026-10-22').delta,
+  ).toBeNull();
+
+  // When the covered artifacts are a sliver of the total, no delta.
+  const big = { ...young, series: [{ date: '2026-10-22', count: 500 }] };
+  expect(
+    compareArtifacts([old, big], '2026-10-21', '2026-10-22').delta,
   ).toBeNull();
 });
 
