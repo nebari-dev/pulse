@@ -42,7 +42,7 @@ pulse-dashboard/
 │   │   ├── useDashboardParams.ts # range/kind/type/source filters + search (q) in the URL
 │   ├── components/
 │   │   ├── ui/            # Nebari components (installed via shadcn — managed)
-│   │   ├── Header/        # brand, section nav (Downloads/Releases/Repos/Traffic), theme toggle
+│   │   ├── Header/        # brand, section nav, GitHub link, theme toggle; one hamburger below sm
 │   │   ├── PageHeader/    # title + description + controls row used by every page
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── WhatChanged/   # weekly strip: movers, releases, repos that went quiet (lib/changes.ts)
@@ -219,7 +219,8 @@ values into the stylesheet.
 2. Add `PageName.tsx`, `PageName.test.tsx`, and `index.ts`
 3. Add a `<Route>` in `src/App.tsx`
 4. Add it to `NAV` in `src/components/Header/Header.tsx` with a `match`
-   predicate, and use `PageHeader` for the title row so pages look alike
+   predicate (the desktop links and the small-screen hamburger both read
+   it), and use `PageHeader` for the title row so pages look alike
 
 ---
 

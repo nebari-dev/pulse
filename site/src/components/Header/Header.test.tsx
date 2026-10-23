@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/hooks/theme-provider';
-import Header from './Header';
+import Header, { REPO_URL } from './Header';
 
 function renderHeader(url = '/') {
   return render(
@@ -43,12 +43,9 @@ describe('Header', () => {
     );
   });
 
-  it('offers every section in the small-screen menu', async () => {
+  it('puts sections, the source link and the theme toggle in one hamburger', async () => {
     renderHeader('/repos?kind=pack');
-    const trigger = screen.getByRole('button', {
-      name: 'Sections, current: Repos',
-    });
-    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole('button', { name: 'Menu' }));
     const menu = await screen.findByRole('menu');
     const items = within(menu).getAllByRole('menuitem');
     expect(items.map((i) => i.textContent)).toEqual([
@@ -57,9 +54,14 @@ describe('Header', () => {
       'Repos',
       'Traffic',
       'Docs',
+      'View source on GitHub',
+      'Switch to dark mode',
     ]);
     expect(items[2]).toHaveAttribute('aria-current', 'page');
     expect(items[3]).toHaveAttribute('href', '/traffic?kind=pack');
+    expect(items[5]).toHaveAttribute('href', REPO_URL);
+    await userEvent.click(items[6]);
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 
   it('toggles dark mode', async () => {
