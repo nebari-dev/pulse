@@ -35,6 +35,7 @@ pulse-dashboard/
 │   │   ├── summary.ts     # summary.json types + pure helpers (windows, series, deltas, search)
 │   │   ├── repos.ts       # release cadence, repo health and traffic helpers
 │   │   ├── changes.ts     # "what changed this week": movers, recent releases, went quiet
+│   │   ├── anomalies.ts   # single-day spike detection + chart marker notes
 │   │   └── format.ts
 │   ├── hooks/
 │   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id) over /data/*.json

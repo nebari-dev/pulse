@@ -1,13 +1,16 @@
+import { TriangleAlert } from 'lucide-react';
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  ReferenceDot,
   ResponsiveContainer,
   Tooltip,
   type TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts';
+import type { ChartMarker } from '@/lib/anomalies';
 import {
   formatCompact,
   formatDate,
@@ -45,6 +48,11 @@ interface TrendChartProps {
   /** What one row is; overrides `weekly`. Affects axis and tooltip labels. */
   bucket?: Bucket;
   /**
+   * Days to flag (anomalies). Drawn as a marker on top of the stack and
+   * explained in the tooltip; the plotted values are untouched.
+   */
+  markers?: ChartMarker[];
+  /**
    * Stack the series (the default when there is more than one). Pass false
    * when series overlap rather than add up, e.g. total vs. unique visitors.
    */
@@ -57,12 +65,17 @@ function ChartTooltip({
   payload,
   label,
   bucket,
-}: TooltipProps<number, string> & { bucket: Bucket }) {
+  notes,
+}: TooltipProps<number, string> & {
+  bucket: Bucket;
+  notes: Map<string, string>;
+}) {
   if (!active || !payload?.length) return null;
   const items = [...payload].reverse(); // top of the stack first
   const sum = items.reduce((acc, p) => acc + (p.value ?? 0), 0);
+  const note = notes.get(String(label));
   return (
-    <div className="rounded-md border bg-popover px-3 py-2 text-popover-foreground text-sm shadow-md">
+    <div className="max-w-xs rounded-md border bg-popover px-3 py-2 text-popover-foreground text-sm shadow-md">
       <p className="mb-1 font-medium">
         {bucketLabel(String(label), bucket, true)}
       </p>
@@ -87,6 +100,15 @@ function ChartTooltip({
           </span>
         </p>
       )}
+      {note && (
+        <p className="mt-1 flex items-start gap-1.5 border-t pt-1 text-warning-foreground text-xs">
+          <TriangleAlert
+            className="mt-0.5 size-3.5 shrink-0"
+            aria-hidden="true"
+          />
+          <span>{note}</span>
+        </p>
+      )}
     </div>
   );
 }
@@ -102,11 +124,28 @@ function TrendChart({
   bucket: bucketProp,
   title,
   stacked: stackedProp,
+  markers = [],
 }: TrendChartProps) {
   const stacked = stackedProp ?? series.length > 1;
   const bucket: Bucket = bucketProp ?? (weekly ? 'week' : 'day');
+  const notes = new Map(markers.map((m) => [m.date, m.note]));
+  // Marker height: the top of the stack (or the tallest series) that day.
+  const topOf = (date: string) => {
+    const row = rows.find((r) => r.date === date);
+    if (!row) return null;
+    const values = series.map((s) => Number(row[s.key] ?? 0));
+    return stacked ? values.reduce((a, b) => a + b, 0) : Math.max(...values);
+  };
   return (
     <figure aria-label={title} className="flex flex-col gap-3">
+      {markers.length > 0 && (
+        <p className="sr-only">
+          {markers.length} flagged {markers.length === 1 ? 'day' : 'days'}:{' '}
+          {markers
+            .map((m) => `${formatDate(m.date, true)}, ${m.note}`)
+            .join(' ')}
+        </p>
+      )}
       {stacked && (
         <ul
           className="flex flex-wrap gap-x-4 gap-y-1 text-sm"
@@ -151,7 +190,7 @@ function TrendChart({
               width={48}
             />
             <Tooltip
-              content={<ChartTooltip bucket={bucket} />}
+              content={<ChartTooltip bucket={bucket} notes={notes} />}
               cursor={{
                 stroke: 'var(--border-strong)',
                 strokeDasharray: '3 3',
@@ -173,6 +212,21 @@ function TrendChart({
                 isAnimationActive={false}
               />
             ))}
+            {markers.map((m) => {
+              const y = topOf(m.date);
+              return y === null ? null : (
+                <ReferenceDot
+                  key={m.date}
+                  x={m.date}
+                  y={y}
+                  r={5}
+                  fill="var(--warning-foreground)"
+                  stroke="var(--card)"
+                  strokeWidth={2}
+                  ifOverflow="extendDomain"
+                />
+              );
+            })}
           </AreaChart>
         </ResponsiveContainer>
       </div>
