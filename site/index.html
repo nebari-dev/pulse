@@ -9,10 +9,10 @@
     <script>
       (() => {
         try {
+          // Pulse defaults to dark; only an explicit 'light' choice turns it off.
           var mode = localStorage.getItem("nebari:themeMode");
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var isDark = mode === 'dark' || (mode !== 'light' && prefersDark);
-          document.documentElement.classList.toggle('dark', isDark);
+          if (mode === null) localStorage.setItem("nebari:themeMode", "dark");
+          document.documentElement.classList.toggle('dark', mode !== 'light');
         } catch (e) {}
       })();
     </script>

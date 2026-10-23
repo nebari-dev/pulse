@@ -240,6 +240,41 @@ export function compare(
   };
 }
 
+/**
+ * Like `compare`, but the previous period is measured only on artifacts that
+ * already had data then, so a source that started collecting mid-way (Quay
+ * keeps ~90 days; cumulative sources begin at their first snapshot) cannot
+ * show up as a spurious jump. `current` still counts every artifact.
+ */
+export function compareArtifacts(
+  artifacts: Artifact[],
+  start: string,
+  end: string,
+): Comparison {
+  const days = diffDays(start, end) + 1;
+  const prevStart = addDays(start, -days);
+  const prevEnd = addDays(start, -1);
+  const sum = (list: Artifact[], from: string, to: string) =>
+    list.reduce((acc, a) => acc + total(between(a.series, from, to)), 0);
+  const covered = artifacts.filter(
+    (a) => a.series.length > 0 && a.series[0].date <= prevStart,
+  );
+  const previous = sum(covered, prevStart, prevEnd);
+  const current = sum(artifacts, start, end);
+  const currentCovered = sum(covered, start, end);
+  // A delta over a sliver of the total (e.g. PyPI only, while Quay has no
+  // prior window yet) would misdescribe the headline number; withhold it.
+  const representative = current === 0 || currentCovered / current >= 0.9;
+  return {
+    current,
+    previous,
+    delta:
+      representative && previous > 0
+        ? (currentCovered - previous) / previous
+        : null,
+  };
+}
+
 /** True when the series has any downloads inside [start, end]. */
 export function hasDataIn(
   series: Point[],

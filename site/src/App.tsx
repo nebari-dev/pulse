@@ -15,7 +15,7 @@ function App() {
         <BrowserRouter>
           <div className="flex min-h-screen flex-col bg-canvas text-canvas-foreground">
             <Header />
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+            <main className="w-full flex-1 px-6 py-8">
               <Routes>
                 <Route path="/" element={<Overview />} />
                 <Route path="/product/:id" element={<Product />} />
