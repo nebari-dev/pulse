@@ -55,6 +55,18 @@ const docs: DocsFile = {
       top_pages: [{ path: '/welcome/', pageviews: 50 }],
       top_pages_date: '2026-10-11',
     },
+    {
+      id: 'packs-docs',
+      name: 'Software Packs docs',
+      hosts: ['packs.nebari.dev'],
+      series: Array.from({ length: 10 }, (_, i) => ({
+        date: day(i),
+        pageviews: 8,
+        visits: 4,
+      })),
+      top_pages: [{ path: '/packs/chat/', pageviews: 12 }],
+      top_pages_date: '2026-10-11',
+    },
   ],
 };
 
@@ -70,6 +82,9 @@ describe('Docs', () => {
     expect(
       screen.getByRole('figure', { name: /Daily docs visits by site/ }),
     ).toBeInTheDocument();
+    expect(screen.getAllByRole('table', { name: /top pages$/ })).toHaveLength(
+      3,
+    );
     const table = screen.getByRole('table', { name: 'Nebari docs top pages' });
     expect(
       within(table).getByRole('link', { name: /get-started/ }),
