@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/table';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useRepos } from '@/hooks/useSummary';
+import { markersFor } from '@/lib/anomalies';
 import { formatCompact, formatDate, formatNumber } from '@/lib/format';
 import {
   laterDate,
@@ -127,6 +128,7 @@ function useTraffic(summary: ReposFile | undefined) {
         title,
         series,
         rows: chartRows(byMetric, range.start, end, false),
+        markers: markersFor(byMetric[metrics[0].metric], title.toLowerCase()),
       };
     });
     return {
@@ -321,6 +323,7 @@ function Traffic() {
                 rows={c.rows}
                 series={c.series}
                 stacked={false}
+                markers={c.markers}
                 title={`Daily GitHub ${c.title.toLowerCase()}`}
               />
             </CardContent>

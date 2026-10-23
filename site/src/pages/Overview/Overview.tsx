@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import WhatChanged from '@/components/WhatChanged';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useRepos, useSummary } from '@/hooks/useSummary';
+import { markersFor } from '@/lib/anomalies';
 import { movers, recentReleases, wentQuiet } from '@/lib/changes';
 import { formatCompact, formatDate } from '@/lib/format';
 import {
@@ -134,7 +135,11 @@ function useOverview(
       start,
       end,
     );
+    const markers = weekly
+      ? []
+      : markersFor(between(sumSeries(all.map((a) => a.series)), start, end));
     return {
+      markers,
       share,
       asOf,
       start,
@@ -252,8 +257,16 @@ function Overview() {
                 rows={view.chartRows}
                 series={view.chartSeries}
                 weekly={view.weekly}
+                markers={view.markers}
                 title={`${view.weekly ? 'Weekly' : 'Daily'} downloads, ${rangeLabel}`}
               />
+              {view.markers.length > 0 && (
+                <p className="mt-2 text-muted-foreground text-xs">
+                  Marked days are more than three standard deviations above the
+                  trailing four-week average; hover one for the numbers. They
+                  stay in the totals.
+                </p>
+              )}
             </CardContent>
           </Card>
 

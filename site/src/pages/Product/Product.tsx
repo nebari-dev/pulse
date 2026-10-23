@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/table';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useProduct, useSummary } from '@/hooks/useSummary';
+import { markersFor } from '@/lib/anomalies';
 import {
   formatAgo,
   formatCompact,
@@ -206,6 +207,7 @@ function useProductView(
             title,
             series,
             rows: chartRows(byMetric, traffic.start, traffic.end, false),
+            markers: markersFor(byMetric[metrics[0][0]], title.toLowerCase()),
           };
         })
       : [];
@@ -278,6 +280,7 @@ function useProductView(
       ),
       allKnown: total(series),
       chartRows: chartRows(bySource, start, end, weekly),
+      markers: weekly ? [] : markersFor(between(series, start, end)),
       chartSeries,
       releases: releaseRows(releases),
       platforms: platformRows(releases),
@@ -426,6 +429,7 @@ function Product() {
               rows={view.chartRows}
               series={view.chartSeries}
               weekly={view.weekly}
+              markers={view.markers}
               title={`${product.name} downloads by source, ${rangeLabel}`}
             />
           </CardContent>
@@ -713,6 +717,7 @@ function Product() {
                       rows={c.rows}
                       series={c.series}
                       stacked={false}
+                      markers={c.markers}
                       title={`${product.name} GitHub ${c.title.toLowerCase()}`}
                     />
                   ))}
