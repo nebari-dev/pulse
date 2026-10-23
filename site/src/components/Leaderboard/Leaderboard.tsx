@@ -32,6 +32,13 @@ export interface LeaderboardRow {
 
 type SortKey = 'name' | 'current' | 'delta' | 'share';
 
+/**
+ * Numeric columns are right-aligned; a sortable TableHead renders its label
+ * inside a `justify-start` button, so align that too or the header sits
+ * left of its values.
+ */
+const RIGHT = 'text-right [&>button]:justify-end';
+
 interface LeaderboardProps {
   rows: LeaderboardRow[];
   rangeLabel: string;
@@ -95,9 +102,9 @@ function Leaderboard({ rows, rangeLabel }: LeaderboardProps) {
         <TableRow>
           {head('name', 'Product')}
           <TableHead>Kind</TableHead>
-          {head('current', rangeLabel, 'text-right')}
-          {head('delta', 'vs. previous', 'text-right')}
-          {head('share', 'Share', 'text-right')}
+          {head('current', rangeLabel, RIGHT)}
+          {head('delta', 'vs. previous', RIGHT)}
+          {head('share', 'Share', RIGHT)}
           <TableHead>Trend</TableHead>
         </TableRow>
       </TableHeader>
