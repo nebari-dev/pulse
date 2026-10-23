@@ -28,13 +28,17 @@ import { useRepos as useReposFile } from '@/hooks/useSummary';
 import { formatAgo, formatDate, formatNumber } from '@/lib/format';
 import {
   daysSincePush,
+  healthRange,
   healthTotals,
+  openIssuesPoints,
+  openWorkSeries,
   repoName,
   repoUrl,
   starsGained,
   starsPoints,
 } from '@/lib/repos';
 import {
+  diffDays,
   KIND_LABEL,
   type KindFilter,
   matchesKind,
@@ -53,6 +57,8 @@ interface Row {
   starsGained: number | null;
   /** Cumulative stars per day over the last 90 days, for the sparkline. */
   starsTrend: Point[];
+  /** Open issues per snapshot over the last 90 days, for the sparkline. */
+  issuesTrend: Point[];
   pushAge: number | null;
 }
 
@@ -90,6 +96,7 @@ function useRepos(summary: ReposFile | undefined) {
             repo.stars_series.length > 0
               ? starsPoints([repo], trendStart, asOf)
               : [],
+          issuesTrend: openIssuesPoints(repo, trendStart, asOf),
           pushAge: daysSincePush(repo, asOf),
         })),
       );
@@ -108,7 +115,28 @@ function useRepos(summary: ReposFile | undefined) {
         authors: m.authors,
       })),
     };
-    return { asOf, rows, totals, quiet, gained, contributors: c, charts };
+    const health = healthRange(rows.map((r) => r.repo));
+    const openWork = health
+      ? {
+          since: health.start,
+          days: diffDays(health.start, health.end) + 1,
+          rows: openWorkSeries(
+            rows.map((r) => r.repo),
+            health.start,
+            health.end,
+          ),
+        }
+      : null;
+    return {
+      asOf,
+      rows,
+      totals,
+      quiet,
+      gained,
+      contributors: c,
+      charts,
+      openWork,
+    };
   }, [summary, params.kind]);
   return { params, setParams, view };
 }
@@ -318,6 +346,39 @@ function Repos() {
             </Card>
           </div>
 
+          {view.openWork && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Open issues and pull requests over time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrendChart
+                  rows={view.openWork.rows}
+                  series={[
+                    {
+                      key: 'open_issues',
+                      label: 'Open issues',
+                      color: 'var(--chart-1)',
+                    },
+                    {
+                      key: 'open_prs',
+                      label: 'Open PRs',
+                      color: 'var(--chart-3)',
+                    },
+                  ]}
+                  stacked={false}
+                  title="Open issues and pull requests across all tracked repos, daily"
+                />
+                <p className="mt-2 text-muted-foreground text-xs">
+                  Daily snapshots since {formatDate(view.openWork.since, true)}
+                  {view.openWork.days < 14 &&
+                    ` (${view.openWork.days} ${view.openWork.days === 1 ? 'day' : 'days'} so far, so the line is short, not flat)`}
+                  . Each repo carries its last snapshot forward.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           <Table aria-label="Repository health">
             <TableHeader>
               <TableRow>
@@ -331,12 +392,13 @@ function Repos() {
                 {head('contributors', 'Authors, 30d', RIGHT)}
                 {head('push', 'Last push')}
                 <TableHead>Stars, 90d</TableHead>
+                <TableHead>Issues, 90d</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-muted-foreground">
+                  <TableCell colSpan={11} className="text-muted-foreground">
                     {params.q
                       ? `No repos match "${params.q}".`
                       : 'No repos tracked yet.'}
@@ -344,7 +406,14 @@ function Repos() {
                 </TableRow>
               )}
               {rows.map(
-                ({ product, repo, starsGained, starsTrend, pushAge }) => (
+                ({
+                  product,
+                  repo,
+                  starsGained,
+                  starsTrend,
+                  issuesTrend,
+                  pushAge,
+                }) => (
                   <TableRow key={repo.repo}>
                     <TableCell className="font-medium">
                       <a
@@ -384,6 +453,7 @@ function Repos() {
                     <Cell value={repo.health?.open_issues} />
                     <Cell value={repo.health?.open_prs} />
                     <Cell value={repo.health?.merged_prs_30d} />
+                    <Cell value={repo.contributors.active_30d} />
                     <TableCell
                       className={cn(
                         'tabular-nums',
@@ -398,6 +468,14 @@ function Repos() {
                         <Sparkline
                           points={starsTrend}
                           label={`${repo.repo} stars, last 90 days`}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {issuesTrend.length > 1 && (
+                        <Sparkline
+                          points={issuesTrend}
+                          label={`${repo.repo} open issues, last 90 days`}
                         />
                       )}
                     </TableCell>

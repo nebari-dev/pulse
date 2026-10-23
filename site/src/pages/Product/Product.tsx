@@ -28,7 +28,9 @@ import {
 import {
   cadence,
   daysSincePush,
+  healthRange,
   laterDate,
+  openWorkSeries,
   productReleases,
   releaseUrl,
   repoName,
@@ -212,6 +214,10 @@ function useProductView(
         })
       : [];
 
+    const health = healthRange(product.repos);
+    const openWork = health
+      ? openWorkSeries(product.repos, laterDate(health.start, start), end)
+      : null;
     const starred = product.repos.filter((r) => r.stars_series.length > 0);
     const stars = starred.length
       ? {
@@ -238,6 +244,7 @@ function useProductView(
       .filter((b) => b.rows.length > 0);
 
     return {
+      openWork,
       stars,
       breakdowns,
       cadence: cadence(stable, product.generated_at, 90),
@@ -586,6 +593,38 @@ function Product() {
               }
             />
           </div>
+
+          {view.openWork && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Open issues and pull requests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrendChart
+                  rows={view.openWork}
+                  series={[
+                    {
+                      key: 'open_issues',
+                      label: 'Open issues',
+                      color: 'var(--chart-1)',
+                    },
+                    {
+                      key: 'open_prs',
+                      label: 'Open PRs',
+                      color: 'var(--chart-3)',
+                    },
+                  ]}
+                  stacked={false}
+                  title={`${product.name} open issues and pull requests, daily`}
+                />
+                <p className="mt-2 text-muted-foreground text-xs">
+                  Daily snapshots since{' '}
+                  {formatDate(view.openWork[0]?.date ?? view.asOf, true)},
+                  summed across the product's repos.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {view.stars && (
             <Card>
