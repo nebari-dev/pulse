@@ -21,16 +21,27 @@ Full product shape (products/<id>.json, and the entries `build()` returns):
         {"source", "ref", "kind", "totals": {...}, "latest_cumulative": N|null,
          "latest_items": [{<key cols>..., "cumulative": N,
                            "totals": {"7d", "30d", "90d", "all"}}] | null,
-         "series": [...]}
+         "series": [...],
+         "breakdown": {"python_minor": [{"category", "series": [...]}],   # pypi only
+                       "system": [{"category", "series": [...]}]} | null}
       ],
       "repos": [
         {"repo": "owner/name",
          "health": {<latest health snapshot>} | null,
          "health_series": [{"date", "stars", "open_issues", "open_prs"}],
          "traffic": [{"date", "views", "unique_views", "clones", "unique_clones"}],
+         "stars_series": [{"date", "stars"}],   # cumulative; only dates that changed
+         "contributors": {"active_30d": N,
+                          "monthly": [{"date": "YYYY-MM-01", "authors": N}]},
          "releases": [{"tag", "date", "prerelease"}]}   # newest first
       ]
     }
+
+Ecosystem contributors (in the full build and repos.json), across every
+tracked repo with a person counted once however many repos they touch:
+    "contributors": {"active_30d": N,
+                     "monthly": [{"date": "YYYY-MM-01", "authors": N}],
+                     "new_by_quarter": [{"date": "YYYY-MM-01", "count": N}]}
 
 Index shape (summary.json):
     {
@@ -78,6 +89,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
     products = []
     source_counts: dict[str, int] = defaultdict(int)
     repo_count = traffic_count = 0
+    all_commits: list[store.Row] = []
     for product in cfg.products:
         artifacts = []
         product_series: Series = defaultdict(int)
@@ -101,9 +113,14 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                         "latest_cumulative": latest,
                         "latest_items": items,
                         "series": _as_list(series),
+                        "breakdown": _breakdown(data_dir, ref) if source == "pypi" else None,
                     }
                 )
-        repos = [_repo(data_dir, repo) for repo in product.repos]
+        repos = []
+        for repo in product.repos:
+            commits = store.read(store.path_for(data_dir, "repos", "contributors", repo))
+            all_commits.extend(commits)
+            repos.append(_repo(data_dir, repo, commits, today))
         repo_count += len(repos)
         traffic_count += sum(1 for r in repos if r["traffic"])
         products.append(
@@ -125,6 +142,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
         },
         "products": products,
         "repos": {"count": repo_count, "traffic": traffic_count},
+        "contributors": contributors(all_commits, today, new_by_quarter=True),
     }
 
 
@@ -140,7 +158,31 @@ HEALTH_INTS = (
 )
 
 
-def _repo(data_dir: Path, repo: str) -> dict:
+def contributors(commits: list[store.Row], today: date, new_by_quarter: bool = False) -> dict:
+    """Unique authors in the last 30 days and per month; optionally the
+    number of authors whose first commit anywhere fell in each quarter."""
+    since = (today - timedelta(days=29)).isoformat()
+    active = {r["author"] for r in commits if r["date"] >= since}
+    monthly: dict[str, set[str]] = defaultdict(set)
+    first_seen: dict[str, str] = {}
+    for r in commits:
+        monthly[r["date"][:7]].add(r["author"])
+        if r["author"] not in first_seen or r["date"] < first_seen[r["author"]]:
+            first_seen[r["author"]] = r["date"]
+    out = {
+        "active_30d": len(active),
+        "monthly": [{"date": f"{m}-01", "authors": len(a)} for m, a in sorted(monthly.items())],
+    }
+    if new_by_quarter:
+        by_q: dict[str, int] = defaultdict(int)
+        for d in first_seen.values():
+            y, m = int(d[:4]), int(d[5:7])
+            by_q[f"{y}-{(m - 1) // 3 * 3 + 1:02d}-01"] += 1
+        out["new_by_quarter"] = [{"date": q, "count": n} for q, n in sorted(by_q.items())]
+    return out
+
+
+def _repo(data_dir: Path, repo: str, commits: list[store.Row], today: date) -> dict:
     health_rows = store.read(store.path_for(data_dir, "repos", "health", repo))
     health_rows.sort(key=lambda r: r["date"])
     health = None
@@ -161,6 +203,14 @@ def _repo(data_dir: Path, repo: str) -> dict:
             store.read(store.path_for(data_dir, "repos", "traffic", repo)),
             key=lambda r: r["date"],
         )
+    ]
+    stars_series = [
+        {"date": r["date"], "stars": int(r["stars"])}
+        for r in sorted(
+            store.read(store.path_for(data_dir, "repos", "stars", repo)),
+            key=lambda r: r["date"],
+        )
+        if r.get("stars") not in (None, "")
     ]
     releases = [
         {
@@ -185,12 +235,31 @@ def _repo(data_dir: Path, repo: str) -> dict:
             for r in health_rows
         ],
         "traffic": traffic,
+        "stars_series": stars_series,
+        "contributors": contributors(commits, today),
         "releases": releases,
     }
 
 
 def _int_or_none(value: str | None) -> int | None:
     return int(value) if value not in (None, "") else None
+
+
+def _breakdown(data_dir: Path, ref: str) -> dict | None:
+    """pypistats' per-dimension daily series, one entry per category."""
+    rows = store.read(store.path_for(data_dir, "downloads", "pypi_breakdown", ref))
+    if not rows:
+        return None
+    per: dict[str, dict[str, Series]] = defaultdict(lambda: defaultdict(dict))
+    for r in rows:
+        per[r["dimension"]][r["category"]][r["date"]] = int(r["count"])
+    return {
+        dimension: [
+            {"category": category, "series": _as_list(series)}
+            for category, series in sorted(categories.items())
+        ]
+        for dimension, categories in sorted(per.items())
+    }
 
 
 def artifact_kind(source: str, ref: str) -> str:
@@ -249,6 +318,7 @@ def index_of(summary: dict) -> dict:
 def repos_of(summary: dict) -> dict:
     return {
         "generated_at": summary["generated_at"],
+        "contributors": summary["contributors"],
         "products": [
             {"id": p["id"], "name": p["name"], "kind": p["kind"], "repos": p["repos"]}
             for p in summary["products"]

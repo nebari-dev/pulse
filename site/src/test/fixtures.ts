@@ -63,6 +63,18 @@ export const operatorRepo: Repo = {
     clones: 2,
     unique_clones: 1,
   })),
+  contributors: {
+    active_30d: 3,
+    monthly: [
+      { date: '2026-09-01', authors: 2 },
+      { date: '2026-10-01', authors: 3 },
+    ],
+  },
+  stars_series: [
+    { date: '2026-08-01', stars: 30 },
+    { date: '2026-09-15', stars: 40 },
+    { date: '2026-10-10', stars: 42 },
+  ],
   releases: [
     { tag: 'v1.2.0', date: '2026-10-08', prerelease: false },
     { tag: 'v1.2.0-rc1', date: '2026-10-01', prerelease: true },
@@ -99,6 +111,8 @@ export const nic: Product = {
       health: null,
       health_series: [],
       traffic: [],
+      stars_series: [],
+      contributors: { active_30d: 0, monthly: [] },
       releases: [],
     },
   ],
@@ -127,6 +141,13 @@ export const nic: Product = {
       source: 'pypi',
       ref: 'nic',
       series: days('2026-10-08', [5, 5, 5]),
+      breakdown: {
+        python_minor: [
+          { category: '3.12', series: days('2026-10-08', [4, 4, 4]) },
+          { category: 'null', series: days('2026-10-08', [1, 1, 1]) },
+        ],
+        system: [{ category: 'Linux', series: days('2026-10-08', [5, 5, 5]) }],
+      },
     }),
   ],
 };
@@ -203,6 +224,17 @@ export function toRepos(
 ): ReposFile {
   return {
     generated_at,
+    contributors: {
+      active_30d: 3,
+      monthly: [
+        { date: '2026-09-01', authors: 2 },
+        { date: '2026-10-01', authors: 3 },
+      ],
+      new_by_quarter: [
+        { date: '2026-07-01', count: 2 },
+        { date: '2026-10-01', count: 1 },
+      ],
+    },
     products: list.map(({ id, name, kind, repos }) => ({
       id,
       name,

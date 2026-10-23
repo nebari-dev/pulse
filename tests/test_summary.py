@@ -155,9 +155,19 @@ def test_repos_health_releases_traffic(tmp_path: Path):
         ["date"],
         [{"date": "2026-10-22", "views": 10, "unique_views": 4, "clones": 2, "unique_clones": 1}],
     )
+    store.upsert(
+        store.path_for(tmp_path, "repos", "stars", "nebari-dev/nebari"),
+        ["date", "stars"],
+        ["date"],
+        [{"date": "2026-10-23", "stars": 301}, {"date": "2022-01-05", "stars": 1}],
+    )
     out = summary.build(cfg, tmp_path, TODAY)
     repo = out["products"][0]["repos"][0]
     assert repo["repo"] == "nebari-dev/nebari"
+    assert repo["stars_series"] == [
+        {"date": "2022-01-05", "stars": 1},
+        {"date": "2026-10-23", "stars": 301},
+    ]
     assert repo["health"]["stars"] == 301
     assert repo["health"]["merged_prs_30d"] is None  # blank cell -> null, not 0
     assert repo["health"]["pushed_at"] == "2026-10-23"
@@ -225,3 +235,53 @@ def test_write_all_splits_index_repos_and_products(tmp_path: Path):
     assert product["repos"][0]["repo"] == "o/r"
     # Compact: no indentation in the files the browser fetches.
     assert "\n " not in (tmp_path / "summary.json").read_text()
+
+
+def test_contributors_active_monthly_and_new_by_quarter():
+    rows = [
+        {"date": "2026-01-15", "author": "ann", "commits": "2"},
+        {"date": "2026-02-01", "author": "ann", "commits": "1"},
+        {"date": "2026-02-03", "author": "bob", "commits": "1"},
+        {"date": "2026-10-20", "author": "cid", "commits": "1"},
+        {"date": "2026-10-21", "author": "ann", "commits": "1"},
+    ]
+    out = summary.contributors(rows, TODAY, new_by_quarter=True)
+    assert out["active_30d"] == 2  # cid and ann; bob was in February
+    assert out["monthly"] == [
+        {"date": "2026-01-01", "authors": 1},
+        {"date": "2026-02-01", "authors": 2},
+        {"date": "2026-10-01", "authors": 2},
+    ]
+    assert out["new_by_quarter"] == [
+        {"date": "2026-01-01", "count": 2},  # ann (Jan) and bob (Feb)
+        {"date": "2026-10-01", "count": 1},  # cid
+    ]
+    assert "new_by_quarter" not in summary.contributors(rows, TODAY)
+
+
+def test_pypi_breakdown_is_grouped_per_dimension_and_category(tmp_path: Path):
+    cfg = _cfg([{"id": "p", "pypi": ["pkg"], "quay": ["ns/r"]}])
+    store.upsert(
+        store.path_for(tmp_path, "downloads", "pypi_breakdown", "pkg"),
+        ["date", "dimension", "category", "count"],
+        ["date", "dimension", "category"],
+        [
+            {"date": "2026-10-22", "dimension": "python_minor", "category": "3.12", "count": 4},
+            {"date": "2026-10-21", "dimension": "python_minor", "category": "3.12", "count": 1},
+            {"date": "2026-10-22", "dimension": "python_minor", "category": "null", "count": 2},
+            {"date": "2026-10-22", "dimension": "system", "category": "Linux", "count": 6},
+        ],
+    )
+    arts = summary.build(cfg, tmp_path, TODAY)["products"][0]["artifacts"]
+    pypi = next(a for a in arts if a["source"] == "pypi")
+    assert pypi["breakdown"] == {
+        "python_minor": [
+            {
+                "category": "3.12",
+                "series": [{"date": "2026-10-21", "count": 1}, {"date": "2026-10-22", "count": 4}],
+            },
+            {"category": "null", "series": [{"date": "2026-10-22", "count": 2}]},
+        ],
+        "system": [{"category": "Linux", "series": [{"date": "2026-10-22", "count": 6}]}],
+    }
+    assert next(a for a in arts if a["source"] == "quay")["breakdown"] is None

@@ -40,3 +40,19 @@ export function formatAgo(days: number | null): string {
   if (days < 365 * 1.5) return `${Math.round(days / 30)} months ago`;
   return `${Math.round(days / 365)} years ago`;
 }
+
+/** "Oct 2026" for the first of a month. */
+export function formatMonth(iso: string): string {
+  const [y, m] = iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('en', {
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+/** "Q4 2026" for the first day of a quarter. */
+export function formatQuarter(iso: string): string {
+  const [y, m] = iso.split('-').map(Number);
+  return `Q${Math.floor((m - 1) / 3) + 1} ${y}`;
+}

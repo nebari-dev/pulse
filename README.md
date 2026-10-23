@@ -25,6 +25,8 @@ data/
   repos/health/<repo>.csv             daily snapshot: stars, forks, open issues/PRs, throughput
   repos/releases/<repo>.csv           one row per release tag with its date
   repos/traffic/<repo>.csv            daily views and clones (needs PULSE_GITHUB_TOKEN)
+  repos/stars/<repo>.csv              cumulative stars per date, back to the first star
+  repos/contributors/<repo>.csv       commits per author per day, bots excluded
   summary.json                        index: products with totals + series per source and type
   repos.json                          every product's repos: health, traffic, releases
   products/<id>.json                  one product in full, loaded by its page
@@ -44,12 +46,15 @@ site/                   dashboard (Vite + React + Nebari design system)
 |---|---|---|
 | `quay` | `date,count` | daily pulls, from the Quay API (`includeStats=true`) |
 | `pypi` | `date,count` | daily downloads excluding mirrors, from pypistats.org |
+| `pypi_breakdown` | `date,dimension,category,count` | daily downloads by Python minor version (`python_minor`) and OS (`system`), from pypistats.org |
 | `conda` | `date,version,file,cumulative` | daily snapshot of per-file totals from api.anaconda.org |
 | `github_releases` | `date,tag,asset,cumulative` | daily snapshot of per-asset `download_count` |
 
 | `repos/health` | `date,stars,forks,subscribers,open_issues,open_prs,merged_prs_30d,issues_opened_30d,issues_closed_30d,pushed_at` | daily snapshot via GraphQL |
 | `repos/releases` | `tag,published_at,prerelease` | one row per release tag |
 | `repos/traffic` | `date,views,unique_views,clones,unique_clones` | daily, 14-day window from GitHub |
+| `repos/stars` | `date,stars` | cumulative; backfilled once from each star's timestamp, then daily |
+| `repos/contributors` | `date,author,commits` | commits per author per day on the default branch, bots excluded; backfilled once, then the latest month refreshed daily |
 
 For cumulative sources the daily series in `summary.json` is the delta
 between consecutive snapshots, kept per version/tag as well so the
@@ -95,9 +100,9 @@ Filters and the table search live in the URL, so any view is shareable.
 | Page | What it shows |
 |---|---|
 | `/` Downloads | totals, trend by artifact type or source, searchable leaderboard |
-| `/product/:id` | one product: artifacts, version adoption, releases, repo health, traffic |
+| `/product/:id` | one product: artifacts, version adoption, PyPI Python/OS mix, releases, repo health, traffic |
 | `/releases` | cadence per product (latest, count in window, median gap) and a release feed |
-| `/repos` | stars, stars gained, open issues/PRs, merged PRs, last push per repo |
+| `/repos` | stars, stars gained, open issues/PRs, merged PRs, authors per repo; new and active contributors over time |
 | `/traffic` | GitHub views and clones, 14-day totals and all collected history |
 
 ```sh

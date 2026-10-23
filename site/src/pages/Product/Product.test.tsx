@@ -45,6 +45,13 @@ describe('Product', () => {
     expect(screen.getByText('linux/x86_64')).toBeInTheDocument();
     // A repo without a health snapshot shows dashes, and no release tiles.
     expect(screen.getByText('no GitHub releases')).toBeInTheDocument();
+    // PyPI breakdown for the window: 3.12 = 12, unknown = 3, Linux = 15.
+    expect(
+      screen.getByRole('table', { name: 'Downloads by python version' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('3.12')).toBeInTheDocument();
+    expect(screen.getByText('unknown')).toBeInTheDocument();
+    expect(screen.getByText('Linux')).toBeInTheDocument();
   });
 
   it('shows repo health, cadence and traffic when a product has repos', async () => {
@@ -61,6 +68,9 @@ describe('Product', () => {
     expect(screen.getByText('30')).toBeInTheDocument();
     expect(screen.getByText('60 views in all')).toBeInTheDocument();
     expect(screen.getByText('Recent releases')).toBeInTheDocument();
+    expect(screen.getByText('Stars over time')).toBeInTheDocument();
+    // 90-day window ending Oct 11 starts Jul 14: 0 → 42 stars.
+    expect(screen.getByText('1 repo, +42 90 days')).toBeInTheDocument();
     expect(screen.getByText('prerelease')).toBeInTheDocument();
   });
 

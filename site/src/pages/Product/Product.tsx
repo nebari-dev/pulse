@@ -32,6 +32,8 @@ import {
   releaseUrl,
   repoName,
   repoUrl,
+  starsGained,
+  starsPoints,
   TRAFFIC_LABEL,
   trafficRange,
   trafficSeries,
@@ -43,7 +45,9 @@ import {
   addDays,
   artifactsOf,
   artifactUrl,
+  BREAKDOWN_LABEL,
   between,
+  breakdownRows,
   chartRows,
   compareArtifacts,
   earliestDate,
@@ -206,7 +210,34 @@ function useProductView(
         })
       : [];
 
+    const starred = product.repos.filter((r) => r.stars_series.length > 0);
+    const stars = starred.length
+      ? {
+          rows: starsPoints(starred, start, end).map((p) => ({
+            date: p.date,
+            stars: p.count,
+          })),
+          gained: starred.reduce(
+            (n, r) => n + (starsGained(r, start, end) ?? 0),
+            0,
+          ),
+        }
+      : null;
+
+    const pypi = artifacts.filter((a) => a.source === 'pypi');
+    const breakdowns = (['python_minor', 'system'] as const)
+      .map((dimension) => ({
+        dimension,
+        rows: breakdownRows(pypi, dimension, start, end).map((r) => ({
+          tag: r.category,
+          cumulative: r.count,
+        })),
+      }))
+      .filter((b) => b.rows.length > 0);
+
     return {
+      stars,
+      breakdowns,
       cadence: cadence(stable, product.generated_at, 90),
       feed: feed.slice(0, 8),
       adoption: adoptionRows(artifacts),
@@ -483,6 +514,31 @@ function Product() {
         </div>
       )}
 
+      {view.breakdowns.length > 0 && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {view.breakdowns.map((b) => (
+            <Card key={b.dimension}>
+              <CardHeader>
+                <CardTitle>
+                  PyPI downloads by {BREAKDOWN_LABEL[b.dimension].toLowerCase()}
+                  , {rangeLabel.toLowerCase()}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <ReleaseTable
+                  rows={b.rows}
+                  label={BREAKDOWN_LABEL[b.dimension]}
+                />
+                <p className="text-muted-foreground text-xs">
+                  As reported by pypistats. "unknown" is downloads whose
+                  installer did not say.
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
       {product.repos.length > 0 && (
         <section
           aria-labelledby="repos-heading"
@@ -518,9 +574,31 @@ function Product() {
               value={formatNumber(
                 product.repos.reduce((n, r) => n + (r.health?.stars ?? 0), 0),
               )}
-              hint={`${product.repos.length} ${product.repos.length === 1 ? 'repo' : 'repos'}`}
+              hint={
+                `${product.repos.length} ${product.repos.length === 1 ? 'repo' : 'repos'}` +
+                (view.stars
+                  ? `, ${view.stars.gained >= 0 ? '+' : ''}${formatNumber(view.stars.gained)} ${rangeLabel.toLowerCase()}`
+                  : '')
+              }
             />
           </div>
+
+          {view.stars && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Stars over time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrendChart
+                  rows={view.stars.rows}
+                  series={[
+                    { key: 'stars', label: 'Stars', color: 'var(--chart-1)' },
+                  ]}
+                  title={`${product.name} stars, ${rangeLabel}`}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           <Table aria-label={`${product.name} repositories`}>
             <TableHeader>
