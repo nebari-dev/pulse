@@ -8,7 +8,28 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { formatCompact, formatDate, formatNumber } from '@/lib/format';
+import {
+  formatCompact,
+  formatDate,
+  formatMonth,
+  formatNumber,
+  formatQuarter,
+} from '@/lib/format';
+
+export type Bucket = 'day' | 'week' | 'month' | 'quarter';
+
+function bucketLabel(date: string, bucket: Bucket, long: boolean): string {
+  switch (bucket) {
+    case 'day':
+      return formatDate(date, long);
+    case 'week':
+      return `${long ? 'Week of ' : ''}${formatDate(date, long)}`;
+    case 'month':
+      return formatMonth(date);
+    case 'quarter':
+      return formatQuarter(date);
+  }
+}
 
 export interface TrendSeries {
   key: string;
@@ -21,6 +42,8 @@ interface TrendChartProps {
   series: TrendSeries[];
   /** Rows are weekly buckets (affects axis and tooltip labels). */
   weekly?: boolean;
+  /** What one row is; overrides `weekly`. Affects axis and tooltip labels. */
+  bucket?: Bucket;
   /**
    * Stack the series (the default when there is more than one). Pass false
    * when series overlap rather than add up, e.g. total vs. unique visitors.
@@ -33,16 +56,15 @@ function ChartTooltip({
   active,
   payload,
   label,
-  weekly,
-}: TooltipProps<number, string> & { weekly: boolean }) {
+  bucket,
+}: TooltipProps<number, string> & { bucket: Bucket }) {
   if (!active || !payload?.length) return null;
   const items = [...payload].reverse(); // top of the stack first
   const sum = items.reduce((acc, p) => acc + (p.value ?? 0), 0);
   return (
     <div className="rounded-md border bg-popover px-3 py-2 text-popover-foreground text-sm shadow-md">
       <p className="mb-1 font-medium">
-        {weekly ? 'Week of ' : ''}
-        {formatDate(String(label), true)}
+        {bucketLabel(String(label), bucket, true)}
       </p>
       {items.map((p) => (
         <p key={p.dataKey} className="flex items-center gap-2">
@@ -77,10 +99,12 @@ function TrendChart({
   rows,
   series,
   weekly = false,
+  bucket: bucketProp,
   title,
   stacked: stackedProp,
 }: TrendChartProps) {
   const stacked = stackedProp ?? series.length > 1;
+  const bucket: Bucket = bucketProp ?? (weekly ? 'week' : 'day');
   return (
     <figure aria-label={title} className="flex flex-col gap-3">
       {stacked && (
@@ -113,7 +137,7 @@ function TrendChart({
             />
             <XAxis
               dataKey="date"
-              tickFormatter={(d: string) => formatDate(d)}
+              tickFormatter={(d: string) => bucketLabel(d, bucket, false)}
               tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
               axisLine={{ stroke: 'var(--border)' }}
               tickLine={false}
@@ -127,7 +151,7 @@ function TrendChart({
               width={48}
             />
             <Tooltip
-              content={<ChartTooltip weekly={weekly} />}
+              content={<ChartTooltip bucket={bucket} />}
               cursor={{
                 stroke: 'var(--border-strong)',
                 strokeDasharray: '3 3',

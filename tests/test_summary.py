@@ -235,3 +235,25 @@ def test_write_all_splits_index_repos_and_products(tmp_path: Path):
     assert product["repos"][0]["repo"] == "o/r"
     # Compact: no indentation in the files the browser fetches.
     assert "\n " not in (tmp_path / "summary.json").read_text()
+
+
+def test_contributors_active_monthly_and_new_by_quarter():
+    rows = [
+        {"date": "2026-01-15", "author": "ann", "commits": "2"},
+        {"date": "2026-02-01", "author": "ann", "commits": "1"},
+        {"date": "2026-02-03", "author": "bob", "commits": "1"},
+        {"date": "2026-10-20", "author": "cid", "commits": "1"},
+        {"date": "2026-10-21", "author": "ann", "commits": "1"},
+    ]
+    out = summary.contributors(rows, TODAY, new_by_quarter=True)
+    assert out["active_30d"] == 2  # cid and ann; bob was in February
+    assert out["monthly"] == [
+        {"date": "2026-01-01", "authors": 1},
+        {"date": "2026-02-01", "authors": 2},
+        {"date": "2026-10-01", "authors": 2},
+    ]
+    assert out["new_by_quarter"] == [
+        {"date": "2026-01-01", "count": 2},  # ann (Jan) and bob (Feb)
+        {"date": "2026-10-01", "count": 1},  # cid
+    ]
+    assert "new_by_quarter" not in summary.contributors(rows, TODAY)

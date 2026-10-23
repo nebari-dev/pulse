@@ -132,6 +132,23 @@ export interface TrafficPoint {
   unique_clones: number;
 }
 
+export interface MonthlyAuthors {
+  date: string; // first of the month
+  authors: number;
+}
+
+/** Unique commit authors (bots excluded), from the default branch. */
+export interface Contributors {
+  active_30d: number;
+  monthly: MonthlyAuthors[];
+}
+
+/** Across every tracked repo, a person counted once. */
+export interface EcosystemContributors extends Contributors {
+  /** Authors whose first commit anywhere fell in the quarter (first day). */
+  new_by_quarter: Point[];
+}
+
 /** Cumulative stars as of a date; only dates where the count changed. */
 export interface StarPoint {
   date: string;
@@ -151,6 +168,7 @@ export interface Repo {
   traffic: TrafficPoint[];
   /** Oldest first; backfilled from the stargazers API, then daily. */
   stars_series: StarPoint[];
+  contributors: Contributors;
   /** Newest first. */
   releases: Release[];
 }
@@ -192,6 +210,7 @@ export interface ProductRepos extends ProductBase {
 }
 export interface ReposFile {
   generated_at: string;
+  contributors: EcosystemContributors;
   products: ProductRepos[];
 }
 

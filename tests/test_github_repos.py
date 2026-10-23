@@ -15,3 +15,19 @@ def test_backfill_stars_accumulates_per_day(monkeypatch):
         {"date": "2024-01-01", "stars": 2},
         {"date": "2024-03-05", "stars": 3},
     ]
+
+
+def test_commit_author_prefers_login_and_drops_bots():
+    assert github_repos.commit_author({"author": {"login": "ann", "type": "User"}}) == "ann"
+    assert github_repos.commit_author({"author": {"login": "dependabot[bot]"}}) is None
+    assert github_repos.commit_author({"author": {"login": "x", "type": "Bot"}}) is None
+    assert (
+        github_repos.commit_author({"author": None, "commit": {"author": {"email": "A@x.io"}}})
+        == "email:a@x.io"
+    )
+    assert (
+        github_repos.commit_author(
+            {"author": None, "commit": {"author": {"email": "1+u@users.noreply.github.com"}}}
+        )
+        is None
+    )
