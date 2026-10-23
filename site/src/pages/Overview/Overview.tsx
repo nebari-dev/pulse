@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import Filters from '@/components/Filters';
 import Leaderboard, { type LeaderboardRow } from '@/components/Leaderboard';
 import SearchBox from '@/components/SearchBox';
+import ShareChart from '@/components/ShareChart';
 import StatTile from '@/components/StatTile';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +34,7 @@ import {
   SOURCE_LABEL,
   SOURCES,
   type Summary,
+  shareRows,
   sumSeries,
   windowFor,
 } from '@/lib/summary';
@@ -118,7 +120,22 @@ function useOverview(
       start,
       end,
     );
+    const share = shareRows(
+      products.map((p) => ({
+        id: p.id,
+        name: p.name,
+        rank: p.totals.all,
+        series: sumSeries(
+          headlineArtifacts(artifactsOf(p.groups, params), params).map(
+            (g) => g.series,
+          ),
+        ),
+      })),
+      start,
+      end,
+    );
     return {
+      share,
       asOf,
       start,
       end,
@@ -239,6 +256,26 @@ function Overview() {
               />
             </CardContent>
           </Card>
+
+          {view.share.series.length > 1 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Share of downloads by product, weekly</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <ShareChart
+                  rows={view.share.rows}
+                  series={view.share.series}
+                  title={`Weekly share of downloads by product, ${rangeLabel}`}
+                />
+                <p className="text-muted-foreground text-xs">
+                  The five largest products in the period get their own band;
+                  the rest are "Other". Same counts as the leaderboard
+                  {excludesCharts(params) && ', chart polls excluded'}.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="flex flex-col gap-3">
             <SearchBox

@@ -45,6 +45,7 @@ pulse-dashboard/
 │   │   ├── PageHeader/    # title + description + controls row used by every page
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── WhatChanged/   # weekly strip: movers, releases, repos that went quiet (lib/changes.ts)
+│   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
 │   │   ├── Overview/      # / — filters, stat tiles, trend chart, searchable leaderboard

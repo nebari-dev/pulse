@@ -546,3 +546,89 @@ export function breakdownRows(
     .filter((r) => r.count > 0)
     .sort((a, b) => b.count - a.count);
 }
+
+// ---- share of the ecosystem --------------------------------------------------
+
+export interface ShareSeries {
+  key: string;
+  label: string;
+  color: string;
+}
+
+export interface ShareInput {
+  id: string;
+  name: string;
+  /** Used to give each product a stable hue: all-time downloads. */
+  rank: number;
+  series: Point[];
+}
+
+/** Hues for the top products; "Other" is drawn in the muted tone. */
+const SHARE_COLORS = [
+  'var(--chart-1)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'var(--chart-2)',
+];
+export const OTHER_KEY = 'other';
+
+/**
+ * Weekly share of the total per product for a 100% stacked chart. The top
+ * `top` products by downloads in [start, end] get their own band; the rest
+ * are summed into "Other". Each row carries `<id>` as a percentage and
+ * `<id>_n` as the count, for the tooltip. Hues follow each product's
+ * all-time rank, so a product keeps its color across ranges and filters as
+ * long as it is in the top group.
+ */
+export function shareRows(
+  products: ShareInput[],
+  start: string,
+  end: string,
+  top = SHARE_COLORS.length,
+): { rows: Array<Record<string, number | string>>; series: ShareSeries[] } {
+  const weekly = products.map((p) => ({
+    ...p,
+    weekly: bucketWeekly(fillDaily(between(p.series, start, end), start, end)),
+  }));
+  const inWindow = (p: (typeof weekly)[number]) => total(p.weekly);
+  const ranked = [...weekly].sort((a, b) => inWindow(b) - inWindow(a));
+  const shown = ranked.slice(0, top).filter((p) => inWindow(p) > 0);
+  const rest = ranked.filter((p) => !shown.includes(p));
+  const byHue = [...shown].sort((a, b) => b.rank - a.rank);
+  const series: ShareSeries[] = byHue.map((p, i) => ({
+    key: p.id,
+    label: p.name,
+    color: SHARE_COLORS[i % SHARE_COLORS.length],
+  }));
+  if (rest.some((p) => inWindow(p) > 0)) {
+    series.push({
+      key: OTHER_KEY,
+      label: 'Other',
+      color: 'var(--muted-foreground)',
+    });
+  }
+  // Legend and stack order: biggest first so the largest band sits at the bottom.
+  series.sort((a, b) => {
+    const at = (k: string) =>
+      k === OTHER_KEY
+        ? -1
+        : inWindow(weekly.find((p) => p.id === k) ?? weekly[0]);
+    return at(b.key) - at(a.key);
+  });
+
+  const weeks = weekly[0]?.weekly.map((p) => p.date) ?? [];
+  const rows = weeks.map((date, i) => {
+    const counts: Record<string, number> = {};
+    for (const p of shown) counts[p.id] = p.weekly[i]?.count ?? 0;
+    counts[OTHER_KEY] = rest.reduce((n, p) => n + (p.weekly[i]?.count ?? 0), 0);
+    const sum = Object.values(counts).reduce((a, b) => a + b, 0);
+    const row: Record<string, number | string> = { date };
+    for (const s of series) {
+      row[s.key] = sum ? (counts[s.key] / sum) * 100 : 0;
+      row[`${s.key}_n`] = counts[s.key];
+    }
+    return row;
+  });
+  return { rows, series };
+}

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { stubSummaryFetch } from '@/test/fixtures';
 import Overview from './Overview';
@@ -23,7 +23,7 @@ describe('Overview', () => {
 
   it('shows totals and every product once data loads', async () => {
     renderOverview();
-    // In the leaderboard and again in the what-changed strip.
+    // In the leaderboard, the what-changed strip and the share chart legend.
     expect(await screen.findAllByText('Nebari Operator')).not.toHaveLength(0);
     expect(screen.getByText('Chat Pack')).toBeInTheDocument();
     // operator 550 + nic 6 + 15 = 571 over the 90d window; Chat Pack's 10
@@ -42,6 +42,17 @@ describe('Overview', () => {
     expect(strip).not.toHaveTextContent('v1.1.0');
   });
 
+  it("charts each product's share of the weekly total", async () => {
+    renderOverview();
+    const figure = await screen.findByRole('figure', {
+      name: /Weekly share of downloads by product/,
+    });
+    expect(figure).toHaveTextContent('Nebari Operator');
+    expect(figure).toHaveTextContent('Nebari Infrastructure Core');
+    // Chat Pack only has chart pulls, which the headline leaves out.
+    expect(figure).not.toHaveTextContent('Chat Pack');
+  });
+
   it('filters by kind and source from the URL', async () => {
     renderOverview('/?kind=pack&source=quay');
     expect(await screen.findByText('Chat Pack')).toBeInTheDocument();
@@ -51,7 +62,10 @@ describe('Overview', () => {
 
   it('stacks the chart by artifact type and filters by type', async () => {
     const first = renderOverview();
-    const legend = await screen.findByRole('list', { name: 'Legend' });
+    const trend = await screen.findByRole('figure', {
+      name: /Daily downloads, 90 days/,
+    });
+    const legend = within(trend).getByRole('list', { name: 'Legend' });
     expect(legend).toHaveTextContent('Images');
     expect(legend).toHaveTextContent('Helm charts');
     expect(legend).toHaveTextContent('Packages');
