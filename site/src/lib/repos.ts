@@ -28,7 +28,7 @@ export interface ReleaseWithRepo extends Release {
 
 /** Every release of a product across its repos, newest first. */
 export function productReleases(
-  product: Product,
+  product: Pick<Product, 'repos'>,
   { includePrereleases = false } = {},
 ): ReleaseWithRepo[] {
   return product.repos

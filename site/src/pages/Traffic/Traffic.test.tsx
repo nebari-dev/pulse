@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { chatPack, stubSummaryFetch, summary } from '@/test/fixtures';
+import { chatPack, stubSummaryFetch } from '@/test/fixtures';
 import Traffic from './Traffic';
 
 function renderPage(url = '/traffic') {
@@ -42,11 +42,7 @@ describe('Traffic', () => {
   });
 
   it('explains the token requirement when nothing has traffic', async () => {
-    stubSummaryFetch({
-      ...summary,
-      products: [chatPack],
-      repos: { count: 0, traffic: 0 },
-    });
+    stubSummaryFetch([chatPack]);
     renderPage();
     expect(await screen.findByText('No traffic data yet.')).toBeInTheDocument();
     expect(screen.getByText('PULSE_GITHUB_TOKEN')).toBeInTheDocument();

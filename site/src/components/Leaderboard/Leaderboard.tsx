@@ -17,12 +17,12 @@ import {
   type Comparison,
   KIND_LABEL,
   type Point,
-  type Product,
+  type ProductBase,
 } from '@/lib/summary';
 import { cn } from '@/lib/utils';
 
 export interface LeaderboardRow {
-  product: Product;
+  product: ProductBase;
   comparison: Comparison;
   /** Share of the grand total in the window, 0..1. */
   share: number;

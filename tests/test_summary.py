@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from pathlib import Path
 
@@ -167,3 +168,60 @@ def test_repos_health_releases_traffic(tmp_path: Path):
         {"date": "2026-10-22", "views": 10, "unique_views": 4, "clones": 2, "unique_clones": 1}
     ]
     assert out["repos"] == {"count": 1, "traffic": 1}
+
+
+def test_write_all_splits_index_repos_and_products(tmp_path: Path):
+    cfg = _cfg(
+        [
+            {"id": "p", "quay": ["ns/img", "ns/charts/c"], "repos": ["o/r"]},
+            {"id": "q", "pypi": ["q"]},
+        ]
+    )
+    for ref, rows in {
+        "ns/img": [{"date": "2026-10-20", "count": 1}, {"date": "2026-10-22", "count": 2}],
+        "ns/charts/c": [{"date": "2026-10-22", "count": 5}],
+    }.items():
+        store.upsert(
+            store.path_for(tmp_path, "downloads", "quay", ref), ["date", "count"], ["date"], rows
+        )
+    (tmp_path / "products").mkdir()
+    (tmp_path / "products" / "gone.json").write_text("{}")  # removed product
+
+    full = summary.build(cfg, tmp_path, TODAY)
+    written = summary.write_all(full, tmp_path)
+    assert [w.name for w in written] == ["summary.json", "repos.json", "p.json", "q.json"]
+    assert not (tmp_path / "products" / "gone.json").exists()
+
+    index = json.loads((tmp_path / "summary.json").read_text())
+    assert [p["id"] for p in index["products"]] == ["p", "q"]
+    p = index["products"][0]
+    assert "artifacts" not in p and "repos" not in p
+    # Images and charts are separate groups; the image group spans both dates.
+    assert p["groups"] == [
+        {
+            "source": "quay",
+            "kind": "image",
+            "artifacts": 1,
+            "since": "2026-10-20",
+            "series": [{"date": "2026-10-20", "count": 1}, {"date": "2026-10-22", "count": 2}],
+        },
+        {
+            "source": "quay",
+            "kind": "chart",
+            "artifacts": 1,
+            "since": "2026-10-22",
+            "series": [{"date": "2026-10-22", "count": 5}],
+        },
+    ]
+    assert index["products"][1]["groups"][0]["since"] is None
+
+    repos = json.loads((tmp_path / "repos.json").read_text())
+    assert repos["products"][0]["repos"][0]["repo"] == "o/r"
+    assert "groups" not in repos["products"][0]
+
+    product = json.loads((tmp_path / "products" / "p.json").read_text())
+    assert product["generated_at"] == TODAY.isoformat()
+    assert [a["ref"] for a in product["artifacts"]] == ["ns/img", "ns/charts/c"]
+    assert product["repos"][0]["repo"] == "o/r"
+    # Compact: no indentation in the files the browser fetches.
+    assert "\n " not in (tmp_path / "summary.json").read_text()

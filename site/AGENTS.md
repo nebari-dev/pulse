@@ -36,7 +36,7 @@ pulse-dashboard/
 │   │   ├── repos.ts       # release cadence, repo health and traffic helpers
 │   │   └── format.ts
 │   ├── hooks/
-│   │   ├── useSummary.ts         # TanStack Query over /data/summary.json
+│   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id) over /data/*.json
 │   │   ├── useDashboardParams.ts # range/kind/type/source filters + search (q) in the URL
 │   ├── components/
 │   │   ├── ui/            # Nebari components (installed via shadcn — managed)
@@ -149,11 +149,22 @@ curl -s https://nebari-dev.github.io/nebari-design/r/registry.json   # list the 
 
 ## Data and state
 
-The only data source is `../data/summary.json`, written by the Python
-collector (see the root README for its shape). `useSummary()` loads it once;
-everything on screen is derived in `useMemo` from `src/lib/summary.ts`
-helpers, always from artifact-level series so the source and type filters
-stay consistent.
+The only data source is the JSON the Python collector writes under
+`../data/` (shapes in `nebari_pulse/summary.py`, types in `src/lib/summary.ts`):
+
+| File | Hook | Page |
+| --- | --- | --- |
+| `summary.json` | `useSummary()` | Downloads: products with series grouped by source and type |
+| `repos.json` | `useRepos()` | Releases, Repos, Traffic |
+| `products/<id>.json` | `useProduct(id)` | one product in full; `null` on 404 |
+
+Each is fetched once and never refetched. Everything on screen is derived
+in `useMemo` from `src/lib/summary.ts` helpers, from the finest series the
+page has (index groups or a product's artifacts), so the source and type
+filters stay consistent. The product page also reads the index so its
+window and "as of" match the Downloads page. Tests stub `fetch` with
+`stubSummaryFetch(products)` from `src/test/fixtures.ts`, which derives all
+three files from full product fixtures the way the collector does.
 
 | State type                                      | Where it lives                             |
 | ----------------------------------------------- | ------------------------------------------ |

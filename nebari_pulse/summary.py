@@ -1,41 +1,60 @@
-"""Build data/summary.json, the contract the dashboard reads.
+"""Build the dashboard's data files from data/.
 
-Shape:
+`build()` assembles one full dict; `write_all()` splits it into the files
+the dashboard fetches, so a page loads only what it shows:
+
+    data/summary.json           index: every product with totals and its
+                                series grouped by (source, artifact kind).
+                                The Downloads page needs nothing else.
+    data/repos.json             every product's GitHub repos: health,
+                                traffic, releases. Releases/Repos/Traffic.
+    data/products/<id>.json     one product in full: every artifact with
+                                its own series and latest items, plus repos.
+
+Full product shape (products/<id>.json, and the entries `build()` returns):
     {
-      "generated_at": "YYYY-MM-DD" (collection date, UTC),
-      "sources": {<source>: {"kind": "daily"|"cumulative", "artifacts": N}},
-      "products": [
-        {
-          "id", "name", "kind",
-          "totals": {"7d": N, "30d": N, "90d": N, "all": N},
-          "series": [{"date": "YYYY-MM-DD", "count": N}, ...],   # daily, summed
-          "artifacts": [
-            {"source", "ref", "totals": {...}, "latest_cumulative": N|null,
-             "latest_items": [{<key cols>..., "cumulative": N,
-                               "totals": {"7d", "30d", "90d", "all"}}] | null,
-             "series": [...]}
-          ],
-          "repos": [
-            {"repo": "owner/name",
-             "health": {<latest health snapshot>} | null,
-             "health_series": [{"date", "stars", "open_issues", "open_prs"}],
-             "traffic": [{"date", "views", "unique_views", "clones", "unique_clones"}],
-             "releases": [{"tag", "date", "prerelease"}]}   # newest first
-          ]
-        }
+      "generated_at": "YYYY-MM-DD",
+      "id", "name", "kind",
+      "totals": {"7d": N, "30d": N, "90d": N, "all": N},
+      "series": [{"date": "YYYY-MM-DD", "count": N}, ...],   # daily, summed
+      "artifacts": [
+        {"source", "ref", "kind", "totals": {...}, "latest_cumulative": N|null,
+         "latest_items": [{<key cols>..., "cumulative": N,
+                           "totals": {"7d", "30d", "90d", "all"}}] | null,
+         "series": [...]}
       ],
-      "repos": {"count": N, "traffic": N}   # repos tracked / with traffic data
+      "repos": [
+        {"repo": "owner/name",
+         "health": {<latest health snapshot>} | null,
+         "health_series": [{"date", "stars", "open_issues", "open_prs"}],
+         "traffic": [{"date", "views", "unique_views", "clones", "unique_clones"}],
+         "releases": [{"tag", "date", "prerelease"}]}   # newest first
+      ]
     }
 
-Per-item totals on cumulative artifacts are the same snapshot deltas,
-kept per version/tag so the dashboard can show which releases people
-install today (version adoption), not just all-time counters.
+Index shape (summary.json):
+    {
+      "generated_at", "sources": {<source>: {"kind", "artifacts": N}},
+      "repos": {"count": N, "traffic": N},
+      "products": [
+        {"id", "name", "kind", "totals",
+         "groups": [{"source", "kind", "artifacts": N,
+                     "since": "YYYY-MM-DD"|null, "series": [...]}]}
+      ]
+    }
+
+Repos shape (repos.json): {"generated_at", "products": [{"id", "name",
+"kind", "repos": [...]}]}.
 
 Daily sources (quay, pypi) contribute their rows directly. Cumulative
 sources (conda, github_releases) contribute the day-over-day delta
 between snapshots, attributed to the later snapshot date; the first
 snapshot of an item contributes nothing. "all" is the sum of every
-daily count we hold, so it grows as history accumulates.
+daily count we hold, so it grows as history accumulates. Per-item totals
+on cumulative artifacts are the same deltas kept per version/tag, so the
+dashboard can show which releases people install today.
+
+The TypeScript types in site/src/lib/summary.ts mirror these shapes.
 """
 
 from __future__ import annotations
@@ -185,9 +204,88 @@ def artifact_kind(source: str, ref: str) -> str:
     return "binary"
 
 
-def write(summary: dict, path: Path) -> None:
+INDEX_FILE = "summary.json"
+REPOS_FILE = "repos.json"
+PRODUCTS_DIR = "products"
+
+
+def write_all(summary: dict, data_dir: Path) -> list[Path]:
+    """Write the index, the repos file and one file per product. Product
+    files for ids no longer in the config are removed. Returns the paths."""
+    written: list[Path] = []
+    written.append(_write(data_dir / INDEX_FILE, index_of(summary)))
+    written.append(_write(data_dir / REPOS_FILE, repos_of(summary)))
+    products_dir = data_dir / PRODUCTS_DIR
+    products_dir.mkdir(parents=True, exist_ok=True)
+    keep = set()
+    for product in summary["products"]:
+        path = products_dir / f"{product['id']}.json"
+        keep.add(path.name)
+        written.append(_write(path, {"generated_at": summary["generated_at"], **product}))
+    for stale in products_dir.glob("*.json"):
+        if stale.name not in keep:
+            stale.unlink()
+    return written
+
+
+def index_of(summary: dict) -> dict:
+    return {
+        "generated_at": summary["generated_at"],
+        "sources": summary["sources"],
+        "repos": summary["repos"],
+        "products": [
+            {
+                "id": p["id"],
+                "name": p["name"],
+                "kind": p["kind"],
+                "totals": p["totals"],
+                "groups": _groups(p["artifacts"]),
+            }
+            for p in summary["products"]
+        ],
+    }
+
+
+def repos_of(summary: dict) -> dict:
+    return {
+        "generated_at": summary["generated_at"],
+        "products": [
+            {"id": p["id"], "name": p["name"], "kind": p["kind"], "repos": p["repos"]}
+            for p in summary["products"]
+        ],
+    }
+
+
+def _groups(artifacts: list[dict]) -> list[dict]:
+    """Artifact series summed per (source, kind), in first-seen order. `since`
+    is the earliest date any artifact in the group has data for, which is
+    what the dashboard needs to judge whether a previous period is covered."""
+    groups: dict[tuple[str, str], dict] = {}
+    for a in artifacts:
+        key = (a["source"], a["kind"])
+        g = groups.setdefault(
+            key,
+            {"source": a["source"], "kind": a["kind"], "artifacts": 0, "since": None, "_s": {}},
+        )
+        g["artifacts"] += 1
+        if a["series"]:
+            first = a["series"][0]["date"]
+            g["since"] = first if g["since"] is None else min(g["since"], first)
+        for pt in a["series"]:
+            g["_s"][pt["date"]] = g["_s"].get(pt["date"], 0) + pt["count"]
+    out = []
+    for g in groups.values():
+        series = g.pop("_s")
+        out.append({**g, "series": _as_list(series)})
+    return out
+
+
+def _write(path: Path, payload: dict) -> Path:
+    """Compact JSON: these files are fetched by the browser, never read by
+    people, and whitespace was ~40% of the old pretty-printed file."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(summary, indent=1, sort_keys=False) + "\n")
+    path.write_text(json.dumps(payload, separators=(",", ":"), sort_keys=False) + "\n")
+    return path
 
 
 def _daily_series(rows: list[store.Row]) -> Series:

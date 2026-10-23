@@ -3,7 +3,7 @@
 pulse collect [--only quay,pypi] [--dry-run]   fetch sources, upsert data/, rebuild summary
                                                 (sources: quay, pypi, conda, github_releases,
                                                  github_repos)
-pulse summarize                                 rebuild data/summary.json from data/ only
+pulse summarize                                 rebuild summary.json, repos.json, products/
 pulse check                                     validate sources.yaml
 """
 
@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     p_collect.add_argument(
         "--dry-run", action="store_true", help="fetch into a temp dir; leave data/ untouched"
     )
-    sub.add_parser("summarize", help="rebuild data/summary.json without fetching")
+    sub.add_parser("summarize", help="rebuild the dashboard data files without fetching")
     sub.add_parser("check", help="validate sources.yaml")
 
     args = parser.parse_args(argv)
@@ -134,9 +134,11 @@ def _collect(cfg: config.DownloadsConfig, args: argparse.Namespace, today) -> in
 
 
 def _summarize(cfg: config.DownloadsConfig, data_dir: Path, today) -> None:
-    out = data_dir / "summary.json"
-    summary.write(summary.build(cfg, data_dir, today), out)
-    print(f"wrote {out}")
+    written = summary.write_all(summary.build(cfg, data_dir, today), data_dir)
+    print(
+        f"wrote {data_dir / summary.INDEX_FILE}, {data_dir / summary.REPOS_FILE} and "
+        f"{len(written) - 2} product files under {data_dir / summary.PRODUCTS_DIR}/"
+    )
 
 
 if __name__ == "__main__":

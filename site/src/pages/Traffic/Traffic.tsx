@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
-import { useSummary } from '@/hooks/useSummary';
+import { useRepos } from '@/hooks/useSummary';
 import { formatCompact, formatDate, formatNumber } from '@/lib/format';
 import {
   laterDate,
@@ -44,13 +44,13 @@ import {
   matchesKind,
   matchesQuery,
   type Point,
-  type Product,
+  type ProductRepos,
   type Repo,
-  type Summary,
+  type ReposFile,
 } from '@/lib/summary';
 
 interface Row {
-  product: Product;
+  product: ProductRepos;
   repo: Repo;
   views: number;
   uniqueViews: number;
@@ -89,7 +89,7 @@ const CHARTS: Array<{
 /** GitHub keeps 14 days; the headline compares the latest two weeks. */
 const WINDOW = 14;
 
-function useTraffic(summary: Summary | undefined) {
+function useTraffic(summary: ReposFile | undefined) {
   const [params, setParams] = useDashboardParams();
   const view = useMemo(() => {
     if (!summary) return null;
@@ -162,7 +162,7 @@ function compareRows(a: Row, b: Row, key: SortKey) {
 }
 
 function Traffic() {
-  const { data, error, isPending } = useSummary();
+  const { data, error, isPending } = useRepos();
   const { params, setParams, view } = useTraffic(data);
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
     key: 'uniqueClones',

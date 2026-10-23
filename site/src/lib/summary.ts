@@ -1,8 +1,17 @@
 /**
- * Types and pure helpers for data/summary.json (the collector's contract).
- * Everything the dashboard shows is derived here from artifact-level series,
- * so a source filter recomputes product totals instead of trusting the
- * pre-aggregated product series.
+ * Types and pure helpers for the collector's files (its contract, mirrored
+ * from nebari_pulse/summary.py):
+ *
+ *   /data/summary.json        Summary: products with series grouped by
+ *                             (source, artifact kind). Enough for the
+ *                             Downloads page and its filters.
+ *   /data/repos.json          ReposFile: every product's GitHub repos.
+ *   /data/products/<id>.json  ProductDetail: one product with every
+ *                             artifact's own series and latest items.
+ *
+ * Everything on screen is derived from series at the finest level the
+ * page has (groups on the index, artifacts on a product), so a source or
+ * type filter recomputes totals instead of trusting a pre-aggregated one.
  */
 
 export const SOURCES = ['quay', 'pypi', 'conda', 'github_releases'] as const;
@@ -71,14 +80,27 @@ export interface LatestItem {
   [column: string]: string | number | Totals | undefined;
 }
 
-export interface Artifact {
+/** The least a series needs to be filtered and summed: where it comes from
+ * and what one count is. Artifacts and index groups both satisfy it. */
+export interface Countable {
   source: Source;
-  ref: string;
   kind: ArtifactKind;
+  series: Point[];
+}
+
+export interface Artifact extends Countable {
+  ref: string;
   totals: Totals;
   latest_cumulative: number | null;
   latest_items: LatestItem[] | null;
-  series: Point[];
+}
+
+/** Artifacts of one product summed per (source, kind), as in the index. */
+export interface ArtifactGroup extends Countable {
+  /** How many artifacts the group sums. */
+  artifacts: number;
+  /** Earliest date any artifact in the group has data for, or null. */
+  since: string | null;
 }
 
 /** Latest daily snapshot of a GitHub repo. Blank upstream answers are null. */
@@ -125,22 +147,44 @@ export interface Repo {
   releases: Release[];
 }
 
-export interface Product {
+export interface ProductBase {
   id: string;
   name: string;
   kind: Kind;
+}
+
+/** One product in full (products/<id>.json). */
+export interface Product extends ProductBase {
   totals: Totals;
   series: Point[];
   artifacts: Artifact[];
   repos: Repo[];
 }
+export interface ProductDetail extends Product {
+  generated_at: string;
+}
+
+/** A product as the index lists it (summary.json). */
+export interface ProductIndex extends ProductBase {
+  totals: Totals;
+  groups: ArtifactGroup[];
+}
 
 export interface Summary {
   generated_at: string;
   sources: Record<string, { kind: 'daily' | 'cumulative'; artifacts: number }>;
-  products: Product[];
+  products: ProductIndex[];
   /** Repos tracked, and how many of them have traffic data. */
   repos: { count: number; traffic: number };
+}
+
+/** A product with only its repos (repos.json). */
+export interface ProductRepos extends ProductBase {
+  repos: Repo[];
+}
+export interface ReposFile {
+  generated_at: string;
+  products: ProductRepos[];
 }
 
 export const RANGES = ['30d', '90d', '1y', 'all'] as const;
@@ -229,8 +273,8 @@ export function bucketWeekly(series: Point[]): Point[] {
 export function latestDate(summary: Summary): string {
   let max = '';
   for (const p of summary.products) {
-    for (const a of p.artifacts) {
-      const last = a.series.at(-1);
+    for (const g of p.groups) {
+      const last = g.series.at(-1);
       if (last && last.date > max) max = last.date;
     }
   }
@@ -240,9 +284,8 @@ export function latestDate(summary: Summary): string {
 export function earliestDate(summary: Summary): string {
   let min = '';
   for (const p of summary.products) {
-    for (const a of p.artifacts) {
-      const first = a.series[0];
-      if (first && (!min || first.date < min)) min = first.date;
+    for (const g of p.groups) {
+      if (g.since && (!min || g.since < min)) min = g.since;
     }
   }
   return min || summary.generated_at;
@@ -261,7 +304,7 @@ export function windowFor(
 
 // ---- products --------------------------------------------------------------
 
-export function matchesKind(product: Product, kind: KindFilter): boolean {
+export function matchesKind(product: ProductBase, kind: KindFilter): boolean {
   return kind === 'all' || product.kind === kind;
 }
 
@@ -270,11 +313,12 @@ export interface ArtifactFilter {
   type: ArtifactKindFilter;
 }
 
-export function artifactsOf(
-  product: Product,
+/** The artifacts (or index groups) a source/type filter keeps. */
+export function artifactsOf<T extends Countable>(
+  items: T[],
   { source, type }: ArtifactFilter,
-): Artifact[] {
-  return product.artifacts.filter(
+): T[] {
+  return items.filter(
     (a) =>
       (source === 'all' || a.source === source) &&
       (type === 'all' || a.kind === type),
@@ -282,10 +326,10 @@ export function artifactsOf(
 }
 
 export function productSeries(
-  product: Product,
+  items: Countable[],
   filter: ArtifactFilter,
 ): Point[] {
-  return sumSeries(artifactsOf(product, filter).map((a) => a.series));
+  return sumSeries(artifactsOf(items, filter).map((a) => a.series));
 }
 
 /**
@@ -294,10 +338,10 @@ export function productSeries(
  * continuously, so they dominate totals while saying nothing about
  * adoption. Selecting the chart type explicitly still shows them.
  */
-export function headlineArtifacts(
-  artifacts: Artifact[],
+export function headlineArtifacts<T extends Countable>(
+  artifacts: T[],
   filter: ArtifactFilter,
-): Artifact[] {
+): T[] {
   return filter.type === 'all'
     ? artifacts.filter((a) => a.kind !== 'chart')
     : artifacts;
@@ -346,14 +390,14 @@ export function compare(
  * show up as a spurious jump. `current` still counts every artifact.
  */
 export function compareArtifacts(
-  artifacts: Artifact[],
+  artifacts: Countable[],
   start: string,
   end: string,
 ): Comparison {
   const days = diffDays(start, end) + 1;
   const prevStart = addDays(start, -days);
   const prevEnd = addDays(start, -1);
-  const sum = (list: Artifact[], from: string, to: string) =>
+  const sum = (list: Countable[], from: string, to: string) =>
     list.reduce((acc, a) => acc + total(between(a.series, from, to)), 0);
   const covered = artifacts.filter(
     (a) => a.series.length > 0 && a.series[0].date <= prevStart,
