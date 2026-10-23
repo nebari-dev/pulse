@@ -214,7 +214,8 @@ function Docs() {
         onChange={(q) => setParams({ q })}
         label="Search pages"
       />
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* One full-width table per site, so paths stay readable. */}
+      <div className="flex flex-col gap-6">
         {view.sites.map((site) => {
           const rows = site.top_pages.filter((p) =>
             matchesQuery(params.q, p.path),
@@ -230,7 +231,7 @@ function Docs() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Path</TableHead>
-                      <TableHead className="w-1/3">Share</TableHead>
+                      <TableHead className="w-1/2">Share</TableHead>
                       <TableHead className="text-right">Page views</TableHead>
                     </TableRow>
                   </TableHeader>

@@ -123,7 +123,9 @@ unique cloners and shows totals second.
 ### Documentation
 
 Sites are listed under `docs` in `sources.yaml` with the hostnames that
-serve them; all are on the `nebari.dev` Cloudflare zone.
+serve them: the Nebari docs (`nebari.dev`, `www.nebari.dev`), the Classic
+docs (`classic.nebari.dev`) and the Software Packs docs
+(`packs.nebari.dev`). All are on the `nebari.dev` Cloudflare zone.
 
 **Traffic** (`docs/traffic/<site>.csv`, `date,host,pageviews,visits`)
 HTML responses with status 200 to real browsers (`requestSource:

@@ -280,3 +280,6 @@ docs:
     - id: classic-docs
       name: Nebari Classic docs
       hosts: [classic.nebari.dev]
+    - id: packs-docs
+      name: Software Packs docs
+      hosts: [packs.nebari.dev]

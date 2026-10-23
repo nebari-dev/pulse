@@ -17,7 +17,7 @@ def test_real_sources_yaml_loads():
     repos = dict((r, p.id) for p, r in cfg.downloads.repos())
     assert repos["nebari-dev/nebari"] == "nebari-classic"
     assert cfg.docs.cloudflare_zone == "nebari.dev"
-    assert [s.id for s in cfg.docs.sites] == ["docs", "classic-docs"]
+    assert [s.id for s in cfg.docs.sites] == ["docs", "classic-docs", "packs-docs"]
 
 
 def test_duplicate_ref_rejected():
