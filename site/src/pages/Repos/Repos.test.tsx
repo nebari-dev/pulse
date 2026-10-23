@@ -28,7 +28,11 @@ describe('Repos', () => {
       await screen.findByRole('link', { name: /nebari-operator/ })
     ).closest('tr') as HTMLElement;
     expect(within(row).getByText('42')).toBeInTheDocument(); // stars
-    expect(within(row).getByText('+2')).toBeInTheDocument(); // gained
+    // 30 stars on Sep 11, 42 on Oct 11: +12 in the 30-day window.
+    expect(within(row).getByText('+12')).toBeInTheDocument();
+    expect(
+      within(row).getByRole('img', { name: /stars, last 90 days/ }),
+    ).toBeInTheDocument();
     expect(within(row).getByText('12')).toBeInTheDocument(); // open issues
     expect(within(row).getByText('2 days ago')).toBeInTheDocument();
     // NIC has a repo but no health snapshot yet: dashes, not zeros.
@@ -36,7 +40,9 @@ describe('Repos', () => {
       .getByRole('link', { name: /nebari-infrastructure-core/ })
       .closest('tr') as HTMLElement;
     expect(within(nic).getAllByText('—').length).toBeGreaterThan(3);
-    expect(screen.getByText('across 1 repos')).toBeInTheDocument();
+    expect(
+      screen.getByText('across 1 repos, +12 in 30 days'),
+    ).toBeInTheDocument();
   });
 
   it('filters by search', async () => {

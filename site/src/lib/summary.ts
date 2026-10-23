@@ -132,6 +132,12 @@ export interface TrafficPoint {
   unique_clones: number;
 }
 
+/** Cumulative stars as of a date; only dates where the count changed. */
+export interface StarPoint {
+  date: string;
+  stars: number;
+}
+
 export interface Release {
   tag: string;
   date: string; // YYYY-MM-DD
@@ -143,6 +149,8 @@ export interface Repo {
   health: RepoHealth | null;
   health_series: HealthPoint[];
   traffic: TrafficPoint[];
+  /** Oldest first; backfilled from the stargazers API, then daily. */
+  stars_series: StarPoint[];
   /** Newest first. */
   releases: Release[];
 }

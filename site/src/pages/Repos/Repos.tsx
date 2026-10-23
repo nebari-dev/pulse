@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
+import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
 import {
   Select,
@@ -28,13 +29,15 @@ import {
   healthTotals,
   repoName,
   repoUrl,
-  starsDelta,
+  starsGained,
+  starsPoints,
 } from '@/lib/repos';
 import {
   KIND_LABEL,
   type KindFilter,
   matchesKind,
   matchesQuery,
+  type Point,
   type ProductRepos,
   type Repo,
   type ReposFile,
@@ -46,6 +49,8 @@ interface Row {
   product: ProductRepos;
   repo: Repo;
   starsGained: number | null;
+  /** Cumulative stars per day over the last 90 days, for the sparkline. */
+  starsTrend: Point[];
   pushAge: number | null;
 }
 
@@ -70,23 +75,25 @@ function useRepos(summary: ReposFile | undefined) {
     if (!summary) return null;
     const asOf = summary.generated_at;
     const { start } = windowFor('30d', asOf, '1970-01-01');
+    const { start: trendStart } = windowFor('90d', asOf, '1970-01-01');
     const rows: Row[] = summary.products
       .filter((p) => matchesKind(p, params.kind))
       .flatMap((product) =>
         product.repos.map((repo) => ({
           product,
           repo,
-          starsGained: starsDelta(repo, start),
+          starsGained: starsGained(repo, start, asOf),
+          starsTrend:
+            repo.stars_series.length > 0
+              ? starsPoints([repo], trendStart, asOf)
+              : [],
           pushAge: daysSincePush(repo, asOf),
         })),
       );
     const totals = healthTotals(rows.map((r) => r.repo));
     const quiet = rows.filter((r) => (r.pushAge ?? 0) > 90).length;
-    const snapshots = Math.max(
-      ...rows.map((r) => r.repo.health_series.length),
-      0,
-    );
-    return { asOf, rows, totals, quiet, snapshots };
+    const gained = rows.reduce((n, r) => n + (r.starsGained ?? 0), 0);
+    return { asOf, rows, totals, quiet, gained };
   }, [summary, params.kind]);
   return { params, setParams, view };
 }
@@ -226,7 +233,7 @@ function Repos() {
             <StatTile
               label="Stars"
               value={formatNumber(view.totals.stars)}
-              hint={`across ${view.totals.repos} repos`}
+              hint={`across ${view.totals.repos} repos, ${view.gained >= 0 ? '+' : ''}${formatNumber(view.gained)} in 30 days`}
             />
             <StatTile
               label="Open issues"
@@ -256,76 +263,86 @@ function Repos() {
                 {head('prs', 'Open PRs', RIGHT)}
                 {head('merged', 'Merged, 30d', RIGHT)}
                 {head('push', 'Last push')}
+                <TableHead>Stars, 90d</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-muted-foreground">
+                  <TableCell colSpan={9} className="text-muted-foreground">
                     {params.q
                       ? `No repos match "${params.q}".`
                       : 'No repos tracked yet.'}
                   </TableCell>
                 </TableRow>
               )}
-              {rows.map(({ product, repo, starsGained, pushAge }) => (
-                <TableRow key={repo.repo}>
-                  <TableCell className="font-medium">
-                    <a
-                      href={repoUrl(repo.repo)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                      title={repo.repo}
+              {rows.map(
+                ({ product, repo, starsGained, starsTrend, pushAge }) => (
+                  <TableRow key={repo.repo}>
+                    <TableCell className="font-medium">
+                      <a
+                        href={repoUrl(repo.repo)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                        title={repo.repo}
+                      >
+                        {repoName(repo.repo)}
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                      </a>
+                    </TableCell>
+                    <TableCell>
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="text-muted-foreground underline-offset-4 hover:underline"
+                      >
+                        {product.name}
+                      </Link>
+                      <span className="sr-only">
+                        {' '}
+                        ({KIND_LABEL[product.kind]})
+                      </span>
+                    </TableCell>
+                    <Cell value={repo.health?.stars} />
+                    <TableCell
+                      className={cn(
+                        'text-right tabular-nums',
+                        starsGained === null && 'text-muted-foreground',
+                      )}
                     >
-                      {repoName(repo.repo)}
-                      <ExternalLink className="size-3" aria-hidden="true" />
-                    </a>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="text-muted-foreground underline-offset-4 hover:underline"
+                      {starsGained === null
+                        ? '—'
+                        : `${starsGained > 0 ? '+' : ''}${starsGained}`}
+                    </TableCell>
+                    <Cell value={repo.health?.open_issues} />
+                    <Cell value={repo.health?.open_prs} />
+                    <Cell value={repo.health?.merged_prs_30d} />
+                    <TableCell
+                      className={cn(
+                        'tabular-nums',
+                        (pushAge ?? 0) > 90 && 'text-destructive-foreground',
+                      )}
+                      title={repo.health?.pushed_at ?? undefined}
                     >
-                      {product.name}
-                    </Link>
-                    <span className="sr-only">
-                      {' '}
-                      ({KIND_LABEL[product.kind]})
-                    </span>
-                  </TableCell>
-                  <Cell value={repo.health?.stars} />
-                  <TableCell
-                    className={cn(
-                      'text-right tabular-nums',
-                      starsGained === null && 'text-muted-foreground',
-                    )}
-                  >
-                    {starsGained === null
-                      ? '—'
-                      : `${starsGained > 0 ? '+' : ''}${starsGained}`}
-                  </TableCell>
-                  <Cell value={repo.health?.open_issues} />
-                  <Cell value={repo.health?.open_prs} />
-                  <Cell value={repo.health?.merged_prs_30d} />
-                  <TableCell
-                    className={cn(
-                      'tabular-nums',
-                      (pushAge ?? 0) > 90 && 'text-destructive-foreground',
-                    )}
-                    title={repo.health?.pushed_at ?? undefined}
-                  >
-                    {formatAgo(pushAge)}
-                  </TableCell>
-                </TableRow>
-              ))}
+                      {formatAgo(pushAge)}
+                    </TableCell>
+                    <TableCell>
+                      {starsTrend.length > 0 && (
+                        <Sparkline
+                          points={starsTrend}
+                          label={`${repo.repo} stars, last 90 days`}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ),
+              )}
             </TableBody>
           </Table>
           <p className="text-muted-foreground text-xs">
             Snapshot taken {formatDate(view.asOf, true)}. "+30d" is stars gained
-            since the first snapshot in the last 30 days
-            {view.snapshots < 2 && ' and needs a second day of data'}. Repos
-            with no push in 90 days are marked.
+            in the last 30 days, from each star's own timestamp. Repos with no
+            push in 90 days are marked.
           </p>
         </>
       )}

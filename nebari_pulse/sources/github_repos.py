@@ -11,6 +11,10 @@ Three families of CSV under data/repos/:
                         only 14 days, so the history exists because we
                         snapshot it. Needs push access to the repo
                         (PULSE_GITHUB_TOKEN); otherwise skipped with a note.
+    stars/<repo>.csv    cumulative stars per date. Backfilled once from the
+                        stargazers API (which gives a timestamp per star),
+                        then kept current from the daily health snapshot so
+                        unstars are reflected too.
 """
 
 from __future__ import annotations
@@ -42,6 +46,8 @@ HEALTH_COLUMNS = [
 ]
 RELEASE_COLUMNS = ["tag", "published_at", "prerelease"]
 TRAFFIC_COLUMNS = ["date", "views", "unique_views", "clones", "unique_clones"]
+STARS_COLUMNS = ["date", "stars"]
+STAR_HEADERS = {"Accept": "application/vnd.github.star+json"}
 
 # GraphQL aliases must be identifiers; one per repo, position-based.
 REPO_FRAGMENT = """
@@ -68,9 +74,10 @@ def collect(cfg: DownloadsConfig, data_dir: Path, today: date) -> CollectResult:
         return result
     repos = [repo for _, repo in pairs]
 
-    _collect_health(repos, data_dir, today, result)
+    stars_today = _collect_health(repos, data_dir, today, result)
     _collect_releases(repos, data_dir, result)
     _collect_traffic(repos, data_dir, today, result)
+    _collect_stars(repos, data_dir, today, stars_today, result)
     result.artifacts = len(repos)
     return result
 
@@ -78,10 +85,14 @@ def collect(cfg: DownloadsConfig, data_dir: Path, today: date) -> CollectResult:
 # ---- health -----------------------------------------------------------------
 
 
-def _collect_health(repos: list[str], data_dir: Path, today: date, result: CollectResult) -> None:
+def _collect_health(
+    repos: list[str], data_dir: Path, today: date, result: CollectResult
+) -> dict[str, int]:
+    """Snapshot every repo; returns today's star count per repo for the stars file."""
+    stars: dict[str, int] = {}
     if not github_token():
         result.errors.append("health: GITHUB_TOKEN not set; GraphQL needs a token")
-        return
+        return stars
     since = (today - timedelta(days=30)).isoformat()
     for start in range(0, len(repos), BATCH):
         batch = repos[start : start + BATCH]
@@ -113,7 +124,9 @@ def _collect_health(repos: list[str], data_dir: Path, today: date, result: Colle
             }
             path = store.path_for(data_dir, "repos", "health", repo)
             result.rows_changed += store.upsert(path, HEALTH_COLUMNS, ["date"], [row])
+            stars[repo] = int(node["stargazerCount"])
             log.info("health %s: %s stars, %s open issues", repo, row["stars"], row["open_issues"])
+    return stars
 
 
 def _fragment(i: int, repo: str, since: str) -> str:
@@ -191,3 +204,55 @@ def _collect_traffic(repos: list[str], data_dir: Path, today: date, result: Coll
             len(denied),
             ", ".join(denied),
         )
+
+
+# ---- stars -------------------------------------------------------------------
+
+
+def _collect_stars(
+    repos: list[str],
+    data_dir: Path,
+    today: date,
+    stars_today: dict[str, int],
+    result: CollectResult,
+) -> None:
+    for repo in repos:
+        path = store.path_for(data_dir, "repos", "stars", repo)
+        rows: list[store.Row] = []
+        if not path.exists():
+            try:
+                rows = _backfill_stars(repo)
+            except HttpError as e:
+                result.errors.append(f"stars {repo}: {e}")
+                continue
+            log.info("stars %s: backfilled %d dates", repo, len(rows))
+        if repo in stars_today:
+            rows.append({"date": today.isoformat(), "stars": stars_today[repo]})
+        if rows:
+            result.rows_changed += store.upsert(path, STARS_COLUMNS, ["date"], rows)
+
+
+def _backfill_stars(repo: str) -> list[store.Row]:
+    """Cumulative stars per date from every star's `starred_at`. Unstars are
+    invisible here, so the last value may exceed today's count; the daily
+    snapshot row written afterwards corrects the present."""
+    per_day: dict[str, int] = {}
+    page = 1
+    while True:
+        batch = get_json(
+            f"{API}/repos/{repo}/stargazers?per_page=100&page={page}",
+            headers={**github_headers(), **STAR_HEADERS},
+        )
+        for star in batch:
+            d = (star.get("starred_at") or "")[:10]
+            if d:
+                per_day[d] = per_day.get(d, 0) + 1
+        if len(batch) < 100:
+            break
+        page += 1
+    total = 0
+    rows = []
+    for d in sorted(per_day):
+        total += per_day[d]
+        rows.append({"date": d, "stars": total})
+    return rows

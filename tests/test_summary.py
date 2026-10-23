@@ -155,9 +155,19 @@ def test_repos_health_releases_traffic(tmp_path: Path):
         ["date"],
         [{"date": "2026-10-22", "views": 10, "unique_views": 4, "clones": 2, "unique_clones": 1}],
     )
+    store.upsert(
+        store.path_for(tmp_path, "repos", "stars", "nebari-dev/nebari"),
+        ["date", "stars"],
+        ["date"],
+        [{"date": "2026-10-23", "stars": 301}, {"date": "2022-01-05", "stars": 1}],
+    )
     out = summary.build(cfg, tmp_path, TODAY)
     repo = out["products"][0]["repos"][0]
     assert repo["repo"] == "nebari-dev/nebari"
+    assert repo["stars_series"] == [
+        {"date": "2022-01-05", "stars": 1},
+        {"date": "2026-10-23", "stars": 301},
+    ]
     assert repo["health"]["stars"] == 301
     assert repo["health"]["merged_prs_30d"] is None  # blank cell -> null, not 0
     assert repo["health"]["pushed_at"] == "2026-10-23"

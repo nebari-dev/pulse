@@ -63,6 +63,11 @@ export const operatorRepo: Repo = {
     clones: 2,
     unique_clones: 1,
   })),
+  stars_series: [
+    { date: '2026-08-01', stars: 30 },
+    { date: '2026-09-15', stars: 40 },
+    { date: '2026-10-10', stars: 42 },
+  ],
   releases: [
     { tag: 'v1.2.0', date: '2026-10-08', prerelease: false },
     { tag: 'v1.2.0-rc1', date: '2026-10-01', prerelease: true },
@@ -99,6 +104,7 @@ export const nic: Product = {
       health: null,
       health_series: [],
       traffic: [],
+      stars_series: [],
       releases: [],
     },
   ],
