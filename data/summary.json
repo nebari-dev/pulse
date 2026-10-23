@@ -13650,17 +13650,17 @@
       "90d": 0,
       "all": 0
      },
-     "latest_cumulative": 10174,
+     "latest_cumulative": 10176,
      "latest_items": [
       {
        "version": "0.15",
        "file": "linux-64/nebi-0.15-hfc2019e_0.conda",
-       "cumulative": 921
+       "cumulative": 922
       },
       {
        "version": "0.14",
        "file": "linux-64/nebi-0.14-hfc2019e_0.conda",
-       "cumulative": 911
+       "cumulative": 912
       },
       {
        "version": "0.7",
@@ -13916,6 +13916,21 @@
        "version": "0.10.5",
        "file": "osx-arm64/nebi-0.10.5-h820172f_0.conda",
        "cumulative": 43
+      },
+      {
+       "version": "0.16",
+       "file": "linux-64/nebi-0.16-hfc2019e_0.conda",
+       "cumulative": 0
+      },
+      {
+       "version": "0.16",
+       "file": "osx-arm64/nebi-0.16-h5ce3bf5_0.conda",
+       "cumulative": 0
+      },
+      {
+       "version": "0.16",
+       "file": "win-64/nebi-0.16-h11686cb_0.conda",
+       "cumulative": 0
       }
      ],
      "series": []
