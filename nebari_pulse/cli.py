@@ -122,7 +122,8 @@ def _collect(cfg: config.Config, args: argparse.Namespace, today) -> int:
         if res.source == "github_repos" and res.notes.get("traffic_denied"):
             denied = res.notes["traffic_denied"]
             print(
-                f"traffic skipped for {len(denied)} repo(s): PULSE_GITHUB_TOKEN needs push access"
+                f"traffic skipped for {len(denied)} repo(s): "
+                f"{res.notes.get('traffic_reason') or 'token needs push access'}"
             )
         if res.source == "quay":
             untracked = res.notes.get("untracked", [])
