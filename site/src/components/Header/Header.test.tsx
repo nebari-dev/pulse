@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/hooks/theme-provider';
@@ -41,6 +41,24 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: 'Repos' })).not.toHaveAttribute(
       'aria-current',
     );
+  });
+
+  it('offers every section in the small-screen menu', async () => {
+    renderHeader('/repos?kind=pack');
+    const trigger = screen.getByRole('button', {
+      name: 'Sections, current: Repos',
+    });
+    await userEvent.click(trigger);
+    const menu = await screen.findByRole('menu');
+    const items = within(menu).getAllByRole('menuitem');
+    expect(items.map((i) => i.textContent)).toEqual([
+      'Downloads',
+      'Releases',
+      'Repos',
+      'Traffic',
+    ]);
+    expect(items[2]).toHaveAttribute('aria-current', 'page');
+    expect(items[3]).toHaveAttribute('href', '/traffic?kind=pack');
   });
 
   it('toggles dark mode', async () => {
