@@ -18,12 +18,13 @@ import {
   chartRows,
   compareArtifacts,
   earliestDate,
+  excludesCharts,
   hasDataIn,
+  headlineArtifacts,
   latestDate,
   matchesKind,
   matchesQuery,
   type Point,
-  productSeries,
   RANGE_LABEL,
   SOURCE_COLOR,
   SOURCE_LABEL,
@@ -45,11 +46,15 @@ function useOverview(summary: Summary | undefined) {
       matchesKind(p, params.kind),
     );
 
+    // Leaderboard and tiles: headline artifacts only (no chart polls unless
+    // the chart type is selected). The trend chart below still draws charts
+    // as their own band so the polling volume stays visible, apart.
     const rows: LeaderboardRow[] = products.map((product) => {
-      const series = productSeries(product, params);
+      const counted = headlineArtifacts(artifactsOf(product, params), params);
+      const series = sumSeries(counted.map((a) => a.series));
       return {
         product,
-        comparison: compareArtifacts(artifactsOf(product, params), start, end),
+        comparison: compareArtifacts(counted, start, end),
         share: 0,
         points: between(series, start, end),
       };
@@ -91,7 +96,11 @@ function useOverview(summary: Summary | undefined) {
       }
     }
 
-    const overall = compareArtifacts(all, start, end);
+    const overall = compareArtifacts(
+      headlineArtifacts(all, params),
+      start,
+      end,
+    );
     return {
       asOf,
       start,
@@ -128,8 +137,9 @@ function Overview() {
         <div>
           <h1 className="font-semibold text-2xl tracking-tight">Downloads</h1>
           <p className="text-muted-foreground text-sm">
-            Image pulls, chart pulls and package downloads across the Nebari
-            ecosystem.
+            Image pulls and package downloads across the Nebari ecosystem. Helm
+            chart pulls are mostly GitOps controllers polling, so they are
+            charted apart and left out of the totals unless you select them.
           </p>
         </div>
         <Filters params={params} onChange={setParams} />
@@ -149,9 +159,10 @@ function Overview() {
               value={formatCompact(view.overall.current)}
               delta={view.overall.delta}
               hint={
-                view.overall.delta === null
+                (view.overall.delta === null
                   ? 'no full previous period yet'
-                  : 'vs. previous period'
+                  : 'vs. previous period') +
+                (excludesCharts(params) ? ', excluding chart polls' : '')
               }
             />
             <StatTile

@@ -25,8 +25,10 @@ describe('Overview', () => {
     renderOverview();
     expect(await screen.findByText('Nebari Operator')).toBeInTheDocument();
     expect(screen.getByText('Chat Pack')).toBeInTheDocument();
-    // operator 550 + nic 6 + 15 + chat 10 = 581 over the 90d window
-    expect(screen.getByText('581')).toBeInTheDocument();
+    // operator 550 + nic 6 + 15 = 571 over the 90d window; Chat Pack's 10
+    // chart pulls are polling and stay out of the headline.
+    expect(screen.getByText('571')).toBeInTheDocument();
+    expect(screen.getByText(/excluding chart polls/)).toBeInTheDocument();
     expect(screen.getByText('Data through')).toBeInTheDocument();
   });
 
@@ -38,17 +40,21 @@ describe('Overview', () => {
   });
 
   it('stacks the chart by artifact type and filters by type', async () => {
-    renderOverview();
+    const first = renderOverview();
     const legend = await screen.findByRole('list', { name: 'Legend' });
     expect(legend).toHaveTextContent('Images');
     expect(legend).toHaveTextContent('Helm charts');
     expect(legend).toHaveTextContent('Packages');
     expect(legend).toHaveTextContent('Binaries');
 
+    first.unmount();
     renderOverview('/?type=chart');
     expect(
       await screen.findByText(/Daily helm charts by source/),
     ).toBeInTheDocument();
+    // Selecting charts explicitly counts them: Chat Pack's 10 pulls.
+    expect(screen.getAllByText('10').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/excluding chart polls/)).not.toBeInTheDocument();
   });
 
   it('reports a load failure', async () => {

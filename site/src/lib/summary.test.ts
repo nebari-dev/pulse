@@ -1,10 +1,12 @@
 import {
+  type Artifact,
   addDays,
   bucketWeekly,
   chartRows,
   compare,
   compareArtifacts,
   fillDaily,
+  headlineArtifacts,
   platformOf,
   sumSeries,
   weekStart,
@@ -145,4 +147,17 @@ it('extracts a platform from release asset names', () => {
   expect(platformOf('nic_0.16.0_darwin_arm64.tar.gz')).toBe('darwin/arm64');
   expect(platformOf('nic_0.16.0_windows_x86_64.zip')).toBe('windows/x86_64');
   expect(platformOf('checksums.txt')).toBeNull();
+});
+
+describe('headlineArtifacts', () => {
+  const image = { kind: 'image' } as Artifact;
+  const chart = { kind: 'chart' } as Artifact;
+  it('drops chart pulls unless charts are selected', () => {
+    expect(
+      headlineArtifacts([image, chart], { source: 'all', type: 'all' }),
+    ).toEqual([image]);
+    expect(
+      headlineArtifacts([image, chart], { source: 'all', type: 'chart' }),
+    ).toEqual([image, chart]);
+  });
 });

@@ -288,6 +288,26 @@ export function productSeries(
   return sumSeries(artifactsOf(product, filter).map((a) => a.series));
 }
 
+/**
+ * Artifacts that count towards a headline number. With no type selected,
+ * Helm chart pulls are left out: GitOps controllers poll charts
+ * continuously, so they dominate totals while saying nothing about
+ * adoption. Selecting the chart type explicitly still shows them.
+ */
+export function headlineArtifacts(
+  artifacts: Artifact[],
+  filter: ArtifactFilter,
+): Artifact[] {
+  return filter.type === 'all'
+    ? artifacts.filter((a) => a.kind !== 'chart')
+    : artifacts;
+}
+
+/** True when the filter leaves chart pulls out of headline numbers. */
+export function excludesCharts(filter: ArtifactFilter): boolean {
+  return filter.type === 'all';
+}
+
 export interface Comparison {
   current: number;
   previous: number;
