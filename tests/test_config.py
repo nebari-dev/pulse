@@ -16,6 +16,8 @@ def test_real_sources_yaml_loads():
     assert "nebari-dev/nebari-infrastructure-core" in gh_refs
     repos = dict((r, p.id) for p, r in cfg.downloads.repos())
     assert repos["nebari-dev/nebari"] == "nebari-classic"
+    assert cfg.docs.cloudflare_zone == "nebari.dev"
+    assert [s.id for s in cfg.docs.sites] == ["docs", "classic-docs"]
 
 
 def test_duplicate_ref_rejected():
@@ -40,3 +42,21 @@ def test_duplicate_repo_rejected():
 def test_bad_repo_rejected():
     with pytest.raises(config.ConfigError, match="owner/name"):
         config._load_downloads({"products": [{"id": "a", "repos": ["not-a-repo"]}]})
+
+
+def test_docs_host_listed_twice_rejected():
+    with pytest.raises(config.ConfigError, match="listed under both"):
+        config._load_docs(
+            {
+                "cloudflare_zone": "z",
+                "sites": [
+                    {"id": "a", "hosts": ["x.dev"]},
+                    {"id": "b", "hosts": ["x.dev"]},
+                ],
+            }
+        )
+
+
+def test_docs_zone_required_with_sites():
+    with pytest.raises(config.ConfigError, match="cloudflare_zone"):
+        config._load_docs({"sites": [{"id": "a", "hosts": ["x.dev"]}]})

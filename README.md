@@ -26,6 +26,8 @@ data/
   repos/releases/<repo>.csv           one row per release tag with its date
   repos/traffic/<repo>.csv            daily views and clones (needs PULSE_GITHUB_TOKEN)
   repos/stars/<repo>.csv              cumulative stars per date, back to the first star
+  docs/traffic/<site>.csv             daily page views and visits per docs host (needs CLOUDFLARE_ANALYTICS_TOKEN)
+  docs/pages/<site>.csv               top paths over the last 7 days, snapshotted daily
   repos/contributors/<repo>.csv       commits per author per day, bots excluded
   summary.json                        index: products with totals + series per source and type
   repos.json                          every product's repos: health, traffic, releases
@@ -54,6 +56,8 @@ site/                   dashboard (Vite + React + Nebari design system)
 | `repos/releases` | `tag,published_at,prerelease` | one row per release tag |
 | `repos/traffic` | `date,views,unique_views,clones,unique_clones` | daily, 14-day window from GitHub |
 | `repos/stars` | `date,stars` | cumulative; backfilled once from each star's timestamp, then daily |
+| `docs/traffic` | `date,host,pageviews,visits` | daily HTML page views and visits per docs host, from Cloudflare zone analytics (~30-day retention upstream) |
+| `docs/pages` | `date,path,pageviews` | daily snapshot of the top paths over the last 7 days |
 | `repos/contributors` | `date,author,commits` | commits per author per day on the default branch, bots excluded; backfilled once, then the latest month refreshed daily |
 
 For cumulative sources the daily series in `summary.json` is the delta
@@ -69,6 +73,13 @@ other repos: set the `PULSE_GITHUB_TOKEN` repository secret to a
 fine-grained PAT with *Administration: read* on the tracked repos (or a
 classic PAT with `repo`). Without it, traffic is skipped with a note and
 the Traffic page says so.
+
+Documentation traffic comes from Cloudflare zone analytics for the hosts
+under `docs` in `sources.yaml`, counted at the edge so cookie consent does
+not hide it. Set the `CLOUDFLARE_ANALYTICS_TOKEN` repository secret to an
+API token with *Zone: Read* and *Analytics: Read* on the `nebari.dev`
+zone. Without it the source is skipped with a note and the Docs page says
+so.
 
 Not available anywhere: **GHCR pull counts**. GitHub exposes them only in
 the package UI. Images published solely to `ghcr.io/nebari-dev` are invisible
@@ -104,6 +115,7 @@ Filters and the table search live in the URL, so any view is shareable.
 | `/releases` | cadence per product (latest, count in window, median gap) and a release feed |
 | `/repos` | stars, stars gained, open issues/PRs, merged PRs, authors per repo; new and active contributors, and open issues/PRs over time |
 | `/traffic` | GitHub views and clones, 14-day totals and all collected history |
+| `/docs` | documentation site visits and page views from the Cloudflare edge, with top pages per site |
 
 ```sh
 cd site
@@ -128,5 +140,4 @@ own; add them to a product or to `quay_ignore`.
 
 ## Roadmap
 
-- Docs traffic (docs.nebari.dev, classic.nebari.dev) from the analytics
-  pack; PyPI downloads by Python version and OS; issue time-to-first-response.
+- Issue time-to-first-response; a weekly digest; CSV export.

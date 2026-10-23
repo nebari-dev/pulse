@@ -35,6 +35,9 @@ jobs:
           # Optional PAT with push access to the tracked repos; unlocks
           # GitHub traffic (views/clones). Health and releases work without it.
           PULSE_GITHUB_TOKEN: ${{ secrets.PULSE_GITHUB_TOKEN }}
+          # Optional API token with Zone:Read + Analytics:Read on the docs
+          # zone; unlocks docs traffic. Skipped with a note when unset.
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
       - name: Commit if changed
         run: |
           git add data/

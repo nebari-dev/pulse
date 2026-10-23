@@ -2,7 +2,7 @@
 
 pulse collect [--only quay,pypi] [--dry-run]   fetch sources, upsert data/, rebuild summary
                                                 (sources: quay, pypi, conda, github_releases,
-                                                 github_repos)
+                                                 github_repos, cloudflare_docs)
 pulse summarize                                 rebuild summary.json, repos.json, products/
 pulse check                                     validate sources.yaml
 """
@@ -17,7 +17,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from . import config, summary
-from .sources import CollectResult, conda, github_releases, github_repos, pypi, quay
+from .sources import (
+    CollectResult,
+    cloudflare_docs,
+    conda,
+    github_releases,
+    github_repos,
+    pypi,
+    quay,
+)
 
 COLLECTORS = {
     "quay": quay.collect,
@@ -25,6 +33,7 @@ COLLECTORS = {
     "conda": conda.collect,
     "github_releases": github_releases.collect,
     "github_repos": github_repos.collect,
+    "cloudflare_docs": cloudflare_docs.collect,
 }
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -60,19 +69,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "check":
         n = sum(len(p.artifacts.get(s, [])) for p in cfg.downloads.products for s in config.SOURCES)
         repos = len(cfg.downloads.repos())
-        print(f"ok: {len(cfg.downloads.products)} products, {n} artifact refs, {repos} repos")
+        print(
+            f"ok: {len(cfg.downloads.products)} products, {n} artifact refs, {repos} repos, "
+            f"{len(cfg.docs.sites)} docs sites"
+        )
         return 0
 
     today = datetime.now(UTC).date()
 
     if args.command == "collect":
-        return _collect(cfg.downloads, args, today)
+        return _collect(cfg, args, today)
 
-    _summarize(cfg.downloads, args.data_dir, today)
+    _summarize(cfg, args.data_dir, today)
     return 0
 
 
-def _collect(cfg: config.DownloadsConfig, args: argparse.Namespace, today) -> int:
+def _collect(cfg: config.Config, args: argparse.Namespace, today) -> int:
     data_dir = args.data_dir
     if args.dry_run:
         import shutil
@@ -94,7 +106,8 @@ def _collect(cfg: config.DownloadsConfig, args: argparse.Namespace, today) -> in
 
     results: list[CollectResult] = []
     for name in names:
-        res = COLLECTORS[name](cfg, data_dir, today)
+        family = cfg.docs if name == "cloudflare_docs" else cfg.downloads
+        res = COLLECTORS[name](family, data_dir, today)
         results.append(res)
         status = f"{res.artifacts} artifacts, {res.rows_changed} rows changed"
         if res.errors:
@@ -104,6 +117,8 @@ def _collect(cfg: config.DownloadsConfig, args: argparse.Namespace, today) -> in
             print(f"  ! {err}")
 
     for res in results:
+        if res.source == "cloudflare_docs" and res.notes.get("skipped"):
+            print(f"docs traffic skipped: {res.notes['skipped']}")
         if res.source == "github_repos" and res.notes.get("traffic_denied"):
             denied = res.notes["traffic_denied"]
             print(
@@ -133,11 +148,13 @@ def _collect(cfg: config.DownloadsConfig, args: argparse.Namespace, today) -> in
     return 0
 
 
-def _summarize(cfg: config.DownloadsConfig, data_dir: Path, today) -> None:
-    written = summary.write_all(summary.build(cfg, data_dir, today), data_dir)
+def _summarize(cfg: config.Config, data_dir: Path, today) -> None:
+    written = summary.write_all(summary.build(cfg.downloads, data_dir, today), data_dir)
+    docs_out = summary.write_docs(summary.build_docs(cfg.docs, data_dir, today), data_dir)
     print(
-        f"wrote {data_dir / summary.INDEX_FILE}, {data_dir / summary.REPOS_FILE} and "
-        f"{len(written) - 2} product files under {data_dir / summary.PRODUCTS_DIR}/"
+        f"wrote {data_dir / summary.INDEX_FILE}, {data_dir / summary.REPOS_FILE}, "
+        f"{docs_out} and {len(written) - 2} product files under "
+        f"{data_dir / summary.PRODUCTS_DIR}/"
     )
 
 

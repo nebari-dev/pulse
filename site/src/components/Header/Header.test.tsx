@@ -56,6 +56,7 @@ describe('Header', () => {
       'Releases',
       'Repos',
       'Traffic',
+      'Docs',
     ]);
     expect(items[2]).toHaveAttribute('aria-current', 'page');
     expect(items[3]).toHaveAttribute('href', '/traffic?kind=pack');

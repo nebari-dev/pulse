@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Header from '@/components/Header';
 import { ThemeProvider } from '@/hooks/theme-provider';
+import Docs from '@/pages/Docs';
 import NotFound from '@/pages/NotFound';
 import Overview from '@/pages/Overview';
 import Product from '@/pages/Product';
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/releases" element={<Releases />} />
                 <Route path="/repos" element={<Repos />} />
                 <Route path="/traffic" element={<Traffic />} />
+                <Route path="/docs" element={<Docs />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
