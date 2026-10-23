@@ -141,6 +141,13 @@ export const nic: Product = {
       source: 'pypi',
       ref: 'nic',
       series: days('2026-10-08', [5, 5, 5]),
+      breakdown: {
+        python_minor: [
+          { category: '3.12', series: days('2026-10-08', [4, 4, 4]) },
+          { category: 'null', series: days('2026-10-08', [1, 1, 1]) },
+        ],
+        system: [{ category: 'Linux', series: days('2026-10-08', [5, 5, 5]) }],
+      },
     }),
   ],
 };

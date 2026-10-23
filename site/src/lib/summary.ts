@@ -88,11 +88,25 @@ export interface Countable {
   series: Point[];
 }
 
+export interface BreakdownCategory {
+  /** pypistats' label; "null" means the installer did not say. */
+  category: string;
+  series: Point[];
+}
+
+/** PyPI downloads by Python minor version and by operating system. */
+export interface Breakdown {
+  python_minor?: BreakdownCategory[];
+  system?: BreakdownCategory[];
+}
+
 export interface Artifact extends Countable {
   ref: string;
   totals: Totals;
   latest_cumulative: number | null;
   latest_items: LatestItem[] | null;
+  /** PyPI only; null elsewhere. Optional for older files. */
+  breakdown?: Breakdown | null;
 }
 
 /** Artifacts of one product summed per (source, kind), as in the index. */
@@ -500,4 +514,35 @@ export function matchesQuery(query: string, ...fields: string[]): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return true;
   return fields.some((f) => f.toLowerCase().includes(q));
+}
+
+export const BREAKDOWN_LABEL: Record<keyof Breakdown, string> = {
+  python_minor: 'Python version',
+  system: 'Operating system',
+};
+
+/**
+ * Downloads per category inside [start, end], summed across the given
+ * artifacts, biggest first. pypistats' "null" becomes "unknown".
+ */
+export function breakdownRows(
+  artifacts: Artifact[],
+  dimension: keyof Breakdown,
+  start: string,
+  end: string,
+): Array<{ category: string; count: number }> {
+  const byCategory = new Map<string, number>();
+  for (const a of artifacts) {
+    for (const c of a.breakdown?.[dimension] ?? []) {
+      const name = c.category === 'null' ? 'unknown' : c.category;
+      byCategory.set(
+        name,
+        (byCategory.get(name) ?? 0) + total(between(c.series, start, end)),
+      );
+    }
+  }
+  return [...byCategory]
+    .map(([category, count]) => ({ category, count }))
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.count - a.count);
 }

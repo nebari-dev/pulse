@@ -46,6 +46,7 @@ site/                   dashboard (Vite + React + Nebari design system)
 |---|---|---|
 | `quay` | `date,count` | daily pulls, from the Quay API (`includeStats=true`) |
 | `pypi` | `date,count` | daily downloads excluding mirrors, from pypistats.org |
+| `pypi_breakdown` | `date,dimension,category,count` | daily downloads by Python minor version (`python_minor`) and OS (`system`), from pypistats.org |
 | `conda` | `date,version,file,cumulative` | daily snapshot of per-file totals from api.anaconda.org |
 | `github_releases` | `date,tag,asset,cumulative` | daily snapshot of per-asset `download_count` |
 
@@ -99,7 +100,7 @@ Filters and the table search live in the URL, so any view is shareable.
 | Page | What it shows |
 |---|---|
 | `/` Downloads | totals, trend by artifact type or source, searchable leaderboard |
-| `/product/:id` | one product: artifacts, version adoption, releases, repo health, traffic |
+| `/product/:id` | one product: artifacts, version adoption, PyPI Python/OS mix, releases, repo health, traffic |
 | `/releases` | cadence per product (latest, count in window, median gap) and a release feed |
 | `/repos` | stars, stars gained, open issues/PRs, merged PRs, authors per repo; new and active contributors over time |
 | `/traffic` | GitHub views and clones, 14-day totals and all collected history |

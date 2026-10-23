@@ -62,7 +62,7 @@ nebari_pulse/
   summary.py                 builds the dashboard's JSON (the contract): index, repos, products
   sources/
     quay.py                  daily pulls per repo, ~90d window; scans namespace for untracked repos
-    pypi.py                  daily downloads (no mirrors) from pypistats, ~180d
+    pypi.py                  daily downloads (no mirrors) + Python/OS breakdown from pypistats, ~180d
     conda.py                 cumulative per-file totals from anaconda.org, snapshotted daily
     github_releases.py       cumulative per-asset download_count, snapshotted daily
     github_repos.py          repo health (GraphQL), release tags/dates, traffic, stars, contributors (REST)
@@ -83,6 +83,7 @@ site/                        see site/AGENTS.md
 |---|---|---|
 | downloads/quay | `date,count` | daily |
 | downloads/pypi | `date,count` | daily |
+| downloads/pypi_breakdown | `date,dimension,category,count` | daily; `python_minor` and `system` from pypistats, category `null` when the installer did not say |
 | downloads/conda | `date,version,file,cumulative` | cumulative snapshot |
 | downloads/github_releases | `date,tag,asset,cumulative` | cumulative snapshot |
 | repos/health | `date,stars,forks,subscribers,open_issues,open_prs,merged_prs_30d,issues_opened_30d,issues_closed_30d,pushed_at` | daily snapshot |
