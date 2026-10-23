@@ -66,7 +66,9 @@ export interface Totals {
 
 export interface LatestItem {
   cumulative: number;
-  [column: string]: string | number;
+  /** Snapshot deltas for this one version/tag; `all` is since collection began. */
+  totals?: Totals;
+  [column: string]: string | number | Totals | undefined;
 }
 
 export interface Artifact {
@@ -79,6 +81,50 @@ export interface Artifact {
   series: Point[];
 }
 
+/** Latest daily snapshot of a GitHub repo. Blank upstream answers are null. */
+export interface RepoHealth {
+  date: string;
+  pushed_at: string | null;
+  stars: number | null;
+  forks: number | null;
+  subscribers: number | null;
+  open_issues: number | null;
+  open_prs: number | null;
+  merged_prs_30d: number | null;
+  issues_opened_30d: number | null;
+  issues_closed_30d: number | null;
+}
+
+export interface HealthPoint {
+  date: string;
+  stars: number | null;
+  open_issues: number | null;
+  open_prs: number | null;
+}
+
+export interface TrafficPoint {
+  date: string;
+  views: number;
+  unique_views: number;
+  clones: number;
+  unique_clones: number;
+}
+
+export interface Release {
+  tag: string;
+  date: string; // YYYY-MM-DD
+  prerelease: boolean;
+}
+
+export interface Repo {
+  repo: string; // owner/name
+  health: RepoHealth | null;
+  health_series: HealthPoint[];
+  traffic: TrafficPoint[];
+  /** Newest first. */
+  releases: Release[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -86,12 +132,15 @@ export interface Product {
   totals: Totals;
   series: Point[];
   artifacts: Artifact[];
+  repos: Repo[];
 }
 
 export interface Summary {
   generated_at: string;
   sources: Record<string, { kind: 'daily' | 'cumulative'; artifacts: number }>;
   products: Product[];
+  /** Repos tracked, and how many of them have traffic data. */
+  repos: { count: number; traffic: number };
 }
 
 export const RANGES = ['30d', '90d', '1y', 'all'] as const;
@@ -353,4 +402,11 @@ export function platformOf(asset: string): string | null {
     /(darwin|linux|windows)[_-](arm64|x86_64|amd64|aarch64)/i,
   );
   return m ? `${m[1].toLowerCase()}/${m[2].toLowerCase()}` : null;
+}
+
+/** Case-insensitive substring match on any of the given fields. */
+export function matchesQuery(query: string, ...fields: string[]): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return fields.some((f) => f.toLowerCase().includes(q));
 }

@@ -17,6 +17,9 @@ class Product:
     name: str
     kind: str
     artifacts: dict[str, list[str]] = field(default_factory=dict)
+    """GitHub repos (owner/name) whose health, releases and traffic count
+    towards this product. Independent of the download sources."""
+    repos: tuple[str, ...] = ()
 
     def refs(self, source: str) -> list[str]:
         return self.artifacts.get(source, [])
@@ -32,6 +35,10 @@ class DownloadsConfig:
     def refs(self, source: str) -> list[tuple[Product, str]]:
         """All (product, artifact ref) pairs for one source, in config order."""
         return [(p, ref) for p in self.products for ref in p.refs(source)]
+
+    def repos(self) -> list[tuple[Product, str]]:
+        """All (product, GitHub repo) pairs, in config order."""
+        return [(p, repo) for p in self.products for repo in p.repos]
 
 
 @dataclass(frozen=True)
@@ -54,6 +61,7 @@ def _load_downloads(raw: dict) -> DownloadsConfig:
     products: list[Product] = []
     seen_ids: set[str] = set()
     seen_refs: dict[tuple[str, str], str] = {}
+    seen_repos: dict[str, str] = {}
     for entry in raw.get("products") or []:
         pid = entry.get("id")
         if not pid or pid in seen_ids:
@@ -76,8 +84,23 @@ def _load_downloads(raw: dict) -> DownloadsConfig:
                 seen_refs[key] = pid
             if refs:
                 artifacts[source] = refs
+        repos = entry.get("repos") or []
+        if not isinstance(repos, list) or not all(
+            isinstance(r, str) and r.count("/") == 1 for r in repos
+        ):
+            raise ConfigError(f"{pid}.repos: expected a list of 'owner/name' strings")
+        for repo in repos:
+            if repo in seen_repos:
+                raise ConfigError(f"repo {repo!r} listed under both {seen_repos[repo]} and {pid}")
+            seen_repos[repo] = pid
         products.append(
-            Product(id=pid, name=entry.get("name", pid), kind=kind, artifacts=artifacts)
+            Product(
+                id=pid,
+                name=entry.get("name", pid),
+                kind=kind,
+                artifacts=artifacts,
+                repos=tuple(repos),
+            )
         )
 
     return DownloadsConfig(

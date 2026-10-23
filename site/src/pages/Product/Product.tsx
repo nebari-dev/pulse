@@ -17,10 +17,29 @@ import {
 } from '@/components/ui/table';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useSummary } from '@/hooks/useSummary';
-import { formatCompact, formatNumber } from '@/lib/format';
+import {
+  formatAgo,
+  formatCompact,
+  formatDate,
+  formatNumber,
+} from '@/lib/format';
+import {
+  cadence,
+  daysSincePush,
+  laterDate,
+  productReleases,
+  releaseUrl,
+  repoName,
+  repoUrl,
+  TRAFFIC_LABEL,
+  trafficRange,
+  trafficSeries,
+  trafficTotal,
+} from '@/lib/repos';
 import {
   ARTIFACT_KIND_LABEL,
   type Artifact,
+  addDays,
   artifactsOf,
   artifactUrl,
   between,
@@ -48,17 +67,52 @@ import NotFound from '@/pages/NotFound';
 interface ReleaseRow {
   tag: string;
   cumulative: number;
+  /** Downloads of this tag/version in the last 30 days, when known. */
+  recent?: number;
 }
 
 /** Per-tag totals from the latest GitHub Releases snapshot, biggest first. */
-function releaseRows(items: LatestItem[]): ReleaseRow[] {
-  const byTag = new Map<string, number>();
+function releaseRows(items: LatestItem[], key = 'tag'): ReleaseRow[] {
+  const byTag = new Map<string, ReleaseRow>();
   for (const item of items) {
-    const tag = String(item.tag ?? '');
-    byTag.set(tag, (byTag.get(tag) ?? 0) + item.cumulative);
+    const tag = String(item[key] ?? '');
+    const row = byTag.get(tag) ?? { tag, cumulative: 0, recent: 0 };
+    row.cumulative += item.cumulative;
+    row.recent = (row.recent ?? 0) + (item.totals?.['30d'] ?? 0);
+    byTag.set(tag, row);
   }
-  return [...byTag]
-    .map(([tag, cumulative]) => ({ tag, cumulative }))
+  return [...byTag.values()].sort((a, b) => b.cumulative - a.cumulative);
+}
+
+/**
+ * Which versions people install now: share of the last 30 days of downloads
+ * per version, from the per-item snapshot deltas of cumulative sources.
+ */
+function adoptionRows(artifacts: Artifact[]): ReleaseRow[] {
+  const rows = [
+    ...releaseRows(
+      artifacts
+        .filter((a) => a.source === 'conda')
+        .flatMap((a) => a.latest_items ?? []),
+      'version',
+    ),
+    ...releaseRows(
+      artifacts
+        .filter((a) => a.source === 'github_releases')
+        .flatMap((a) => a.latest_items ?? []),
+      'tag',
+    ),
+  ];
+  const merged = new Map<string, ReleaseRow>();
+  for (const r of rows) {
+    const m = merged.get(r.tag) ?? { tag: r.tag, cumulative: 0, recent: 0 };
+    m.cumulative += r.cumulative;
+    m.recent = (m.recent ?? 0) + (r.recent ?? 0);
+    merged.set(r.tag, m);
+  }
+  return [...merged.values()]
+    .filter((r) => (r.recent ?? 0) > 0)
+    .map((r) => ({ tag: r.tag, cumulative: r.recent ?? 0 }))
     .sort((a, b) => b.cumulative - a.cumulative);
 }
 
@@ -108,7 +162,69 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
       .filter((a) => a.source === 'github_releases' && a.latest_items?.length)
       .flatMap((a) => a.latest_items ?? []);
 
+    const stable = productReleases(product);
+    const feed = productReleases(product, { includePrereleases: true });
+    const traffic = trafficRange(product.repos);
+    const trafficStart = traffic
+      ? laterDate(addDays(traffic.end, -13), traffic.start)
+      : '';
+    const trafficCharts = traffic
+      ? (
+          [
+            [
+              'Views',
+              ['views', 'var(--chart-1)'],
+              ['unique_views', 'var(--chart-3)'],
+            ],
+            [
+              'Clones',
+              ['clones', 'var(--chart-4)'],
+              ['unique_clones', 'var(--chart-5)'],
+            ],
+          ] as const
+        ).map(([title, ...metrics]) => {
+          const byMetric: Record<string, Point[]> = {};
+          const series: TrendSeries[] = [];
+          for (const [metric, color] of metrics) {
+            byMetric[metric] = trafficSeries(product.repos, metric);
+            series.push({ key: metric, label: TRAFFIC_LABEL[metric], color });
+          }
+          return {
+            title,
+            series,
+            rows: chartRows(byMetric, traffic.start, traffic.end, false),
+          };
+        })
+      : [];
+
     return {
+      cadence: cadence(stable, summary.generated_at, 90),
+      feed: feed.slice(0, 8),
+      adoption: adoptionRows(artifacts),
+      traffic: traffic && {
+        ...traffic,
+        windowStart: trafficStart,
+        views: trafficTotal(product.repos, 'views', trafficStart, traffic.end),
+        uniqueViews: trafficTotal(
+          product.repos,
+          'unique_views',
+          trafficStart,
+          traffic.end,
+        ),
+        clones: trafficTotal(
+          product.repos,
+          'clones',
+          trafficStart,
+          traffic.end,
+        ),
+        uniqueClones: trafficTotal(
+          product.repos,
+          'unique_clones',
+          trafficStart,
+          traffic.end,
+        ),
+        charts: trafficCharts,
+      },
       product,
       asOf,
       start,
@@ -286,16 +402,33 @@ function Product() {
         which predates collection; Quay and PyPI do not expose one.
       </p>
 
-      {view.releases.length > 0 && (
+      {(view.releases.length > 0 || view.adoption.length > 0) && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Downloads by release</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ReleaseTable rows={view.releases} label="Release" />
-            </CardContent>
-          </Card>
+          {view.adoption.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Version adoption, last 30 days</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <ReleaseTable rows={view.adoption} label="Version" />
+                <p className="text-muted-foreground text-xs">
+                  Share of downloads in the last 30 days by version, from
+                  conda-forge and GitHub Releases. PyPI and Quay do not report
+                  per-version counts.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          {view.releases.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Downloads by release, all time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReleaseTable rows={view.releases} label="Release" />
+              </CardContent>
+            </Card>
+          )}
           {view.platforms.length > 0 && (
             <Card>
               <CardHeader>
@@ -308,7 +441,174 @@ function Product() {
           )}
         </div>
       )}
+
+      {product.repos.length > 0 && (
+        <section
+          aria-labelledby="repos-heading"
+          className="flex flex-col gap-4"
+        >
+          <h2
+            id="repos-heading"
+            className="font-semibold text-lg tracking-tight"
+          >
+            Repositories
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatTile
+              label="Latest release"
+              value={view.cadence.latest?.tag ?? '—'}
+              hint={
+                view.cadence.latest
+                  ? `${formatAgo(view.cadence.daysSince)} · ${formatDate(view.cadence.latest.date, true)}`
+                  : 'no GitHub releases'
+              }
+            />
+            <StatTile
+              label="Releases, 90 days"
+              value={String(view.cadence.recent)}
+              hint={
+                view.cadence.medianGapDays === null
+                  ? 'stable releases only'
+                  : `median ${view.cadence.medianGapDays} days apart`
+              }
+            />
+            <StatTile
+              label="Stars"
+              value={formatNumber(
+                product.repos.reduce((n, r) => n + (r.health?.stars ?? 0), 0),
+              )}
+              hint={`${product.repos.length} ${product.repos.length === 1 ? 'repo' : 'repos'}`}
+            />
+          </div>
+
+          <Table aria-label={`${product.name} repositories`}>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Repository</TableHead>
+                <TableHead className="text-right">Stars</TableHead>
+                <TableHead className="text-right">Open issues</TableHead>
+                <TableHead className="text-right">Open PRs</TableHead>
+                <TableHead className="text-right">Merged, 30d</TableHead>
+                <TableHead>Last push</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {product.repos.map((r) => (
+                <TableRow key={r.repo}>
+                  <TableCell className="font-medium">
+                    <a
+                      href={repoUrl(r.repo)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                    >
+                      {repoName(r.repo)}
+                      <ExternalLink className="size-3" aria-hidden="true" />
+                    </a>
+                  </TableCell>
+                  <HealthCell value={r.health?.stars} />
+                  <HealthCell value={r.health?.open_issues} />
+                  <HealthCell value={r.health?.open_prs} />
+                  <HealthCell value={r.health?.merged_prs_30d} />
+                  <TableCell className="tabular-nums">
+                    {formatAgo(daysSincePush(r, data.generated_at))}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {view.feed.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent releases</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ol className="flex flex-col divide-y divide-border">
+                  {view.feed.map((r) => (
+                    <li
+                      key={`${r.repo}:${r.tag}`}
+                      className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm"
+                    >
+                      <span className="w-24 shrink-0 text-muted-foreground tabular-nums">
+                        {formatDate(r.date, true)}
+                      </span>
+                      <a
+                        href={releaseUrl(r.repo, r.tag)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
+                      >
+                        {r.tag}
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                      </a>
+                      {product.repos.length > 1 && (
+                        <span className="text-muted-foreground text-xs">
+                          {repoName(r.repo)}
+                        </span>
+                      )}
+                      {r.prerelease && (
+                        <Badge variant="secondary">prerelease</Badge>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
+
+          {view.traffic && (
+            <Card>
+              <CardHeader>
+                <CardTitle>GitHub traffic</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <div className="grid gap-4 sm:grid-cols-4">
+                  <StatTile
+                    label="Views, 14 days"
+                    value={formatCompact(view.traffic.views)}
+                    hint={`${formatCompact(view.traffic.uniqueViews)} unique`}
+                  />
+                  <StatTile
+                    label="Clones, 14 days"
+                    value={formatCompact(view.traffic.clones)}
+                    hint={`${formatCompact(view.traffic.uniqueClones)} unique`}
+                  />
+                  <StatTile
+                    label="Window"
+                    value={formatDate(view.traffic.windowStart)}
+                    hint={`to ${formatDate(view.traffic.end)}`}
+                  />
+                </div>
+                <div className="grid gap-6 lg:grid-cols-2">
+                  {view.traffic.charts.map((c) => (
+                    <TrendChart
+                      key={c.title}
+                      rows={c.rows}
+                      series={c.series}
+                      stacked={false}
+                      title={`${product.name} GitHub ${c.title.toLowerCase()}`}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </section>
+      )}
     </div>
+  );
+}
+
+function HealthCell({ value }: { value: number | null | undefined }) {
+  return (
+    <TableCell className="text-right tabular-nums">
+      {value === null || value === undefined ? (
+        <span className="text-muted-foreground">—</span>
+      ) : (
+        formatNumber(value)
+      )}
+    </TableCell>
   );
 }
 

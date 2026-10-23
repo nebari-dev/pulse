@@ -30,3 +30,13 @@ export function formatDate(iso: string, withYear = false): string {
     timeZone: 'UTC',
   });
 }
+
+/** "today", "yesterday", "12 days ago", "3 months ago", "2 years ago". */
+export function formatAgo(days: number | null): string {
+  if (days === null) return '—';
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 60) return `${days} days ago`;
+  if (days < 365 * 1.5) return `${Math.round(days / 30)} months ago`;
+  return `${Math.round(days / 365)} years ago`;
+}

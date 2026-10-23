@@ -32,6 +32,9 @@ jobs:
       - run: uv run pulse collect
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional PAT with push access to the tracked repos; unlocks
+          # GitHub traffic (views/clones). Health and releases work without it.
+          PULSE_GITHUB_TOKEN: ${{ secrets.PULSE_GITHUB_TOKEN }}
       - name: Commit if changed
         run: |
           git add data/

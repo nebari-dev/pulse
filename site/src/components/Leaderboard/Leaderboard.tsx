@@ -42,6 +42,8 @@ const RIGHT = 'text-right [&>button]:justify-end';
 interface LeaderboardProps {
   rows: LeaderboardRow[];
   rangeLabel: string;
+  /** Shown as the only row when `rows` is empty (e.g. a search with no hits). */
+  emptyMessage?: string;
 }
 
 function compareRows(a: LeaderboardRow, b: LeaderboardRow, key: SortKey) {
@@ -60,7 +62,7 @@ function compareRows(a: LeaderboardRow, b: LeaderboardRow, key: SortKey) {
 }
 
 /** Every product and pack, sortable; the table view behind the chart. */
-function Leaderboard({ rows, rangeLabel }: LeaderboardProps) {
+function Leaderboard({ rows, rangeLabel, emptyMessage }: LeaderboardProps) {
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
     key: 'current',
     dir: 'desc',
@@ -109,6 +111,13 @@ function Leaderboard({ rows, rangeLabel }: LeaderboardProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
+        {sorted.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={6} className="text-muted-foreground">
+              {emptyMessage ?? 'Nothing to show.'}
+            </TableCell>
+          </TableRow>
+        )}
         {sorted.map(({ product, comparison, share, points }) => (
           <TableRow key={product.id}>
             <TableCell className="font-medium">

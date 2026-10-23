@@ -21,6 +21,11 @@ interface TrendChartProps {
   series: TrendSeries[];
   /** Rows are weekly buckets (affects axis and tooltip labels). */
   weekly?: boolean;
+  /**
+   * Stack the series (the default when there is more than one). Pass false
+   * when series overlap rather than add up, e.g. total vs. unique visitors.
+   */
+  stacked?: boolean;
   title: string;
 }
 
@@ -68,8 +73,14 @@ function ChartTooltip({
  * Daily (or weekly) downloads as a stacked area. One series is a plain area
  * in the primary hue; several get fixed per-entity colors and a legend.
  */
-function TrendChart({ rows, series, weekly = false, title }: TrendChartProps) {
-  const stacked = series.length > 1;
+function TrendChart({
+  rows,
+  series,
+  weekly = false,
+  title,
+  stacked: stackedProp,
+}: TrendChartProps) {
+  const stacked = stackedProp ?? series.length > 1;
   return (
     <figure aria-label={title} className="flex flex-col gap-3">
       {stacked && (

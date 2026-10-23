@@ -24,10 +24,31 @@ class HttpError(RuntimeError):
 
 
 def get_json(url: str, headers: dict[str, str] | None = None, retries: int = 3) -> Any:
+    return request_json(url, headers=headers, retries=retries)
+
+
+def post_json(
+    url: str, payload: Any, headers: dict[str, str] | None = None, retries: int = 3
+) -> Any:
+    body = json.dumps(payload).encode()
+    return request_json(
+        url,
+        headers={"Content-Type": "application/json", **(headers or {})},
+        retries=retries,
+        data=body,
+    )
+
+
+def request_json(
+    url: str,
+    headers: dict[str, str] | None = None,
+    retries: int = 3,
+    data: bytes | None = None,
+) -> Any:
     req_headers = {"User-Agent": USER_AGENT, "Accept": "application/json", **(headers or {})}
     delay = 2.0
     for attempt in range(retries + 1):
-        req = urllib.request.Request(url, headers=req_headers)
+        req = urllib.request.Request(url, headers=req_headers, data=data)
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
                 return json.load(resp)
@@ -51,9 +72,15 @@ def get_json(url: str, headers: dict[str, str] | None = None, retries: int = 3) 
     raise AssertionError("unreachable")
 
 
+def github_token() -> str | None:
+    """PULSE_GITHUB_TOKEN (a PAT that can read traffic on the tracked repos)
+    wins over GITHUB_TOKEN (the Actions token, scoped to this repo only)."""
+    return os.environ.get("PULSE_GITHUB_TOKEN") or os.environ.get("GITHUB_TOKEN") or None
+
+
 def github_headers() -> dict[str, str]:
     headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
-    token = os.environ.get("GITHUB_TOKEN")
+    token = github_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers

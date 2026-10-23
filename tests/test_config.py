@@ -14,6 +14,8 @@ def test_real_sources_yaml_loads():
     assert cfg.downloads.quay_namespace == "nebari"
     gh_refs = [r for _, r in cfg.downloads.refs("github_releases")]
     assert "nebari-dev/nebari-infrastructure-core" in gh_refs
+    repos = dict((r, p.id) for p, r in cfg.downloads.repos())
+    assert repos["nebari-dev/nebari"] == "nebari-classic"
 
 
 def test_duplicate_ref_rejected():
@@ -26,3 +28,15 @@ def test_duplicate_ref_rejected():
 def test_bad_kind_rejected():
     with pytest.raises(config.ConfigError, match="kind"):
         config._load_downloads({"products": [{"id": "a", "kind": "thing"}]})
+
+
+def test_duplicate_repo_rejected():
+    with pytest.raises(config.ConfigError, match="repo 'o/r' listed under both"):
+        config._load_downloads(
+            {"products": [{"id": "a", "repos": ["o/r"]}, {"id": "b", "repos": ["o/r"]}]}
+        )
+
+
+def test_bad_repo_rejected():
+    with pytest.raises(config.ConfigError, match="owner/name"):
+        config._load_downloads({"products": [{"id": "a", "repos": ["not-a-repo"]}]})

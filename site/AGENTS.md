@@ -32,16 +32,24 @@ pulse-dashboard/
 │   ├── index.css
 │   ├── lib/
 │   │   ├── utils.ts
-│   │   ├── summary.ts     # summary.json types + pure helpers (windows, series, deltas)
+│   │   ├── summary.ts     # summary.json types + pure helpers (windows, series, deltas, search)
+│   │   ├── repos.ts       # release cadence, repo health and traffic helpers
 │   │   └── format.ts
 │   ├── hooks/
 │   │   ├── useSummary.ts         # TanStack Query over /data/summary.json
-│   │   ├── useDashboardParams.ts # range/kind/source filters in the URL
+│   │   ├── useDashboardParams.ts # range/kind/type/source filters + search (q) in the URL
 │   ├── components/
-│   │   └── ui/            # Nebari components (installed via shadcn — managed)
+│   │   ├── ui/            # Nebari components (installed via shadcn — managed)
+│   │   ├── Header/        # brand, section nav (Downloads/Releases/Repos/Traffic), theme toggle
+│   │   ├── PageHeader/    # title + description + controls row used by every page
+│   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
+│   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
-│   │   ├── Overview/      # / — filters, stat tiles, trend chart, leaderboard
-│   │   ├── Product/       # /product/:id — per-artifact, release and platform breakdowns
+│   │   ├── Overview/      # / — filters, stat tiles, trend chart, searchable leaderboard
+│   │   ├── Product/       # /product/:id — artifacts, version adoption, releases, repos, traffic
+│   │   ├── Releases/      # /releases — cadence per product + release feed
+│   │   ├── Repos/         # /repos — health table per repo
+│   │   ├── Traffic/       # /traffic — GitHub views/clones
 │   │   └── NotFound/
 │   │       ├── NotFound.tsx
 │   │       ├── NotFound.test.tsx
@@ -147,11 +155,21 @@ everything on screen is derived in `useMemo` from `src/lib/summary.ts`
 helpers, always from artifact-level series so the source and type filters
 stay consistent.
 
-| State type                          | Where it lives                             |
-| ----------------------------------- | ------------------------------------------ |
-| Filters (range, kind, type, source) | URL search params via `useDashboardParams` |
-| Component-local (sort order, hover) | `useState` inside the component            |
-| summary.json                        | TanStack Query (`useSummary`)              |
+| State type                                      | Where it lives                             |
+| ----------------------------------------------- | ------------------------------------------ |
+| Filters (range, kind, type, source), search `q` | URL search params via `useDashboardParams` |
+| Component-local (sort order, hover)             | `useState` inside the component            |
+| summary.json                                    | TanStack Query (`useSummary`)              |
+
+Every table with more than a handful of rows gets a `SearchBox` bound to
+`params.q`, filtered with `matchesQuery` over the row's visible names and
+ids, and an empty-state row that echoes the query. Section navigation
+links carry the current query string so filters survive switching pages.
+
+Repo-derived data (`product.repos`) is optional per product: a repo can
+exist without a health snapshot (`health: null`), traffic (`traffic: []`)
+or releases. Render dashes for unknown values, never zeros, and leave repos
+without traffic out of traffic tables rather than showing them as 0.
 
 Charts use Recharts with Nebari chart tokens (`var(--chart-N)`); each source
 and artifact type has a fixed color in `SOURCE_COLOR` / `ARTIFACT_KIND_COLOR`
@@ -184,6 +202,8 @@ values into the stylesheet.
 1. Create `src/pages/PageName/` directory (PascalCase)
 2. Add `PageName.tsx`, `PageName.test.tsx`, and `index.ts`
 3. Add a `<Route>` in `src/App.tsx`
+4. Add it to `NAV` in `src/components/Header/Header.tsx` with a `match`
+   predicate, and use `PageHeader` for the title row so pages look alike
 
 ---
 
