@@ -32,10 +32,13 @@ downloads:
     - checksums.txt
 
   products:
-    - id: nebari
-      name: Nebari
+    # Nebari Classic: the original platform (nebari-dev/nebari) and the
+    # images it deploys (nebari-docker-images, workflow controller, ...).
+    # Does not include the Keycloak theme (NIC) or jhub-apps (shared).
+    - id: nebari-classic
+      name: Nebari Classic
       kind: product
-      pypi: [nebari]
+      pypi: [nebari, nebari-workflow-controller]
       conda: [conda-forge/nebari]
       quay:
         - nebari/nebari-jupyterhub
@@ -47,7 +50,6 @@ downloads:
         - nebari/nebari-workflow-controller
         - nebari/nebari-self-registration
         - nebari/nebari-jupyterlite-plugin
-        - nebari/nebari-keycloak-theme
         - nebari/keycloak
         - nebari/nebari-backup-restore
 
@@ -65,11 +67,14 @@ downloads:
       name: Nebari Infrastructure Core
       kind: product
       pypi: [nic]
-      github_releases: [nebari-dev/nebari-infrastructure-core]
+      github_releases:
+        - nebari-dev/nebari-infrastructure-core
+        - nebari-dev/nebari-keycloak-theme   # theme JARs, selectable per realm
       quay:
         - nebari/starters/aws
         - nebari/starters/demo
         - nebari/starters/local
+        - nebari/nebari-keycloak-theme
 
     - id: nebi
       name: Nebi
