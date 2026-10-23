@@ -594,14 +594,14 @@ function Product() {
               <CardContent className="flex flex-col gap-4">
                 <div className="grid gap-4 sm:grid-cols-4">
                   <StatTile
-                    label="Views, 14 days"
-                    value={formatCompact(view.traffic.views)}
-                    hint={`${formatCompact(view.traffic.uniqueViews)} unique`}
+                    label="Unique visitors, 14 days"
+                    value={formatCompact(view.traffic.uniqueViews)}
+                    hint={`${formatCompact(view.traffic.views)} views in all`}
                   />
                   <StatTile
-                    label="Clones, 14 days"
-                    value={formatCompact(view.traffic.clones)}
-                    hint={`${formatCompact(view.traffic.uniqueClones)} unique`}
+                    label="Unique cloners, 14 days"
+                    value={formatCompact(view.traffic.uniqueClones)}
+                    hint={`${formatCompact(view.traffic.clones)} clones, incl. CI`}
                   />
                   <StatTile
                     label="Window"

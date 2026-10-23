@@ -57,8 +57,9 @@ describe('Product', () => {
     expect(
       screen.getByRole('link', { name: /^nebari-operator/ }),
     ).toHaveAttribute('href', 'https://github.com/nebari-dev/nebari-operator');
-    expect(screen.getByText('Views, 14 days')).toBeInTheDocument();
-    expect(screen.getByText('60')).toBeInTheDocument();
+    expect(screen.getByText('Unique visitors, 14 days')).toBeInTheDocument();
+    expect(screen.getByText('30')).toBeInTheDocument();
+    expect(screen.getByText('60 views in all')).toBeInTheDocument();
     expect(screen.getByText('Recent releases')).toBeInTheDocument();
     expect(screen.getByText('prerelease')).toBeInTheDocument();
   });
