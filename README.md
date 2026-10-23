@@ -25,7 +25,7 @@ data/
 site/                   dashboard (Vite + React + Nebari design system)
 .github/workflows/
   collect.yml           daily cron -> pulse collect -> commit data/ -> dispatch deploy
-  deploy.yml            build site/ and deploy to Cloudflare Pages (project: pulse)
+  deploy.yml            build site/ and deploy to Cloudflare Pages (project: nebari-pulse)
   preview-deploy.yml    per-PR preview deployment for site/ changes
   ci.yml                collector lint/tests/dry-run + site lint/tests/build on PRs
 ```
@@ -76,7 +76,7 @@ npm run build && npm run test -- --run && npm run check
 
 Deploys go to Cloudflare Pages via `wrangler-action`; the repo needs the
 `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets and a Pages
-project named `pulse`. Each daily data commit redeploys the site.
+project named `nebari-pulse` (`pulse.pages.dev` was already taken). Each daily data commit redeploys the site.
 
 ## Adding a product or pack
 

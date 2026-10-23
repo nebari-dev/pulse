@@ -41,7 +41,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           # Non-main branch => a Pages PREVIEW deployment, not production.
-          command: pages deploy site/dist --project-name=pulse --branch=pr-${{ github.event.pull_request.number }}
+          command: pages deploy site/dist --project-name=nebari-pulse --branch=pr-${{ github.event.pull_request.number }}
 
       - name: Comment preview URL on the PR
         if: steps.deploy.outputs.pages-deployment-alias-url != '' || steps.deploy.outputs.deployment-url != ''
