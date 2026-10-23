@@ -2,6 +2,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import Filters from '@/components/Filters';
+import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +51,7 @@ import {
   KIND_LABEL,
   type LatestItem,
   latestDate,
+  matchesQuery,
   type Point,
   platformOf,
   productSeries,
@@ -309,6 +311,12 @@ function Product() {
   if (!view) return <NotFound />;
 
   const { product } = view;
+  const shownArtifacts = view.artifacts.filter((a) =>
+    matchesQuery(params.q, a.ref, SOURCE_LABEL[a.source], a.kind),
+  );
+  const shownRepos = product.repos.filter((r) =>
+    matchesQuery(params.q, r.repo),
+  );
   return (
     <div className="flex flex-col gap-6">
       <Link
@@ -374,6 +382,11 @@ function Product() {
         </Card>
       )}
 
+      <SearchBox
+        value={params.q}
+        onChange={(q) => setParams({ q })}
+        label="Search artifacts and repos"
+      />
       <Table aria-label={`${product.name} artifacts`}>
         <TableHeader>
           <TableRow>
@@ -386,7 +399,16 @@ function Product() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {view.artifacts.map((a) => (
+          {shownArtifacts.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={6} className="text-muted-foreground">
+                {params.q
+                  ? `No artifacts match "${params.q}".`
+                  : 'No artifacts for this filter.'}
+              </TableCell>
+            </TableRow>
+          )}
+          {shownArtifacts.map((a) => (
             <ArtifactRow
               key={`${a.source}:${a.ref}`}
               artifact={a}
@@ -493,7 +515,14 @@ function Product() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {product.repos.map((r) => (
+              {shownRepos.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-muted-foreground">
+                    No repos match "{params.q}".
+                  </TableCell>
+                </TableRow>
+              )}
+              {shownRepos.map((r) => (
                 <TableRow key={r.repo}>
                   <TableCell className="font-medium">
                     <a
