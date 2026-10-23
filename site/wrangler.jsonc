@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nebari-pulse",
+  "compatibility_date": "2026-10-23",
+  // Static-assets-only Worker: no script, the built site is the whole deploy.
+  // Client-side routes (/product/:id) fall through to index.html.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  // Workers Previews: one preview per pull request, created by
+  // .github/workflows/preview-deploy.yml with `wrangler preview --name pr-<n>`.
+  "previews": {}
+}
