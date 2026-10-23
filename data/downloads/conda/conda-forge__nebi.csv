@@ -7,9 +7,9 @@ date,version,file,cumulative
 2026-10-23,0.11,linux-64/nebi-0.11-hfc2019e_0.conda,190
 2026-10-23,0.12,linux-64/nebi-0.12-hfc2019e_0.conda,430
 2026-10-23,0.13,linux-64/nebi-0.13-hfc2019e_0.conda,532
-2026-10-23,0.14,linux-64/nebi-0.14-hfc2019e_0.conda,912
-2026-10-23,0.15,linux-64/nebi-0.15-hfc2019e_0.conda,923
-2026-10-23,0.16,linux-64/nebi-0.16-hfc2019e_0.conda,26
+2026-10-23,0.14,linux-64/nebi-0.14-hfc2019e_0.conda,913
+2026-10-23,0.15,linux-64/nebi-0.15-hfc2019e_0.conda,925
+2026-10-23,0.16,linux-64/nebi-0.16-hfc2019e_0.conda,29
 2026-10-23,0.7,linux-64/nebi-0.7-hfc2019e_0.conda,695
 2026-10-23,0.9,linux-64/nebi-0.9-hfc2019e_0.conda,678
 2026-10-23,0.9,linux-64/nebi-0.9-hfc2019e_1.conda,618
@@ -52,7 +52,7 @@ date,version,file,cumulative
 2026-10-23,0.13,win-64/nebi-0.13-h11686cb_0.conda,64
 2026-10-23,0.14,win-64/nebi-0.14-h11686cb_0.conda,55
 2026-10-23,0.15,win-64/nebi-0.15-h11686cb_0.conda,63
-2026-10-23,0.16,win-64/nebi-0.16-h11686cb_0.conda,21
+2026-10-23,0.16,win-64/nebi-0.16-h11686cb_0.conda,22
 2026-10-23,0.7,win-64/nebi-0.7-h11686cb_0.conda,94
 2026-10-23,0.9,win-64/nebi-0.9-h11686cb_0.conda,96
 2026-10-23,0.9,win-64/nebi-0.9-h11686cb_1.conda,74
