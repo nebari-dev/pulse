@@ -2,6 +2,9 @@ import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '@/components/PageHeader';
+import ReleaseTimeline, {
+  type TimelineRow,
+} from '@/components/ReleaseTimeline';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
@@ -78,7 +81,18 @@ function useReleases(summary: ReposFile | undefined) {
       .sort((a, b) => (a.date > b.date ? -1 : a.date < b.date ? 1 : 0));
     const recent = rows.reduce((acc, r) => acc + r.cadence.recent, 0);
     const active = rows.filter((r) => r.cadence.recent > 0).length;
-    return { asOf, start, end, rows, feed, recent, active };
+    // Timeline rows follow the table's default order: latest release first.
+    const timeline: TimelineRow[] = [...rows]
+      .sort((a, b) =>
+        (b.cadence.latest?.date ?? '').localeCompare(
+          a.cadence.latest?.date ?? '',
+        ),
+      )
+      .map((r) => ({
+        product: r.product,
+        releases: feed.filter((f) => f.product.id === r.product.id),
+      }));
+    return { asOf, start, end, rows, feed, recent, active, timeline };
   }, [summary, params.range, params.kind]);
   return { params, setParams, view };
 }
@@ -198,6 +212,24 @@ function Releases() {
               hint="release dates from GitHub"
             />
           </div>
+
+          {view.timeline.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Timeline, {rangeLabel.toLowerCase()}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReleaseTimeline
+                  rows={view.timeline.filter((t) =>
+                    matchesQuery(params.q, t.product.name, t.product.id),
+                  )}
+                  start={view.start}
+                  end={view.end}
+                  title={`Release timeline by product, ${rangeLabel}`}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           <Table aria-label={`Release cadence by product, ${rangeLabel}`}>
             <TableHeader>

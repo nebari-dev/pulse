@@ -43,6 +43,7 @@ pulse-dashboard/
 │   │   ├── ui/            # Nebari components (installed via shadcn — managed)
 │   │   ├── Header/        # brand, section nav (Downloads/Releases/Repos/Traffic), theme toggle
 │   │   ├── PageHeader/    # title + description + controls row used by every page
+│   │   ├── ReleaseTimeline/ # one row per product, a link per release on a shared time axis
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── WhatChanged/   # weekly strip: movers, releases, repos that went quiet (lib/changes.ts)
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)

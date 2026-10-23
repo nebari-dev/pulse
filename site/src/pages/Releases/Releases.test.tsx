@@ -37,7 +37,23 @@ describe('Releases', () => {
     expect(within(table).queryByText('Chat Pack')).not.toBeInTheDocument();
     // The feed lists the prerelease too.
     expect(screen.getByText('v1.2.0-rc1')).toBeInTheDocument();
-    expect(screen.getByText('prerelease')).toBeInTheDocument();
+    // Badge in the feed, plus the timeline legend.
+    expect(screen.getAllByText('prerelease').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('draws the timeline with every product that has repos', async () => {
+    renderPage();
+    const figure = await screen.findByRole('figure', {
+      name: /Release timeline by product/,
+    });
+    expect(
+      within(figure).getByRole('list', { name: 'Nebari Operator releases' }),
+    ).toBeInTheDocument();
+    expect(
+      within(figure).getByRole('list', {
+        name: 'Nebari Infrastructure Core releases',
+      }),
+    ).toHaveTextContent('none in this period');
   });
 
   it('filters the table by search', async () => {
