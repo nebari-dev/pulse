@@ -1,0 +1,67 @@
+name: Preview deploy
+
+on:
+  pull_request:
+    paths:
+      - 'site/**'
+      - '.github/workflows/preview-deploy.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# One live preview per PR; a newer push cancels the in-flight one.
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Fork PRs receive no secrets, so the Cloudflare deploy could not
+    # authenticate. Same-repo PRs only; forks are skipped cleanly.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+
+      - name: Deploy preview to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Non-main branch => a Pages PREVIEW deployment, not production.
+          command: pages deploy site/dist --project-name=pulse --branch=pr-${{ github.event.pull_request.number }}
+
+      - name: Comment preview URL on the PR
+        if: steps.deploy.outputs.pages-deployment-alias-url != '' || steps.deploy.outputs.deployment-url != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          UNIQUE_URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: |
+          set -euo pipefail
+          marker='<!-- preview-url -->'
+          url="${ALIAS_URL:-$UNIQUE_URL}"
+          body=$(printf '%s\n\n**Preview deploy:** %s\n\nBuilt from `%s`. Redeploys on each push to this PR.' "$marker" "$url" "$HEAD_SHA")
+          # Upsert a single marker comment so re-pushes update in place.
+          comments=$(gh api "repos/$REPO/issues/$PR/comments" --paginate)
+          id=$(printf '%s' "$comments" | jq -r --arg m "$marker" 'map(select((.body // "") | contains($m))) | .[0].id // empty' | head -n1)
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/$REPO/issues/comments/$id" -f body="$body"
+          else
+            gh api --method POST "repos/$REPO/issues/$PR/comments" -f body="$body"
+          fi

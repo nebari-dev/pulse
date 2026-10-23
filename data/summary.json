@@ -810,6 +810,7 @@
       "all": 1069
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -1191,6 +1192,7 @@
       "all": 0
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -1572,6 +1574,7 @@
       "all": 1889
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -1953,6 +1956,7 @@
       "all": 3105
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -2334,6 +2338,7 @@
       "all": 2215
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -2715,6 +2720,7 @@
       "all": 932
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -3096,6 +3102,7 @@
       "all": 995
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -3477,6 +3484,7 @@
       "all": 34
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -3858,6 +3866,7 @@
       "all": 26
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -4239,6 +4248,7 @@
       "all": 206
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -4616,6 +4626,7 @@
       "all": 16
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -4997,6 +5008,7 @@
       "all": 0
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -5378,6 +5390,7 @@
       "all": 3768
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-04-08",
@@ -6151,6 +6164,153 @@
       "all": 0
      },
      "latest_cumulative": 49864,
+     "latest_items": [
+      {
+       "version": "2022.11.1",
+       "file": "noarch/nebari-2022.11.1-pyhd8ed1ab_0.conda",
+       "cumulative": 2641
+      },
+      {
+       "version": "2022.10.1",
+       "file": "noarch/nebari-2022.10.1-pyhd8ed1ab_0.conda",
+       "cumulative": 2522
+      },
+      {
+       "version": "2023.5.1",
+       "file": "noarch/nebari-2023.5.1-pyhd8ed1ab_0.conda",
+       "cumulative": 2305
+      },
+      {
+       "version": "2023.4.1",
+       "file": "noarch/nebari-2023.4.1-pyhd8ed1ab_0.conda",
+       "cumulative": 2272
+      },
+      {
+       "version": "2023.7.1",
+       "file": "noarch/nebari-2023.7.1-pyh707e725_0.conda",
+       "cumulative": 2128
+      },
+      {
+       "version": "2023.7.2",
+       "file": "noarch/nebari-2023.7.2-pyh707e725_0.conda",
+       "cumulative": 2124
+      },
+      {
+       "version": "2023.10.1",
+       "file": "noarch/nebari-2023.10.1-pyhd8ed1ab_0.conda",
+       "cumulative": 2009
+      },
+      {
+       "version": "2023.12.1",
+       "file": "noarch/nebari-2023.12.1-pyh707e725_0.conda",
+       "cumulative": 2002
+      },
+      {
+       "version": "2024.1.1",
+       "file": "noarch/nebari-2024.1.1-pyh707e725_0.conda",
+       "cumulative": 1993
+      },
+      {
+       "version": "2024.1.1",
+       "file": "noarch/nebari-2024.1.1-pyh707e725_1.conda",
+       "cumulative": 1969
+      },
+      {
+       "version": "2024.5.1",
+       "file": "noarch/nebari-2024.5.1-pyh707e725_0.conda",
+       "cumulative": 1965
+      },
+      {
+       "version": "2023.11.1",
+       "file": "noarch/nebari-2023.11.1-pyh707e725_0.conda",
+       "cumulative": 1963
+      },
+      {
+       "version": "2024.4.1",
+       "file": "noarch/nebari-2024.4.1-pyh707e725_0.conda",
+       "cumulative": 1958
+      },
+      {
+       "version": "2024.3.3",
+       "file": "noarch/nebari-2024.3.3-pyh707e725_0.conda",
+       "cumulative": 1946
+      },
+      {
+       "version": "2024.3.1",
+       "file": "noarch/nebari-2024.3.1-pyh707e725_0.conda",
+       "cumulative": 1938
+      },
+      {
+       "version": "2024.3.2",
+       "file": "noarch/nebari-2024.3.2-pyh707e725_0.conda",
+       "cumulative": 1938
+      },
+      {
+       "version": "2023.11.1",
+       "file": "noarch/nebari-2023.11.1-pyh707e725_1.conda",
+       "cumulative": 1931
+      },
+      {
+       "version": "2024.6.1",
+       "file": "noarch/nebari-2024.6.1-pyh707e725_0.conda",
+       "cumulative": 1879
+      },
+      {
+       "version": "2024.7.1",
+       "file": "noarch/nebari-2024.7.1-pyh707e725_0.conda",
+       "cumulative": 1746
+      },
+      {
+       "version": "2024.11.1",
+       "file": "noarch/nebari-2024.11.1-pyh707e725_0.conda",
+       "cumulative": 1562
+      },
+      {
+       "version": "2024.12.1",
+       "file": "noarch/nebari-2024.12.1-pyh707e725_0.conda",
+       "cumulative": 1478
+      },
+      {
+       "version": "2025.2.1",
+       "file": "noarch/nebari-2025.2.1-pyh707e725_2.conda",
+       "cumulative": 1213
+      },
+      {
+       "version": "2025.2.1",
+       "file": "noarch/nebari-2025.2.1-pyh707e725_0.conda",
+       "cumulative": 1178
+      },
+      {
+       "version": "2025.3.1",
+       "file": "noarch/nebari-2025.3.1-pyh707e725_0.conda",
+       "cumulative": 1127
+      },
+      {
+       "version": "2025.4.1",
+       "file": "noarch/nebari-2025.4.1-pyh707e725_0.conda",
+       "cumulative": 1090
+      },
+      {
+       "version": "2025.6.1",
+       "file": "noarch/nebari-2025.6.1-pyh707e725_0.conda",
+       "cumulative": 1002
+      },
+      {
+       "version": "2025.4.2",
+       "file": "noarch/nebari-2025.4.2-pyh707e725_0.conda",
+       "cumulative": 995
+      },
+      {
+       "version": "2025.10.1",
+       "file": "noarch/nebari-2025.10.1-pyh707e725_0.conda",
+       "cumulative": 790
+      },
+      {
+       "version": "2024.9.1",
+       "file": "noarch/nebari-2024.9.1-pyh707e725_0.conda",
+       "cumulative": 200
+      }
+     ],
      "series": []
     }
    ]
@@ -6546,6 +6706,7 @@
       "all": 8327
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -6927,6 +7088,7 @@
       "all": 494
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -7308,6 +7470,7 @@
       "all": 2483
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -7685,6 +7848,7 @@
       "all": 6870
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -8066,6 +8230,558 @@
       "all": 0
      },
      "latest_cumulative": 259,
+     "latest_items": [
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "install.yaml",
+       "cumulative": 147
+      },
+      {
+       "tag": "v0.1.0-alpha.13",
+       "asset": "install.yaml",
+       "cumulative": 33
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "install.yaml",
+       "cumulative": 21
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "install.yaml",
+       "cumulative": 21
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "install.yaml",
+       "cumulative": 18
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "install.yaml",
+       "cumulative": 6
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "install.yaml",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-operator-0.1.2.tgz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "install.yaml",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "nebari-operator-0.1.0-alpha.1.tgz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.12",
+       "asset": "install.yaml",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "install.yaml",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "nebari-operator-0.1.0-alpha.20.tgz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "install.yaml",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.8",
+       "asset": "install.yaml",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "install.yaml",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-app-0.1.0.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-operator-0.1.0.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-operator_0.1.0_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-operator_0.1.0_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-operator_0.1.0_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-operator_0.1.0_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-operator_0.1.0_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "nebari-operator_0.1.0-alpha.1_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "nebari-operator_0.1.0-alpha.1_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "nebari-operator_0.1.0-alpha.1_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "nebari-operator_0.1.0-alpha.1_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.1",
+       "asset": "nebari-operator_0.1.0-alpha.1_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.10",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.10",
+       "asset": "nebari-operator-0.1.0-alpha.10.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.11",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.11",
+       "asset": "nebari-operator-0.1.0-alpha.11.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.12",
+       "asset": "nebari-operator-0.1.0-alpha.12.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.13",
+       "asset": "nebari-operator-0.1.0-alpha.13.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.14",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.14",
+       "asset": "nebari-operator-0.1.0-alpha.14.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.15",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.15",
+       "asset": "nebari-operator-0.1.0-alpha.15.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.16",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.16",
+       "asset": "nebari-operator-0.1.0-alpha.16.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.17",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.17",
+       "asset": "nebari-operator-0.1.0-alpha.17.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "nebari-operator-0.1.0-alpha.18.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "nebari-operator_0.1.0-alpha.18_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "nebari-operator_0.1.0-alpha.18_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "nebari-operator_0.1.0-alpha.18_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "nebari-operator_0.1.0-alpha.18_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.18",
+       "asset": "nebari-operator_0.1.0-alpha.18_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "nebari-operator-0.1.0-alpha.19.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "nebari-operator_0.1.0-alpha.19_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "nebari-operator_0.1.0-alpha.19_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "nebari-operator_0.1.0-alpha.19_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "nebari-operator_0.1.0-alpha.19_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.19",
+       "asset": "nebari-operator_0.1.0-alpha.19_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "nebari-operator-0.1.0-alpha.2.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "nebari-operator_0.1.0-alpha.2_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "nebari-operator_0.1.0-alpha.2_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "nebari-operator_0.1.0-alpha.2_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "nebari-operator_0.1.0-alpha.2_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.2",
+       "asset": "nebari-operator_0.1.0-alpha.2_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "nebari-operator_0.1.0-alpha.20_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "nebari-operator_0.1.0-alpha.20_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "nebari-operator_0.1.0-alpha.20_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "nebari-operator_0.1.0-alpha.20_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.20",
+       "asset": "nebari-operator_0.1.0-alpha.20_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "nebari-operator-0.1.0-alpha.3.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "nebari-operator_0.1.0-alpha.3_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "nebari-operator_0.1.0-alpha.3_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "nebari-operator_0.1.0-alpha.3_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "nebari-operator_0.1.0-alpha.3_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.3",
+       "asset": "nebari-operator_0.1.0-alpha.3_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "nebari-operator-0.1.0-alpha.4.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "nebari-operator_0.1.0-alpha.4_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "nebari-operator_0.1.0-alpha.4_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "nebari-operator_0.1.0-alpha.4_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "nebari-operator_0.1.0-alpha.4_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.4",
+       "asset": "nebari-operator_0.1.0-alpha.4_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "nebari-operator-0.1.0-alpha.5.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "nebari-operator_0.1.0-alpha.5_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "nebari-operator_0.1.0-alpha.5_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "nebari-operator_0.1.0-alpha.5_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "nebari-operator_0.1.0-alpha.5_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "nebari-operator_0.1.0-alpha.5_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.6",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.6",
+       "asset": "nebari-operator-0.1.0-alpha.6.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.7",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.7",
+       "asset": "nebari-operator-0.1.0-alpha.7.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.8",
+       "asset": "nebari-operator-0.1.0-alpha.8.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-app-0.1.1.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-operator-0.1.1.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-operator_0.1.1_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-operator_0.1.1_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-operator_0.1.1_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-operator_0.1.1_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "nebari-operator_0.1.1_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-app-0.1.2.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-operator_0.1.2_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-operator_0.1.2_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-operator_0.1.2_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-operator_0.1.2_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "nebari-operator_0.1.2_Windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "install.yaml",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-app-0.2.0.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-operator-0.2.0.tgz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-operator_0.2.0_Darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-operator_0.2.0_Darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-operator_0.2.0_Linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-operator_0.2.0_Linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-operator_0.2.0_Windows_x86_64.zip",
+       "cumulative": 0
+      }
+     ],
      "series": []
     }
    ]
@@ -8661,6 +9377,7 @@
       "all": 117
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -9038,6 +9755,7 @@
       "all": 64
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -9415,6 +10133,7 @@
       "all": 212
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -9792,6 +10511,7 @@
       "all": 200
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-04-08",
@@ -10205,6 +10925,743 @@
       "all": 0
      },
      "latest_cumulative": 2086,
+     "latest_items": [
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core_0.14.0_linux_x86_64.tar.gz",
+       "cumulative": 415
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core_0.3.0_linux_x86_64.tar.gz",
+       "cumulative": 204
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core_0.13.0_linux_x86_64.tar.gz",
+       "cumulative": 188
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core_0.12.0_linux_x86_64.tar.gz",
+       "cumulative": 175
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core_0.6.0_linux_x86_64.tar.gz",
+       "cumulative": 175
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core_0.8.0_linux_x86_64.tar.gz",
+       "cumulative": 138
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core_0.10.0_linux_x86_64.tar.gz",
+       "cumulative": 115
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core_0.11.0_linux_x86_64.tar.gz",
+       "cumulative": 101
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core_0.9.0_linux_x86_64.tar.gz",
+       "cumulative": 81
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core-0.9.0-source.tar.gz",
+       "cumulative": 49
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core_0.4.0_linux_x86_64.tar.gz",
+       "cumulative": 36
+      },
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core_0.14.0_darwin_arm64.tar.gz",
+       "cumulative": 20
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.1_linux_x86_64.tar.gz",
+       "cumulative": 20
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core_0.2.0_linux_x86_64.tar.gz",
+       "cumulative": 17
+      },
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core-0.14.0-source.tar.gz",
+       "cumulative": 12
+      },
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core_0.14.0_darwin_x86_64.tar.gz",
+       "cumulative": 11
+      },
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core_0.14.0_linux_arm64.tar.gz",
+       "cumulative": 11
+      },
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core_0.14.0_windows_x86_64.zip",
+       "cumulative": 11
+      },
+      {
+       "tag": "v0.14.0",
+       "asset": "nebari-infrastructure-core_0.14.0_windows_arm64.zip",
+       "cumulative": 10
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core_0.1.0_linux_x86_64.tar.gz",
+       "cumulative": 9
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core_0.12.0_darwin_arm64.tar.gz",
+       "cumulative": 6
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core_0.5.0_linux_x86_64.tar.gz",
+       "cumulative": 6
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core_0.6.0_darwin_arm64.tar.gz",
+       "cumulative": 6
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core_0.9.0_darwin_arm64.tar.gz",
+       "cumulative": 6
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.1_linux_x86_64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core_0.2.0_darwin_arm64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core_0.3.0_darwin_arm64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core_0.5.0_darwin_x86_64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core-0.8.0-source.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core_0.10.0_darwin_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core_0.10.0_darwin_x86_64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core_0.10.0_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core_0.10.0_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core_0.15.0_darwin_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core_0.4.0_darwin_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core_0.4.0_darwin_x86_64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core_0.4.0_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core_0.4.0_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core_0.5.0_darwin_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core_0.5.0_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core_0.5.0_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core_0.6.0_darwin_x86_64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core_0.6.0_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core_0.6.0_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core_0.8.0_darwin_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core_0.8.0_darwin_x86_64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core_0.8.0_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core_0.8.0_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core_0.9.0_darwin_x86_64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core_0.9.0_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core_0.10.0_windows_arm64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core_0.11.0_darwin_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core_0.11.0_darwin_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core_0.11.0_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core_0.11.0_windows_x86_64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core_0.12.0_darwin_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core_0.12.0_windows_x86_64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core_0.13.0_darwin_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.2_linux_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core_0.15.0_darwin_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core_0.15.0_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core_0.15.0_linux_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core_0.2.0_darwin_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core_0.2.0_windows_x86_64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core_0.3.0_darwin_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core_0.3.0_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core_0.3.0_windows_x86_64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core_0.4.0_windows_arm64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core_0.5.0_windows_arm64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core_0.6.0_windows_arm64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.8.0",
+       "asset": "nebari-infrastructure-core_0.8.0_windows_arm64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core_0.9.0_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.9.0",
+       "asset": "nebari-infrastructure-core_0.9.0_windows_arm64.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core-0.1.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core_0.1.0_darwin_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core_0.1.0_darwin_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core_0.1.0_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core_0.1.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "nebari-infrastructure-core_0.1.0_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebari-infrastructure-core-0.10.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core_0.11.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core_0.12.0_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core_0.12.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core_0.13.0_darwin_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core_0.13.0_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core_0.13.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core_0.13.0_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core-0.14.0-rc.1-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.1_darwin_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.1_darwin_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.1_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.1_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.1_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core-0.14.0-rc.2-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.2_darwin_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.2_darwin_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.2_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.2_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.14.0-rc.2_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core_0.15.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core_0.15.0_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.1_darwin_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core_0.16.0_linux_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core-0.2.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core_0.2.0_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "nebari-infrastructure-core_0.2.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core-0.3.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.3.0",
+       "asset": "nebari-infrastructure-core_0.3.0_windows_arm64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.4.0",
+       "asset": "nebari-infrastructure-core-0.4.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.5.0",
+       "asset": "nebari-infrastructure-core-0.5.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.6.0",
+       "asset": "nebari-infrastructure-core-0.6.0-source.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.11.0",
+       "asset": "nebari-infrastructure-core-0.11.0-source.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.12.0",
+       "asset": "nebari-infrastructure-core-0.12.0-source.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0",
+       "asset": "nebari-infrastructure-core-0.13.0-source.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core-0.13.0-rc.1-source.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.13.0-rc.1_darwin_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.13.0-rc.1_darwin_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.13.0-rc.1_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.13.0-rc.1_linux_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.13.0-rc.1_windows_arm64.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.13.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.13.0-rc.1_windows_x86_64.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.15.0",
+       "asset": "nebari-infrastructure-core-0.15.0-source.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core-0.15.0-rc.1-source.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.1_darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.1_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.1_windows_arm64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.1_windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core-0.15.0-rc.2-source.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.2_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.2_darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.2_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.2_linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.2_windows_arm64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.15.0-rc.2",
+       "asset": "nebari-infrastructure-core_0.15.0-rc.2_windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core-0.16.0-source.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core_0.16.0_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core_0.16.0_darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core_0.16.0_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core_0.16.0_windows_arm64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0",
+       "asset": "nebari-infrastructure-core_0.16.0_windows_x86_64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core-0.16.0-rc.1-source.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.16.0-rc.1_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.16.0-rc.1_darwin_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.16.0-rc.1_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.16.0-rc.1_linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.16.0-rc.1_windows_arm64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16.0-rc.1",
+       "asset": "nebari-infrastructure-core_0.16.0-rc.1_windows_x86_64.zip",
+       "cumulative": 0
+      }
+     ],
      "series": []
     }
    ]
@@ -10600,6 +12057,7 @@
       "all": 14047
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -10981,6 +12439,7 @@
       "all": 99
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -11358,6 +12817,7 @@
       "all": 0
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -11739,6 +13199,273 @@
       "all": 0
      },
      "latest_cumulative": 10174,
+     "latest_items": [
+      {
+       "version": "0.15",
+       "file": "linux-64/nebi-0.15-hfc2019e_0.conda",
+       "cumulative": 921
+      },
+      {
+       "version": "0.14",
+       "file": "linux-64/nebi-0.14-hfc2019e_0.conda",
+       "cumulative": 911
+      },
+      {
+       "version": "0.7",
+       "file": "linux-64/nebi-0.7-hfc2019e_0.conda",
+       "cumulative": 695
+      },
+      {
+       "version": "0.9",
+       "file": "linux-64/nebi-0.9-hfc2019e_0.conda",
+       "cumulative": 678
+      },
+      {
+       "version": "0.10.0",
+       "file": "linux-64/nebi-0.10.0-hfc2019e_0.conda",
+       "cumulative": 659
+      },
+      {
+       "version": "0.10.1",
+       "file": "linux-64/nebi-0.10.1-hfc2019e_0.conda",
+       "cumulative": 651
+      },
+      {
+       "version": "0.9",
+       "file": "linux-64/nebi-0.9-hfc2019e_1.conda",
+       "cumulative": 618
+      },
+      {
+       "version": "0.10.2",
+       "file": "linux-64/nebi-0.10.2-hfc2019e_0.conda",
+       "cumulative": 563
+      },
+      {
+       "version": "0.13",
+       "file": "linux-64/nebi-0.13-hfc2019e_0.conda",
+       "cumulative": 532
+      },
+      {
+       "version": "0.10.4",
+       "file": "linux-64/nebi-0.10.4-hfc2019e_0.conda",
+       "cumulative": 523
+      },
+      {
+       "version": "0.12",
+       "file": "linux-64/nebi-0.12-hfc2019e_0.conda",
+       "cumulative": 430
+      },
+      {
+       "version": "0.11",
+       "file": "linux-64/nebi-0.11-hfc2019e_0.conda",
+       "cumulative": 190
+      },
+      {
+       "version": "0.10.5",
+       "file": "linux-64/nebi-0.10.5-hfc2019e_0.conda",
+       "cumulative": 187
+      },
+      {
+       "version": "0.9",
+       "file": "osx-64/nebi-0.9-h8822bef_0.conda",
+       "cumulative": 96
+      },
+      {
+       "version": "0.9",
+       "file": "win-64/nebi-0.9-h11686cb_0.conda",
+       "cumulative": 96
+      },
+      {
+       "version": "0.10.1",
+       "file": "osx-64/nebi-0.10.1-h8822bef_0.conda",
+       "cumulative": 95
+      },
+      {
+       "version": "0.10.0",
+       "file": "osx-64/nebi-0.10.0-h8822bef_0.conda",
+       "cumulative": 94
+      },
+      {
+       "version": "0.7",
+       "file": "win-64/nebi-0.7-h11686cb_0.conda",
+       "cumulative": 94
+      },
+      {
+       "version": "0.10.1",
+       "file": "win-64/nebi-0.10.1-h11686cb_0.conda",
+       "cumulative": 88
+      },
+      {
+       "version": "0.9",
+       "file": "osx-64/nebi-0.9-hcd6a927_1.conda",
+       "cumulative": 87
+      },
+      {
+       "version": "0.10.0",
+       "file": "win-64/nebi-0.10.0-h11686cb_0.conda",
+       "cumulative": 85
+      },
+      {
+       "version": "0.9",
+       "file": "osx-arm64/nebi-0.9-h89545e0_0.conda",
+       "cumulative": 82
+      },
+      {
+       "version": "0.9",
+       "file": "osx-arm64/nebi-0.9-h820172f_0.conda",
+       "cumulative": 80
+      },
+      {
+       "version": "0.9",
+       "file": "osx-64/nebi-0.9-h5839d16_0.conda",
+       "cumulative": 76
+      },
+      {
+       "version": "0.10.0",
+       "file": "osx-arm64/nebi-0.10.0-h820172f_0.conda",
+       "cumulative": 74
+      },
+      {
+       "version": "0.9",
+       "file": "win-64/nebi-0.9-h11686cb_1.conda",
+       "cumulative": 74
+      },
+      {
+       "version": "0.10.1",
+       "file": "osx-arm64/nebi-0.10.1-h820172f_0.conda",
+       "cumulative": 71
+      },
+      {
+       "version": "0.7",
+       "file": "osx-64/nebi-0.7-h5839d16_0.conda",
+       "cumulative": 69
+      },
+      {
+       "version": "0.10.2",
+       "file": "win-64/nebi-0.10.2-h11686cb_0.conda",
+       "cumulative": 65
+      },
+      {
+       "version": "0.13",
+       "file": "win-64/nebi-0.13-h11686cb_0.conda",
+       "cumulative": 64
+      },
+      {
+       "version": "0.9",
+       "file": "osx-64/nebi-0.9-hcd6a927_0.conda",
+       "cumulative": 63
+      },
+      {
+       "version": "0.15",
+       "file": "win-64/nebi-0.15-h11686cb_0.conda",
+       "cumulative": 63
+      },
+      {
+       "version": "0.11",
+       "file": "win-64/nebi-0.11-h11686cb_0.conda",
+       "cumulative": 62
+      },
+      {
+       "version": "0.12",
+       "file": "win-64/nebi-0.12-h11686cb_0.conda",
+       "cumulative": 61
+      },
+      {
+       "version": "0.10.4",
+       "file": "win-64/nebi-0.10.4-h11686cb_0.conda",
+       "cumulative": 60
+      },
+      {
+       "version": "0.10.5",
+       "file": "win-64/nebi-0.10.5-h11686cb_0.conda",
+       "cumulative": 60
+      },
+      {
+       "version": "0.10.2",
+       "file": "osx-64/nebi-0.10.2-h8822bef_0.conda",
+       "cumulative": 59
+      },
+      {
+       "version": "0.14",
+       "file": "osx-arm64/nebi-0.14-h820172f_0.conda",
+       "cumulative": 59
+      },
+      {
+       "version": "0.11",
+       "file": "osx-arm64/nebi-0.11-h820172f_0.conda",
+       "cumulative": 57
+      },
+      {
+       "version": "0.9",
+       "file": "osx-arm64/nebi-0.9-h89545e0_1.conda",
+       "cumulative": 55
+      },
+      {
+       "version": "0.14",
+       "file": "win-64/nebi-0.14-h11686cb_0.conda",
+       "cumulative": 55
+      },
+      {
+       "version": "0.10.2",
+       "file": "osx-arm64/nebi-0.10.2-h820172f_0.conda",
+       "cumulative": 54
+      },
+      {
+       "version": "0.12",
+       "file": "osx-arm64/nebi-0.12-h820172f_0.conda",
+       "cumulative": 52
+      },
+      {
+       "version": "0.13",
+       "file": "osx-arm64/nebi-0.13-h820172f_0.conda",
+       "cumulative": 52
+      },
+      {
+       "version": "0.10.4",
+       "file": "osx-64/nebi-0.10.4-h8822bef_0.conda",
+       "cumulative": 49
+      },
+      {
+       "version": "0.11",
+       "file": "osx-64/nebi-0.11-h8822bef_0.conda",
+       "cumulative": 49
+      },
+      {
+       "version": "0.13",
+       "file": "osx-64/nebi-0.13-h8822bef_0.conda",
+       "cumulative": 49
+      },
+      {
+       "version": "0.10.5",
+       "file": "osx-64/nebi-0.10.5-h8822bef_0.conda",
+       "cumulative": 48
+      },
+      {
+       "version": "0.14",
+       "file": "osx-64/nebi-0.14-h8822bef_0.conda",
+       "cumulative": 45
+      },
+      {
+       "version": "0.12",
+       "file": "osx-64/nebi-0.12-h8822bef_0.conda",
+       "cumulative": 44
+      },
+      {
+       "version": "0.15",
+       "file": "osx-64/nebi-0.15-h8822bef_0.conda",
+       "cumulative": 44
+      },
+      {
+       "version": "0.10.4",
+       "file": "osx-arm64/nebi-0.10.4-h820172f_0.conda",
+       "cumulative": 43
+      },
+      {
+       "version": "0.10.5",
+       "file": "osx-arm64/nebi-0.10.5-h820172f_0.conda",
+       "cumulative": 43
+      }
+     ],
      "series": []
     },
     {
@@ -11751,6 +13478,998 @@
       "all": 0
      },
      "latest_cumulative": 4637,
+     "latest_items": [
+      {
+       "tag": "v0.11",
+       "asset": "nebi_0.11_macOS_arm64.tar.gz",
+       "cumulative": 808
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi_0.11_linux_x86_64.tar.gz",
+       "cumulative": 759
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi_0.11_windows_x86_64.zip",
+       "cumulative": 692
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi_0.10.3_linux_x86_64.tar.gz",
+       "cumulative": 204
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi_0.10.3_macOS_arm64.tar.gz",
+       "cumulative": 157
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi_0.10.3_windows_x86_64.zip",
+       "cumulative": 139
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi_0.9_linux_x86_64.tar.gz",
+       "cumulative": 120
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi_0.10.4_linux_x86_64.tar.gz",
+       "cumulative": 119
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi_0.10.5_macOS_arm64.tar.gz",
+       "cumulative": 114
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi_0.10.5_linux_x86_64.tar.gz",
+       "cumulative": 109
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi_0.10.5_windows_x86_64.zip",
+       "cumulative": 96
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi_0.12-rc3_linux_x86_64.tar.gz",
+       "cumulative": 95
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi_0.9_linux_arm64.tar.gz",
+       "cumulative": 66
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi_0.15_linux_x86_64.tar.gz",
+       "cumulative": 63
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi_0.12-rc3_linux_arm64.tar.gz",
+       "cumulative": 50
+      },
+      {
+       "tag": "v0.5",
+       "asset": "nebi_0.5_macOS_arm64.tar.gz",
+       "cumulative": 50
+      },
+      {
+       "tag": "v0.5",
+       "asset": "nebi_0.5_linux_x86_64.tar.gz",
+       "cumulative": 49
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi_0.10.2_linux_x86_64.tar.gz",
+       "cumulative": 47
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi_0.14_linux_x86_64.tar.gz",
+       "cumulative": 36
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi_0.10.4_macOS_arm64.tar.gz",
+       "cumulative": 33
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi_0.14_macOS_arm64.tar.gz",
+       "cumulative": 33
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi_0.14_windows_x86_64.zip",
+       "cumulative": 32
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi_0.10.3_linux_arm64.tar.gz",
+       "cumulative": 30
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi_0.10.1_linux_x86_64.tar.gz",
+       "cumulative": 29
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi_0.10.4_windows_x86_64.zip",
+       "cumulative": 29
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi_0.15_linux_arm64.tar.gz",
+       "cumulative": 29
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi_0.10.2_macOS_arm64.tar.gz",
+       "cumulative": 25
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi_0.7_macOS_arm64.tar.gz",
+       "cumulative": 25
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi_0.12_linux_x86_64.tar.gz",
+       "cumulative": 23
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi_0.12_macOS_arm64.tar.gz",
+       "cumulative": 23
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi_0.12_windows_x86_64.zip",
+       "cumulative": 23
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi_0.10.1_windows_x86_64.zip",
+       "cumulative": 20
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi_0.9_windows_x86_64.zip",
+       "cumulative": 20
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi_0.7_linux_x86_64.tar.gz",
+       "cumulative": 18
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi_0.10.1_macOS_arm64.tar.gz",
+       "cumulative": 17
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi_0.10.2_windows_x86_64.zip",
+       "cumulative": 15
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi_0.15_macOS_arm64.tar.gz",
+       "cumulative": 15
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi_0.15_windows_x86_64.zip",
+       "cumulative": 15
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi_0.6.0-rc3_macOS_arm64.tar.gz",
+       "cumulative": 14
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi_0.7_windows_x86_64.zip",
+       "cumulative": 14
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi_0.8_linux_x86_64.tar.gz",
+       "cumulative": 13
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi_0.9_macOS_arm64.tar.gz",
+       "cumulative": 12
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi_0.10.0_linux_x86_64.tar.gz",
+       "cumulative": 10
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi_0.6.0-rc3_linux_x86_64.tar.gz",
+       "cumulative": 9
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi_0.10.0_macOS_arm64.tar.gz",
+       "cumulative": 8
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi_0.10.0_windows_x86_64.zip",
+       "cumulative": 8
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi_0.6.0-rc2_linux_x86_64.tar.gz",
+       "cumulative": 8
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi_0.8_macOS_arm64.tar.gz",
+       "cumulative": 8
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi_0.6_linux_x86_64.tar.gz",
+       "cumulative": 7
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 7
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi_0.12-rc1_linux_x86_64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi_0.12-rc2_linux_x86_64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi_0.6_macOS_arm64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi_0.6.0-rc1_macOS_arm64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi_0.8_linux_arm64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi_0.8_windows_x86_64.zip",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.1",
+       "asset": "darb_0.1_macOS_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi_0.12-rc1_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi_0.12-rc2_linux_arm64.tar.gz",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi_0.6_windows_x86_64.zip",
+       "cumulative": 4
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi_0.10.2_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi_0.11_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi_0.12-rc1_macOS_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.13",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.13",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.2",
+       "asset": "darb_0.2_macOS_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.3",
+       "asset": "darb_0.3_macOS_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.4",
+       "asset": "nebi_0.4_linux_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.5",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi_0.7_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi_0.9_macOS_x86_64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.1",
+       "asset": "darb_0.1_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1",
+       "asset": "darb_0.1_linux_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1",
+       "asset": "darb_0.1_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi_0.10.5_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.5",
+       "asset": "nebi_0.10.5_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.11",
+       "asset": "nebi_0.11_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi_0.12_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12",
+       "asset": "nebi_0.12_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi_0.12-rc1_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc1",
+       "asset": "nebi_0.12-rc1_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi_0.12-rc2_macOS_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi_0.12-rc2_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc2",
+       "asset": "nebi_0.12-rc2_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi_0.12-rc3_macOS_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi_0.12-rc3_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.12-rc3",
+       "asset": "nebi_0.12-rc3_windows_x86_64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.13",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi_0.14_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.14",
+       "asset": "nebi_0.14_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.15",
+       "asset": "nebi_0.15_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2",
+       "asset": "darb_0.2_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2",
+       "asset": "darb_0.2_linux_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2",
+       "asset": "darb_0.2_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.3",
+       "asset": "darb_0.3_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.3",
+       "asset": "darb_0.3_linux_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.3",
+       "asset": "darb_0.3_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.4",
+       "asset": "nebi_0.4_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.4",
+       "asset": "nebi_0.4_macOS_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.4",
+       "asset": "nebi_0.4_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.5",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.5",
+       "asset": "nebi_0.5_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.5",
+       "asset": "nebi_0.5_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi_0.6.0-rc2_macOS_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi_0.7_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.8",
+       "asset": "nebi_0.8_macOS_x86_64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.9",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi_0.10.0_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.0",
+       "asset": "nebi_0.10.0_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi_0.10.1_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.1",
+       "asset": "nebi_0.10.1_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.2",
+       "asset": "nebi_0.10.2_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.3",
+       "asset": "nebi_0.10.3_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi_0.10.4_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.10.4",
+       "asset": "nebi_0.10.4_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi_0.6_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6",
+       "asset": "nebi_0.6_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi_0.6.0-rc1_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi_0.6.0-rc1_linux_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi_0.6.0-rc1_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc1",
+       "asset": "nebi_0.6.0-rc1_windows_x86_64.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi_0.6.0-rc2_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi_0.6.0-rc2_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc2",
+       "asset": "nebi_0.6.0-rc2_windows_x86_64.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi_0.6.0-rc3_linux_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi_0.6.0-rc3_macOS_x86_64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.6.0-rc3",
+       "asset": "nebi_0.6.0-rc3_windows_x86_64.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.7",
+       "asset": "nebi-desktop-windows-amd64.exe",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-cli-release.json",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-container-image.json",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-desktop-linux-amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-desktop-linux-amd64.tar.gz.release.json",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-desktop-linux-amd64.tar.gz.sbom.spdx.json",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-desktop-macos-universal.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-desktop-macos-universal.zip.release.json",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi-desktop-macos-universal.zip.sbom.spdx.json",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi_0.16_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi_0.16_linux_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi_0.16_macOS_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi_0.16_macOS_x86_64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.16",
+       "asset": "nebi_0.16_windows_x86_64.zip",
+       "cumulative": 0
+      }
+     ],
      "series": []
     }
    ]
@@ -12146,6 +14865,7 @@
       "all": 7144
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -12527,6 +15247,7 @@
       "all": 393
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -13287,6 +16008,7 @@
       "all": 33
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -13664,6 +16386,7 @@
       "all": 1
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -14041,6 +16764,7 @@
       "all": 2
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -14418,6 +17142,7 @@
       "all": 2
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -14795,6 +17520,7 @@
       "all": 2
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -15172,6 +17898,7 @@
       "all": 2
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -15932,6 +18659,7 @@
       "all": 467052
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -16313,6 +19041,7 @@
       "all": 2940
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -16694,6 +19423,7 @@
       "all": 2680
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -17075,6 +19805,7 @@
       "all": 359
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -17456,6 +20187,7 @@
       "all": 187
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -17837,6 +20569,7 @@
       "all": 18
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -18597,6 +21330,7 @@
       "all": 157
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -19357,6 +22091,7 @@
       "all": 410
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -19738,6 +22473,7 @@
       "all": 11846
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -20119,6 +22855,7 @@
       "all": 4906
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -20500,6 +23237,7 @@
       "all": 578
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -20881,6 +23619,7 @@
       "all": 507
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -21262,6 +24001,7 @@
       "all": 473
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -22026,6 +24766,7 @@
       "all": 424
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -22790,6 +25531,7 @@
       "all": 423
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -23554,6 +26296,7 @@
       "all": 400
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -23935,6 +26678,7 @@
       "all": 202
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -24316,6 +27060,7 @@
       "all": 200
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -24697,6 +27442,7 @@
       "all": 204
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -25078,6 +27824,7 @@
       "all": 202
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -25842,6 +28589,7 @@
       "all": 233
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -26223,6 +28971,7 @@
       "all": 390
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -26604,6 +29353,108 @@
       "all": 0
      },
      "latest_cumulative": 2,
+     "latest_items": [
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "frames_0.1.0-alpha.5_linux_amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.5",
+       "asset": "frames_0.1.5_linux_amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "frames_0.1.0-alpha.5_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "frames_0.1.0-alpha.5_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "frames_0.1.0-alpha.5_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.0-alpha.5",
+       "asset": "frames_0.1.0-alpha.5_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.5",
+       "asset": "frames_0.1.5_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.5",
+       "asset": "frames_0.1.5_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.5",
+       "asset": "frames_0.1.5_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.5",
+       "asset": "frames_0.1.5_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "frames_0.1.6_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "frames_0.1.6_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "frames_0.1.6_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "frames_0.1.6_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "frames_0.1.6_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "frames_0.1.7_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "frames_0.1.7_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "frames_0.1.7_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "frames_0.1.7_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "frames_0.1.7_windows_amd64.zip",
+       "cumulative": 0
+      }
+     ],
      "series": []
     }
    ]
@@ -26999,6 +29850,7 @@
       "all": 400
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -27763,6 +30615,7 @@
       "all": 6
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -28144,6 +30997,7 @@
       "all": 7
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -28908,6 +31762,7 @@
       "all": 4744
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -29289,6 +32144,7 @@
       "all": 411
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -30049,6 +32905,7 @@
       "all": 376
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -30809,6 +33666,7 @@
       "all": 403
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -31573,6 +34431,7 @@
       "all": 19
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -31954,6 +34813,7 @@
       "all": 387
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-23",
@@ -32335,6 +35195,548 @@
       "all": 0
      },
      "latest_cumulative": 41,
+     "latest_items": [
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl_0.2.0_linux_amd64.tar.gz",
+       "cumulative": 8
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl-server_0.1.0_darwin_arm64.tar.gz",
+       "cumulative": 5
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl_0.1.0_linux_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl_0.2.0_darwin_arm64.tar.gz",
+       "cumulative": 3
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl-server_0.1.0_darwin_amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl-server_0.1.0_linux_amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl-server_0.1.0_linux_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl_0.1.0_darwin_amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl_0.1.0_darwin_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl_0.1.0_linux_amd64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.0",
+       "asset": "skillsctl_0.1.0_windows_amd64.zip",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl_0.2.4_darwin_arm64.tar.gz",
+       "cumulative": 2
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl_0.1.4_linux_amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl_0.1.7_darwin_arm64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl_0.2.0_darwin_amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl_0.2.0_windows_amd64.zip",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl-server_0.2.4_linux_amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl_0.2.4_linux_amd64.tar.gz",
+       "cumulative": 1
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl-server_0.1.1_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl-server_0.1.1_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl-server_0.1.1_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl-server_0.1.1_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl_0.1.1_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl_0.1.1_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl_0.1.1_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl_0.1.1_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.1",
+       "asset": "skillsctl_0.1.1_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl-server_0.1.2_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl-server_0.1.2_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl-server_0.1.2_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl-server_0.1.2_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl_0.1.2_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl_0.1.2_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl_0.1.2_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl_0.1.2_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.2",
+       "asset": "skillsctl_0.1.2_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl-server_0.1.3_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl-server_0.1.3_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl-server_0.1.3_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl-server_0.1.3_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl_0.1.3_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl_0.1.3_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl_0.1.3_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl_0.1.3_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.3",
+       "asset": "skillsctl_0.1.3_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl-server_0.1.4_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl-server_0.1.4_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl-server_0.1.4_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl-server_0.1.4_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl_0.1.4_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl_0.1.4_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl_0.1.4_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.4",
+       "asset": "skillsctl_0.1.4_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl-server_0.1.6_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl-server_0.1.6_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl-server_0.1.6_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl-server_0.1.6_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl_0.1.6_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl_0.1.6_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl_0.1.6_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl_0.1.6_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.6",
+       "asset": "skillsctl_0.1.6_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl-server_0.1.7_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl-server_0.1.7_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl-server_0.1.7_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl-server_0.1.7_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl_0.1.7_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl_0.1.7_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl_0.1.7_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.1.7",
+       "asset": "skillsctl_0.1.7_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl-server_0.2.0_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl-server_0.2.0_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl-server_0.2.0_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl-server_0.2.0_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.0",
+       "asset": "skillsctl_0.2.0_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl-server_0.2.1_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl-server_0.2.1_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl-server_0.2.1_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl-server_0.2.1_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl_0.2.1_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl_0.2.1_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl_0.2.1_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl_0.2.1_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.1",
+       "asset": "skillsctl_0.2.1_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl-server_0.2.2_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl-server_0.2.2_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl-server_0.2.2_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl-server_0.2.2_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl_0.2.2_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl_0.2.2_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl_0.2.2_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl_0.2.2_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.2",
+       "asset": "skillsctl_0.2.2_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl-server_0.2.3_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl-server_0.2.3_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl-server_0.2.3_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl-server_0.2.3_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl_0.2.3_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl_0.2.3_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl_0.2.3_linux_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl_0.2.3_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.3",
+       "asset": "skillsctl_0.2.3_windows_amd64.zip",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl-server_0.2.4_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl-server_0.2.4_darwin_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl-server_0.2.4_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl_0.2.4_darwin_amd64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl_0.2.4_linux_arm64.tar.gz",
+       "cumulative": 0
+      },
+      {
+       "tag": "v0.2.4",
+       "asset": "skillsctl_0.2.4_windows_amd64.zip",
+       "cumulative": 0
+      }
+     ],
      "series": []
     }
    ]
@@ -32726,6 +36128,7 @@
       "all": 21
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",
@@ -33103,6 +36506,7 @@
       "all": 15
      },
      "latest_cumulative": null,
+     "latest_items": null,
      "series": [
       {
        "date": "2026-07-24",

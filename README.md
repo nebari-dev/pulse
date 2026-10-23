@@ -22,9 +22,12 @@ data/
   downloads/<source>/<artifact>.csv   raw rows, one file per artifact
   summary.json                        per-product daily series + 7/30/90d totals
   untracked.json                      Quay repos not yet in sources.yaml
+site/                   dashboard (Vite + React + Nebari design system)
 .github/workflows/
-  collect.yml           daily cron -> pulse collect -> commit data/
-  ci.yml                lint, tests, dry-run collect on PRs
+  collect.yml           daily cron -> pulse collect -> commit data/ -> dispatch deploy
+  deploy.yml            build site/ and deploy to Cloudflare Pages (project: pulse)
+  preview-deploy.yml    per-PR preview deployment for site/ changes
+  ci.yml                collector lint/tests/dry-run + site lint/tests/build on PRs
 ```
 
 ## Data model
@@ -58,6 +61,23 @@ uv run pytest && uv run ruff check .
 `GITHUB_TOKEN` is optional locally (`export GITHUB_TOKEN=$(gh auth token)`)
 but avoids the 60 req/h anonymous limit.
 
+## Dashboard
+
+`site/` is a static Vite + React app that fetches `data/summary.json` at
+runtime (served from `../data` in dev, copied into `dist/data` on build).
+Filters live in the URL, so any view is shareable.
+
+```sh
+cd site
+npm install
+npm run dev            # http://localhost:5173, reads ../data/summary.json
+npm run build && npm run test -- --run && npm run check
+```
+
+Deploys go to Cloudflare Pages via `wrangler-action`; the repo needs the
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets and a Pages
+project named `pulse`. Each daily data commit redeploys the site.
+
 ## Adding a product or pack
 
 Add an entry under `downloads.products` in `sources.yaml` and open a PR. The
@@ -67,6 +87,5 @@ own; add them to a product or to `quay_ignore`.
 
 ## Roadmap
 
-- Phase 2: dashboard (Vite + React, Nebari design system) reading `summary.json`.
 - Phase 3: GitHub traffic (clones/views), repo health (stars, issues, PR
   throughput, release cadence), docs traffic from the analytics pack.

@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  collector:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -22,3 +22,20 @@ jobs:
         run: uv run pulse collect --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  site:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npx biome ci .
+      - run: npx vitest run
+      - run: npm run build
