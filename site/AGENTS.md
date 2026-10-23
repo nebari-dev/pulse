@@ -34,6 +34,7 @@ pulse-dashboard/
 │   │   ├── utils.ts
 │   │   ├── summary.ts     # summary.json types + pure helpers (windows, series, deltas, search)
 │   │   ├── repos.ts       # release cadence, repo health and traffic helpers
+│   │   ├── changes.ts     # "what changed this week": movers, recent releases, went quiet
 │   │   └── format.ts
 │   ├── hooks/
 │   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id) over /data/*.json
@@ -43,6 +44,7 @@ pulse-dashboard/
 │   │   ├── Header/        # brand, section nav (Downloads/Releases/Repos/Traffic), theme toggle
 │   │   ├── PageHeader/    # title + description + controls row used by every page
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
+│   │   ├── WhatChanged/   # weekly strip: movers, releases, repos that went quiet (lib/changes.ts)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
 │   │   ├── Overview/      # / — filters, stat tiles, trend chart, searchable leaderboard
