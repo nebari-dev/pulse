@@ -32,6 +32,8 @@ import {
   releaseUrl,
   repoName,
   repoUrl,
+  starsGained,
+  starsPoints,
   TRAFFIC_LABEL,
   trafficRange,
   trafficSeries,
@@ -206,7 +208,22 @@ function useProductView(
         })
       : [];
 
+    const starred = product.repos.filter((r) => r.stars_series.length > 0);
+    const stars = starred.length
+      ? {
+          rows: starsPoints(starred, start, end).map((p) => ({
+            date: p.date,
+            stars: p.count,
+          })),
+          gained: starred.reduce(
+            (n, r) => n + (starsGained(r, start, end) ?? 0),
+            0,
+          ),
+        }
+      : null;
+
     return {
+      stars,
       cadence: cadence(stable, product.generated_at, 90),
       feed: feed.slice(0, 8),
       adoption: adoptionRows(artifacts),
@@ -518,9 +535,31 @@ function Product() {
               value={formatNumber(
                 product.repos.reduce((n, r) => n + (r.health?.stars ?? 0), 0),
               )}
-              hint={`${product.repos.length} ${product.repos.length === 1 ? 'repo' : 'repos'}`}
+              hint={
+                `${product.repos.length} ${product.repos.length === 1 ? 'repo' : 'repos'}` +
+                (view.stars
+                  ? `, ${view.stars.gained >= 0 ? '+' : ''}${formatNumber(view.stars.gained)} ${rangeLabel.toLowerCase()}`
+                  : '')
+              }
             />
           </div>
+
+          {view.stars && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Stars over time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrendChart
+                  rows={view.stars.rows}
+                  series={[
+                    { key: 'stars', label: 'Stars', color: 'var(--chart-1)' },
+                  ]}
+                  title={`${product.name} stars, ${rangeLabel}`}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           <Table aria-label={`${product.name} repositories`}>
             <TableHeader>

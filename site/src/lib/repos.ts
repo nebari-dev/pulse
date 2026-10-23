@@ -9,6 +9,7 @@ import {
   type Product,
   type Release,
   type Repo,
+  type StarPoint,
   type TrafficPoint,
 } from '@/lib/summary';
 
@@ -200,15 +201,45 @@ export function healthTotals(repos: Repo[]): HealthTotals {
   return t;
 }
 
-/** Stars gained between the first snapshot on or after `start` and the last. */
-export function starsDelta(repo: Repo, start: string): number | null {
-  const inRange = repo.health_series.filter(
-    (h) => h.date >= start && h.stars !== null,
+// ---- stars -------------------------------------------------------------------
+
+/** Stars as of `date`: the last point on or before it, 0 before the first. */
+export function starsAt(series: StarPoint[], date: string): number {
+  let stars = 0;
+  for (const p of series) {
+    if (p.date > date) break;
+    stars = p.stars;
+  }
+  return stars;
+}
+
+/** Stars gained inside [start, end], or null when the repo has no history. */
+export function starsGained(
+  repo: Repo,
+  start: string,
+  end: string,
+): number | null {
+  if (repo.stars_series.length === 0) return null;
+  return (
+    starsAt(repo.stars_series, end) -
+    starsAt(repo.stars_series, addDays(start, -1))
   );
-  const first = inRange[0];
-  const last = inRange.at(-1);
-  if (!first || !last || first === last) return null;
-  return (last.stars ?? 0) - (first.stars ?? 0);
+}
+
+/** Daily cumulative stars across repos in [start, end], for charts. */
+export function starsPoints(
+  repos: Repo[],
+  start: string,
+  end: string,
+): Point[] {
+  const out: Point[] = [];
+  for (let d = start; d <= end; d = addDays(d, 1)) {
+    out.push({
+      date: d,
+      count: repos.reduce((n, r) => n + starsAt(r.stars_series, d), 0),
+    });
+  }
+  return out;
 }
 
 /** Days between a repo's last push and `asOf`, or null when unknown. */

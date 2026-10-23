@@ -25,6 +25,7 @@ data/
   repos/health/<repo>.csv             daily snapshot: stars, forks, open issues/PRs, throughput
   repos/releases/<repo>.csv           one row per release tag with its date
   repos/traffic/<repo>.csv            daily views and clones (needs PULSE_GITHUB_TOKEN)
+  repos/stars/<repo>.csv              cumulative stars per date, back to the first star
   summary.json                        index: products with totals + series per source and type
   repos.json                          every product's repos: health, traffic, releases
   products/<id>.json                  one product in full, loaded by its page
@@ -50,6 +51,7 @@ site/                   dashboard (Vite + React + Nebari design system)
 | `repos/health` | `date,stars,forks,subscribers,open_issues,open_prs,merged_prs_30d,issues_opened_30d,issues_closed_30d,pushed_at` | daily snapshot via GraphQL |
 | `repos/releases` | `tag,published_at,prerelease` | one row per release tag |
 | `repos/traffic` | `date,views,unique_views,clones,unique_clones` | daily, 14-day window from GitHub |
+| `repos/stars` | `date,stars` | cumulative; backfilled once from each star's timestamp, then daily |
 
 For cumulative sources the daily series in `summary.json` is the delta
 between consecutive snapshots, kept per version/tag as well so the

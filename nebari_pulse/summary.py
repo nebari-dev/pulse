@@ -28,6 +28,7 @@ Full product shape (products/<id>.json, and the entries `build()` returns):
          "health": {<latest health snapshot>} | null,
          "health_series": [{"date", "stars", "open_issues", "open_prs"}],
          "traffic": [{"date", "views", "unique_views", "clones", "unique_clones"}],
+         "stars_series": [{"date", "stars"}],   # cumulative; only dates that changed
          "releases": [{"tag", "date", "prerelease"}]}   # newest first
       ]
     }
@@ -162,6 +163,14 @@ def _repo(data_dir: Path, repo: str) -> dict:
             key=lambda r: r["date"],
         )
     ]
+    stars_series = [
+        {"date": r["date"], "stars": int(r["stars"])}
+        for r in sorted(
+            store.read(store.path_for(data_dir, "repos", "stars", repo)),
+            key=lambda r: r["date"],
+        )
+        if r.get("stars") not in (None, "")
+    ]
     releases = [
         {
             "tag": r["tag"],
@@ -185,6 +194,7 @@ def _repo(data_dir: Path, repo: str) -> dict:
             for r in health_rows
         ],
         "traffic": traffic,
+        "stars_series": stars_series,
         "releases": releases,
     }
 

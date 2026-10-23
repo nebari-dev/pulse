@@ -65,10 +65,10 @@ nebari_pulse/
     pypi.py                  daily downloads (no mirrors) from pypistats, ~180d
     conda.py                 cumulative per-file totals from anaconda.org, snapshotted daily
     github_releases.py       cumulative per-asset download_count, snapshotted daily
-    github_repos.py          repo health (GraphQL), release tags/dates (REST), traffic (REST)
+    github_repos.py          repo health (GraphQL), release tags/dates, traffic, star history (REST)
 data/
   downloads/<source>/<artifact>.csv
-  repos/health|releases|traffic/<owner>__<name>.csv
+  repos/health|releases|traffic|stars/<owner>__<name>.csv
   summary.json               index: products with totals + series per (source, kind)
   repos.json                 every product's repos: health, traffic, releases
   products/<id>.json         one product in full: artifacts with series + items, repos
@@ -88,6 +88,7 @@ site/                        see site/AGENTS.md
 | repos/health | `date,stars,forks,subscribers,open_issues,open_prs,merged_prs_30d,issues_opened_30d,issues_closed_30d,pushed_at` | daily snapshot |
 | repos/releases | `tag,published_at,prerelease` | one row per release tag |
 | repos/traffic | `date,views,unique_views,clones,unique_clones` | daily |
+| repos/stars | `date,stars` | cumulative; backfilled once from the stargazers API (timestamp per star), then today's count from the health snapshot |
 
 Rules the collector relies on:
 
