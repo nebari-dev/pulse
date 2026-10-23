@@ -1,12 +1,14 @@
-import { Activity, Github, Moon, Sun } from 'lucide-react';
+import { Activity, Github, Menu, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import logoDark from '@/assets/nebari-logo_dark.svg';
 import logoLight from '@/assets/nebari-logo_light.svg';
 import { Button } from '@/components/ui/button';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import {
   MenuBarActions,
   MenuBarBrand,
   MenuBarNav,
+  NavDropdownMenu,
   NavigationMenu,
   NavLink,
 } from '@/components/ui/navigation-menu';
@@ -41,6 +43,7 @@ export const NAV = [
 function Header() {
   const { isDarkMode, setThemeMode } = useTheme();
   const { pathname, search } = useLocation();
+  const current = NAV.find((item) => item.match(pathname)) ?? NAV[0];
   return (
     <NavigationMenu className="h-14 justify-between border-border bg-header pl-4 text-header-foreground">
       <MenuBarBrand href="/" aria-label="Pulse home" className="gap-3">
@@ -64,6 +67,26 @@ function Header() {
             {item.label}
           </NavLink>
         ))}
+      </MenuBarNav>
+      {/* Below the sm breakpoint the links collapse into one menu named
+          after the current section, so every page stays reachable. */}
+      <MenuBarNav aria-label="Sections menu" className="ml-2 sm:hidden">
+        <NavDropdownMenu
+          active
+          icon={<Menu aria-hidden="true" />}
+          trigger={current.label}
+          triggerProps={{ 'aria-label': `Sections, current: ${current.label}` }}
+        >
+          {NAV.map((item) => (
+            <DropdownMenuItem
+              key={item.to}
+              aria-current={item.match(pathname) ? 'page' : undefined}
+              render={<Link to={{ pathname: item.to, search }} />}
+            >
+              {item.label}
+            </DropdownMenuItem>
+          ))}
+        </NavDropdownMenu>
       </MenuBarNav>
       <MenuBarActions className="gap-2">
         <Button
