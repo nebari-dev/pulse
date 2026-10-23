@@ -108,6 +108,7 @@ describe('series', () => {
 it('compares only artifacts that existed in the previous period', () => {
   const old = {
     source: 'pypi' as const,
+    kind: 'package' as const,
     ref: 'x',
     totals: { '7d': 0, '30d': 0, '90d': 0, all: 0 },
     latest_cumulative: null,
@@ -122,6 +123,7 @@ it('compares only artifacts that existed in the previous period', () => {
   const young = {
     ...old,
     source: 'quay' as const,
+    kind: 'image' as const,
     series: [{ date: '2026-10-22', count: 2 }],
   };
   const c = compareArtifacts([old, young], '2026-10-21', '2026-10-22');

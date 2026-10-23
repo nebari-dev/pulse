@@ -8,6 +8,9 @@ import {
 import { Tabs, TabsIndicator, TabsList, TabsTab } from '@/components/ui/tabs';
 import type { DashboardParams } from '@/hooks/useDashboardParams';
 import {
+  ARTIFACT_KIND_LABEL,
+  ARTIFACT_KINDS,
+  type ArtifactKindFilter,
   KIND_LABEL,
   type KindFilter,
   RANGE_LABEL,
@@ -21,7 +24,7 @@ import {
 interface FiltersProps {
   params: DashboardParams;
   onChange: (patch: Partial<DashboardParams>) => void;
-  /** Hide the kind filter (e.g. on a single product's page). */
+  /** Hide the product/pack filter (e.g. on a single product's page). */
   showKind?: boolean;
 }
 
@@ -31,12 +34,17 @@ const KIND_ITEMS: Array<{ value: KindFilter; label: string }> = [
   { value: 'pack', label: `${KIND_LABEL.pack}s` },
 ];
 
+const TYPE_ITEMS: Array<{ value: ArtifactKindFilter; label: string }> = [
+  { value: 'all', label: 'All types' },
+  ...ARTIFACT_KINDS.map((k) => ({ value: k, label: ARTIFACT_KIND_LABEL[k] })),
+];
+
 const SOURCE_ITEMS: Array<{ value: SourceFilter; label: string }> = [
   { value: 'all', label: 'All sources' },
   ...SOURCES.map((s) => ({ value: s, label: SOURCE_LABEL[s] })),
 ];
 
-/** One row of controls: date range, kind, source. State is in the URL. */
+/** One row of controls: date range, kind, artifact type, source. State is in the URL. */
 function Filters({ params, onChange, showKind = true }: FiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -72,6 +80,25 @@ function Filters({ params, onChange, showKind = true }: FiltersProps) {
           </SelectContent>
         </Select>
       )}
+
+      <Select
+        items={TYPE_ITEMS}
+        value={params.type}
+        onValueChange={(value) =>
+          onChange({ type: value as ArtifactKindFilter })
+        }
+      >
+        <SelectTrigger aria-label="Artifact type" className="w-40">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {TYPE_ITEMS.map((item) => (
+            <SelectItem key={item.value} value={item.value}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <Select
         items={SOURCE_ITEMS}

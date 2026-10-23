@@ -9,6 +9,9 @@ import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useSummary } from '@/hooks/useSummary';
 import { formatCompact, formatDate } from '@/lib/format';
 import {
+  ARTIFACT_KIND_COLOR,
+  ARTIFACT_KIND_LABEL,
+  ARTIFACT_KINDS,
   artifactsOf,
   between,
   chartRows,
@@ -41,14 +44,10 @@ function useOverview(summary: Summary | undefined) {
     );
 
     const rows: LeaderboardRow[] = products.map((product) => {
-      const series = productSeries(product, params.source);
+      const series = productSeries(product, params);
       return {
         product,
-        comparison: compareArtifacts(
-          artifactsOf(product, params.source),
-          start,
-          end,
-        ),
+        comparison: compareArtifacts(artifactsOf(product, params), start, end),
         share: 0,
         points: between(series, start, end),
       };
@@ -56,26 +55,41 @@ function useOverview(summary: Summary | undefined) {
     const grand = rows.reduce((acc, r) => acc + r.comparison.current, 0);
     for (const r of rows) r.share = grand ? r.comparison.current / grand : 0;
 
-    // Chart: stacked by source when unfiltered, otherwise a single area.
-    const bySource: Record<string, Point[]> = {};
+    // Chart: stacked by artifact type (images vs charts vs ...) unless a
+    // type is selected, then by source. A single remaining series is drawn
+    // as a plain area.
+    const all = products.flatMap((p) => artifactsOf(p, params));
+    const byGroup: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
-    const sources = params.source === 'all' ? SOURCES : [params.source];
-    for (const source of sources) {
-      const series = sumSeries(products.map((p) => productSeries(p, source)));
-      if (!hasDataIn(series, start, end)) continue;
-      bySource[source] = series;
-      chartSeries.push({
-        key: source,
-        label: SOURCE_LABEL[source],
-        color: SOURCE_COLOR[source],
-      });
+    if (params.type === 'all') {
+      for (const kind of ARTIFACT_KINDS) {
+        const series = sumSeries(
+          all.filter((a) => a.kind === kind).map((a) => a.series),
+        );
+        if (!hasDataIn(series, start, end)) continue;
+        byGroup[kind] = series;
+        chartSeries.push({
+          key: kind,
+          label: ARTIFACT_KIND_LABEL[kind],
+          color: ARTIFACT_KIND_COLOR[kind],
+        });
+      }
+    } else {
+      for (const source of SOURCES) {
+        const series = sumSeries(
+          all.filter((a) => a.source === source).map((a) => a.series),
+        );
+        if (!hasDataIn(series, start, end)) continue;
+        byGroup[source] = series;
+        chartSeries.push({
+          key: source,
+          label: SOURCE_LABEL[source],
+          color: SOURCE_COLOR[source],
+        });
+      }
     }
 
-    const overall = compareArtifacts(
-      products.flatMap((p) => artifactsOf(p, params.source)),
-      start,
-      end,
-    );
+    const overall = compareArtifacts(all, start, end);
     return {
       asOf,
       start,
@@ -84,7 +98,7 @@ function useOverview(summary: Summary | undefined) {
       days,
       rows,
       overall,
-      chartRows: chartRows(bySource, start, end, weekly),
+      chartRows: chartRows(byGroup, start, end, weekly),
       chartSeries,
       packs: products.filter((p) => p.kind === 'pack').length,
       count: products.length,
@@ -168,7 +182,10 @@ function Overview() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {view.weekly ? 'Weekly' : 'Daily'} downloads
+                {view.weekly ? 'Weekly' : 'Daily'}{' '}
+                {params.type === 'all'
+                  ? 'downloads by type'
+                  : `${ARTIFACT_KIND_LABEL[params.type].toLowerCase()} by source`}
                 {params.source !== 'all' &&
                   ` from ${SOURCE_LABEL[params.source]}`}
               </CardTitle>

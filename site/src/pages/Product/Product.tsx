@@ -19,6 +19,7 @@ import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useSummary } from '@/hooks/useSummary';
 import { formatCompact, formatNumber } from '@/lib/format';
 import {
+  ARTIFACT_KIND_LABEL,
   type Artifact,
   artifactsOf,
   artifactUrl,
@@ -86,7 +87,7 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
     const earliest = earliestDate(summary);
     const { start, end, days } = windowFor(params.range, asOf, earliest);
     const weekly = days > 120;
-    const artifacts = artifactsOf(product, params.source);
+    const artifacts = artifactsOf(product, params);
 
     const bySource: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
@@ -102,7 +103,7 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
         color: SOURCE_COLOR[source],
       });
     }
-    const series = productSeries(product, params.source);
+    const series = productSeries(product, params);
     const releases = artifacts
       .filter((a) => a.source === 'github_releases' && a.latest_items?.length)
       .flatMap((a) => a.latest_items ?? []);
@@ -147,6 +148,7 @@ function ArtifactRow({
           {SOURCE_LABEL[artifact.source]}
         </span>
       </TableCell>
+      <TableCell>{ARTIFACT_KIND_LABEL[artifact.kind]}</TableCell>
       <TableCell className="font-mono text-xs">
         <a
           href={artifactUrl(artifact)}
@@ -260,6 +262,7 @@ function Product() {
         <TableHeader>
           <TableRow>
             <TableHead>Source</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Artifact</TableHead>
             <TableHead className="text-right">{rangeLabel}</TableHead>
             <TableHead className="text-right">All recorded</TableHead>

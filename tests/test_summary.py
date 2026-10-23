@@ -46,6 +46,7 @@ def test_daily_and_cumulative_sources_combine(tmp_path: Path):
     ]
     assert product["totals"]["7d"] == 12
     assert product["totals"]["all"] == 12
+    assert [a["kind"] for a in product["artifacts"]] == ["image", "binary"]
     gh = next(a for a in product["artifacts"] if a["source"] == "github_releases")
     assert gh["latest_items"][0] == {"tag": "v1", "asset": "a.tgz", "cumulative": 15}
     assert gh["latest_cumulative"] == 16
@@ -74,3 +75,11 @@ def test_missing_data_files_are_fine(tmp_path: Path):
     out = summary.build(cfg, tmp_path, TODAY)
     assert out["products"][0]["totals"]["all"] == 0
     assert out["products"][0]["artifacts"][0]["series"] == []
+
+
+def test_artifact_kind():
+    assert summary.artifact_kind("quay", "nebari/nebari-operator") == "image"
+    assert summary.artifact_kind("quay", "nebari/charts/nebari-operator") == "chart"
+    assert summary.artifact_kind("pypi", "nebari") == "package"
+    assert summary.artifact_kind("conda", "conda-forge/nebi") == "package"
+    assert summary.artifact_kind("github_releases", "nebari-dev/nic") == "binary"

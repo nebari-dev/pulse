@@ -803,6 +803,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-jupyterhub",
+     "kind": "image",
      "totals": {
       "7d": 38,
       "30d": 115,
@@ -1185,6 +1186,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-jupyterhub-gpu",
+     "kind": "image",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -1567,6 +1569,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-jupyterlab",
+     "kind": "image",
      "totals": {
       "7d": 68,
       "30d": 269,
@@ -1949,6 +1952,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-jupyterlab-gpu",
+     "kind": "image",
      "totals": {
       "7d": 177,
       "30d": 736,
@@ -2331,6 +2335,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-dask-worker",
+     "kind": "image",
      "totals": {
       "7d": 117,
       "30d": 1330,
@@ -2713,6 +2718,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-dask-worker-gpu",
+     "kind": "image",
      "totals": {
       "7d": 26,
       "30d": 27,
@@ -3095,6 +3101,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-workflow-controller",
+     "kind": "image",
      "totals": {
       "7d": 32,
       "30d": 89,
@@ -3477,6 +3484,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-self-registration",
+     "kind": "image",
      "totals": {
       "7d": 10,
       "30d": 10,
@@ -3859,6 +3867,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-jupyterlite-plugin",
+     "kind": "image",
      "totals": {
       "7d": 4,
       "30d": 10,
@@ -4241,6 +4250,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-keycloak-theme",
+     "kind": "image",
      "totals": {
       "7d": 88,
       "30d": 206,
@@ -4619,6 +4629,7 @@
     {
      "source": "quay",
      "ref": "nebari/keycloak",
+     "kind": "image",
      "totals": {
       "7d": 6,
       "30d": 8,
@@ -5001,6 +5012,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-backup-restore",
+     "kind": "image",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -5383,6 +5395,7 @@
     {
      "source": "pypi",
      "ref": "nebari",
+     "kind": "package",
      "totals": {
       "7d": 26,
       "30d": 301,
@@ -6157,6 +6170,7 @@
     {
      "source": "conda",
      "ref": "conda-forge/nebari",
+     "kind": "package",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -6699,6 +6713,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-operator",
+     "kind": "image",
      "totals": {
       "7d": 566,
       "30d": 2600,
@@ -7081,6 +7096,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-operator",
+     "kind": "chart",
      "totals": {
       "7d": 93,
       "30d": 257,
@@ -7463,6 +7479,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-app",
+     "kind": "chart",
      "totals": {
       "7d": 381,
       "30d": 1547,
@@ -7841,6 +7858,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-webapi",
+     "kind": "image",
      "totals": {
       "7d": 378,
       "30d": 1999,
@@ -8223,6 +8241,7 @@
     {
      "source": "github_releases",
      "ref": "nebari-dev/nebari-operator",
+     "kind": "binary",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -9370,6 +9389,7 @@
     {
      "source": "quay",
      "ref": "nebari/starters/aws",
+     "kind": "image",
      "totals": {
       "7d": 45,
       "30d": 89,
@@ -9748,6 +9768,7 @@
     {
      "source": "quay",
      "ref": "nebari/starters/demo",
+     "kind": "image",
      "totals": {
       "7d": 12,
       "30d": 12,
@@ -10126,6 +10147,7 @@
     {
      "source": "quay",
      "ref": "nebari/starters/local",
+     "kind": "image",
      "totals": {
       "7d": 45,
       "30d": 87,
@@ -10504,6 +10526,7 @@
     {
      "source": "pypi",
      "ref": "nic",
+     "kind": "package",
      "totals": {
       "7d": 7,
       "30d": 22,
@@ -10918,6 +10941,7 @@
     {
      "source": "github_releases",
      "ref": "nebari-dev/nebari-infrastructure-core",
+     "kind": "binary",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -12050,6 +12074,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebi",
+     "kind": "image",
      "totals": {
       "7d": 623,
       "30d": 2900,
@@ -12432,6 +12457,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebi-web",
+     "kind": "image",
      "totals": {
       "7d": 0,
       "30d": 99,
@@ -12810,6 +12836,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebi-environments",
+     "kind": "image",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -13192,6 +13219,7 @@
     {
      "source": "conda",
      "ref": "conda-forge/nebi",
+     "kind": "package",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -13471,6 +13499,7 @@
     {
      "source": "github_releases",
      "ref": "nebari-dev/nebi",
+     "kind": "binary",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -14858,6 +14887,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-landing",
+     "kind": "image",
      "totals": {
       "7d": 311,
       "30d": 1846,
@@ -15240,6 +15270,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-landing",
+     "kind": "chart",
      "totals": {
       "7d": 43,
       "30d": 157,
@@ -16001,6 +16032,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-apps",
+     "kind": "chart",
      "totals": {
       "7d": 33,
       "30d": 33,
@@ -16379,6 +16411,7 @@
     {
      "source": "quay",
      "ref": "nebari/apps-pack-api",
+     "kind": "image",
      "totals": {
       "7d": 1,
       "30d": 1,
@@ -16757,6 +16790,7 @@
     {
      "source": "quay",
      "ref": "nebari/apps-pack-mcp",
+     "kind": "image",
      "totals": {
       "7d": 2,
       "30d": 2,
@@ -17135,6 +17169,7 @@
     {
      "source": "quay",
      "ref": "nebari/apps-pack-operator",
+     "kind": "image",
      "totals": {
       "7d": 2,
       "30d": 2,
@@ -17513,6 +17548,7 @@
     {
      "source": "quay",
      "ref": "nebari/apps-pack-proxy",
+     "kind": "image",
      "totals": {
       "7d": 2,
       "30d": 2,
@@ -17891,6 +17927,7 @@
     {
      "source": "quay",
      "ref": "nebari/apps-pack-ui",
+     "kind": "image",
      "totals": {
       "7d": 2,
       "30d": 2,
@@ -18652,6 +18689,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-chat",
+     "kind": "chart",
      "totals": {
       "7d": 34821,
       "30d": 151370,
@@ -19034,6 +19072,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-chat-backend",
+     "kind": "image",
      "totals": {
       "7d": 751,
       "30d": 1282,
@@ -19416,6 +19455,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-chat-frontend",
+     "kind": "image",
      "totals": {
       "7d": 528,
       "30d": 1067,
@@ -19798,6 +19838,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/ravnar",
+     "kind": "chart",
      "totals": {
       "7d": 87,
       "30d": 171,
@@ -20180,6 +20221,7 @@
     {
      "source": "quay",
      "ref": "nebari/ravnar",
+     "kind": "image",
      "totals": {
       "7d": 42,
       "30d": 62,
@@ -20562,6 +20604,7 @@
     {
      "source": "quay",
      "ref": "nebari/ravnar-nebari",
+     "kind": "image",
      "totals": {
       "7d": 3,
       "30d": 3,
@@ -21323,6 +21366,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/collab-hub",
+     "kind": "chart",
      "totals": {
       "7d": 43,
       "30d": 157,
@@ -22084,6 +22128,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-data-science-pack",
+     "kind": "chart",
      "totals": {
       "7d": 47,
       "30d": 168,
@@ -22466,6 +22511,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-data-science-pack-jupyterhub",
+     "kind": "image",
      "totals": {
       "7d": 688,
       "30d": 2268,
@@ -22848,6 +22894,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-data-science-pack-jupyterlab",
+     "kind": "image",
      "totals": {
       "7d": 392,
       "30d": 1853,
@@ -23230,6 +23277,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-data-science-pack-jupyterlab-base",
+     "kind": "image",
      "totals": {
       "7d": 40,
       "30d": 93,
@@ -23612,6 +23660,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-data-science-pack-jupyterlab-gpu",
+     "kind": "image",
      "totals": {
       "7d": 28,
       "30d": 82,
@@ -23994,6 +24043,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-data-science-pack-jupyterlab-gpu-base",
+     "kind": "image",
      "totals": {
       "7d": 25,
       "30d": 64,
@@ -24759,6 +24809,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-langfuse",
+     "kind": "chart",
      "totals": {
       "7d": 47,
       "30d": 166,
@@ -25524,6 +25575,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-lgtm-pack",
+     "kind": "chart",
      "totals": {
       "7d": 45,
       "30d": 165,
@@ -26289,6 +26341,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-llm-serving",
+     "kind": "chart",
      "totals": {
       "7d": 46,
       "30d": 161,
@@ -26671,6 +26724,7 @@
     {
      "source": "quay",
      "ref": "nebari/llm-serving-pack-frontend",
+     "kind": "image",
      "totals": {
       "7d": 30,
       "30d": 50,
@@ -27053,6 +27107,7 @@
     {
      "source": "quay",
      "ref": "nebari/llm-serving-pack-key-manager",
+     "kind": "image",
      "totals": {
       "7d": 30,
       "30d": 50,
@@ -27435,6 +27490,7 @@
     {
      "source": "quay",
      "ref": "nebari/llm-serving-pack-model-downloader",
+     "kind": "image",
      "totals": {
       "7d": 30,
       "30d": 50,
@@ -27817,6 +27873,7 @@
     {
      "source": "quay",
      "ref": "nebari/llm-serving-pack-operator",
+     "kind": "image",
      "totals": {
       "7d": 30,
       "30d": 50,
@@ -28582,6 +28639,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-frames",
+     "kind": "image",
      "totals": {
       "7d": 28,
       "30d": 28,
@@ -28964,6 +29022,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-frames",
+     "kind": "chart",
      "totals": {
       "7d": 44,
       "30d": 152,
@@ -29346,6 +29405,7 @@
     {
      "source": "github_releases",
      "ref": "nebari-dev/nebari-frames",
+     "kind": "binary",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -29843,6 +29903,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-nebi-pack",
+     "kind": "chart",
      "totals": {
       "7d": 43,
       "30d": 157,
@@ -30608,6 +30669,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-nexus",
+     "kind": "chart",
      "totals": {
       "7d": 1,
       "30d": 1,
@@ -30990,6 +31052,7 @@
     {
      "source": "quay",
      "ref": "nebari/nebari-nexus-api",
+     "kind": "image",
      "totals": {
       "7d": 1,
       "30d": 1,
@@ -31755,6 +31818,7 @@
     {
      "source": "quay",
      "ref": "nebari/provenance-collector",
+     "kind": "image",
      "totals": {
       "7d": 465,
       "30d": 1728,
@@ -32137,6 +32201,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/provenance-collector",
+     "kind": "chart",
      "totals": {
       "7d": 43,
       "30d": 171,
@@ -32898,6 +32963,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-rayserve-pack",
+     "kind": "chart",
      "totals": {
       "7d": 45,
       "30d": 159,
@@ -33659,6 +33725,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/nebari-superset",
+     "kind": "chart",
      "totals": {
       "7d": 43,
       "30d": 163,
@@ -34424,6 +34491,7 @@
     {
      "source": "quay",
      "ref": "nebari/skillsctl",
+     "kind": "image",
      "totals": {
       "7d": 5,
       "30d": 5,
@@ -34806,6 +34874,7 @@
     {
      "source": "quay",
      "ref": "nebari/charts/skillsctl",
+     "kind": "chart",
      "totals": {
       "7d": 43,
       "30d": 151,
@@ -35188,6 +35257,7 @@
     {
      "source": "github_releases",
      "ref": "nebari-dev/skillsctl",
+     "kind": "binary",
      "totals": {
       "7d": 0,
       "30d": 0,
@@ -36121,6 +36191,7 @@
     {
      "source": "quay",
      "ref": "nebari/unity-catalog-pack-unity-catalog-keycloak-sync",
+     "kind": "image",
      "totals": {
       "7d": 4,
       "30d": 4,
@@ -36499,6 +36570,7 @@
     {
      "source": "quay",
      "ref": "nebari/unity-catalog-pack-unity-catalog-ui",
+     "kind": "image",
      "totals": {
       "7d": 4,
       "30d": 4,

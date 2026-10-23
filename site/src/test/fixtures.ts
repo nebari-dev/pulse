@@ -1,4 +1,10 @@
-import type { Artifact, Product, Summary } from '@/lib/summary';
+import type {
+  Artifact,
+  ArtifactKind,
+  Product,
+  Source,
+  Summary,
+} from '@/lib/summary';
 
 function days(start: string, counts: number[]) {
   const [y, m, d] = start.split('-').map(Number);
@@ -8,10 +14,17 @@ function days(start: string, counts: number[]) {
   }));
 }
 
+function kindOf(source: Source, ref: string): ArtifactKind {
+  if (source === 'quay') return ref.includes('/charts/') ? 'chart' : 'image';
+  if (source === 'github_releases') return 'binary';
+  return 'package';
+}
+
 function artifact(
   partial: Partial<Artifact> & Pick<Artifact, 'source' | 'ref'>,
 ): Artifact {
   return {
+    kind: kindOf(partial.source, partial.ref),
     totals: { '7d': 0, '30d': 0, '90d': 0, all: 0 },
     latest_cumulative: null,
     latest_items: null,

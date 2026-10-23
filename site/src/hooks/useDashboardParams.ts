@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
+  ARTIFACT_KINDS,
+  type ArtifactKindFilter,
   type KindFilter,
   RANGES,
   type Range,
@@ -10,17 +12,28 @@ import {
 
 export interface DashboardParams {
   range: Range;
+  /** Product vs pack. */
   kind: KindFilter;
+  /** Artifact type: image, chart, package, binary. */
+  type: ArtifactKindFilter;
   source: SourceFilter;
 }
 
-const DEFAULTS: DashboardParams = { range: '90d', kind: 'all', source: 'all' };
+const DEFAULTS: DashboardParams = {
+  range: '90d',
+  kind: 'all',
+  type: 'all',
+  source: 'all',
+};
 
 function isRange(v: string | null): v is Range {
   return (RANGES as readonly string[]).includes(v ?? '');
 }
 function isKind(v: string | null): v is KindFilter {
   return v === 'product' || v === 'pack';
+}
+function isType(v: string | null): v is ArtifactKindFilter {
+  return (ARTIFACT_KINDS as readonly string[]).includes(v ?? '');
 }
 function isSource(v: string | null): v is SourceFilter {
   return (SOURCES as readonly string[]).includes(v ?? '');
@@ -37,10 +50,12 @@ export function useDashboardParams(): [
   const [params, setParams] = useSearchParams();
   const range = params.get('range');
   const kind = params.get('kind');
+  const type = params.get('type');
   const source = params.get('source');
   const current: DashboardParams = {
     range: isRange(range) ? range : DEFAULTS.range,
     kind: isKind(kind) ? kind : DEFAULTS.kind,
+    type: isType(type) ? type : DEFAULTS.type,
     source: isSource(source) ? source : DEFAULTS.source,
   };
 

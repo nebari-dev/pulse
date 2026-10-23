@@ -63,6 +63,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                     {
                         "source": source,
                         "ref": ref,
+                        "kind": artifact_kind(source, ref),
                         "totals": _totals(series, today),
                         "latest_cumulative": latest,
                         "latest_items": items,
@@ -87,6 +88,17 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
         },
         "products": products,
     }
+
+
+def artifact_kind(source: str, ref: str) -> str:
+    """What one download of this artifact is: an image or Helm chart pull, a
+    package install, or a release binary. Chart pulls are kept apart from
+    image pulls because GitOps controllers poll charts continuously."""
+    if source == "quay":
+        return "chart" if "/charts/" in ref else "image"
+    if source in ("pypi", "conda"):
+        return "package"
+    return "binary"
 
 
 def write(summary: dict, path: Path) -> None:
