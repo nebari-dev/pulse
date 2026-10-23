@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { stubSummaryFetch } from '@/test/fixtures';
+import { nic, stubSummaryFetch } from '@/test/fixtures';
 import Product from './Product';
 
 function renderProduct(url: string) {
@@ -52,6 +52,11 @@ describe('Product', () => {
     expect(screen.getByText('3.12')).toBeInTheDocument();
     expect(screen.getByText('unknown')).toBeInTheDocument();
     expect(screen.getByText('Linux')).toBeInTheDocument();
+    // Version share needs two bands; v0.15.0 has no downloads in the window,
+    // so only one band exists and the chart stays hidden.
+    expect(
+      screen.queryByRole('figure', { name: /version share by week/ }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows repo health, cadence and traffic when a product has repos', async () => {
@@ -90,6 +95,38 @@ describe('Product', () => {
       }),
     ).not.toBeInTheDocument();
     expect(screen.getByText('No repos match "pypi".')).toBeInTheDocument();
+  });
+
+  it('charts version share once two versions have downloads', async () => {
+    const gh = nic.artifacts[0];
+    stubSummaryFetch([
+      {
+        ...nic,
+        artifacts: [
+          {
+            ...gh,
+            versions: [
+              {
+                version: 'v0.16.0',
+                series: [{ date: '2026-10-05', count: 6 }],
+              },
+              {
+                version: 'v0.15.0',
+                series: [{ date: '2026-10-05', count: 2 }],
+              },
+            ],
+          },
+          ...nic.artifacts.slice(1),
+        ],
+      },
+    ]);
+    renderProduct('/product/nic');
+    const figure = await screen.findByRole('figure', {
+      name: /version share by week/,
+    });
+    expect(
+      within(figure).getByRole('list', { name: 'Legend' }),
+    ).toHaveTextContent('v0.16.0v0.15.0');
   });
 
   it('shows not found for an unknown id', async () => {

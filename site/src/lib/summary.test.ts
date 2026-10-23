@@ -11,6 +11,7 @@ import {
   platformOf,
   shareRows,
   sumSeries,
+  versionShareInputs,
   weekStart,
   windowFor,
 } from './summary';
@@ -245,5 +246,40 @@ describe('shareRows', () => {
     expect(color(one, 'a')).toBe(color(two, 'a'));
     expect(color(one, 'b')).toBe(color(two, 'b'));
     expect(color(one, 'a')).not.toBe(color(one, 'b'));
+  });
+});
+
+describe('versionShareInputs', () => {
+  it('merges versions across artifacts and ranks by all-time downloads', () => {
+    const conda = {
+      latest_items: [{ version: '1.0', file: 'a', cumulative: 50 }],
+      versions: [
+        { version: '1.0', series: [{ date: '2026-10-05', count: 2 }] },
+      ],
+    } as unknown as Artifact;
+    const gh = {
+      latest_items: [
+        { tag: '1.0', asset: 'x', cumulative: 5 },
+        { tag: '2.0', asset: 'y', cumulative: 9 },
+      ],
+      versions: [
+        { version: '1.0', series: [{ date: '2026-10-05', count: 1 }] },
+        { version: '2.0', series: [{ date: '2026-10-05', count: 4 }] },
+      ],
+    } as unknown as Artifact;
+    expect(versionShareInputs([conda, gh])).toEqual([
+      {
+        id: '1.0',
+        name: '1.0',
+        rank: 55,
+        series: [{ date: '2026-10-05', count: 3 }],
+      },
+      {
+        id: '2.0',
+        name: '2.0',
+        rank: 9,
+        series: [{ date: '2026-10-05', count: 4 }],
+      },
+    ]);
   });
 });

@@ -23,7 +23,9 @@ Full product shape (products/<id>.json, and the entries `build()` returns):
                            "totals": {"7d", "30d", "90d", "all"}}] | null,
          "series": [...],
          "breakdown": {"python_minor": [{"category", "series": [...]}],   # pypi only
-                       "system": [{"category", "series": [...]}]} | null}
+                       "system": [{"category", "series": [...]}]} | null,
+         "versions": [{"version", "series": [...]}] | null}   # cumulative sources only;
+                     # weekly (Monday-dated) deltas per version/tag, for share over time
       ],
       "repos": [
         {"repo": "owner/name",
@@ -98,9 +100,9 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                 rows = store.read(store.path_for(data_dir, "downloads", source, ref))
                 if source in DAILY_SOURCES:
                     series = _daily_series(rows)
-                    latest, items = None, None
+                    latest, items, versions = None, None, None
                 else:
-                    series, latest, items = _cumulative_series(rows, today)
+                    series, latest, items, versions = _cumulative_series(rows, today)
                 for d, n in series.items():
                     product_series[d] += n
                 source_counts[source] += 1
@@ -114,6 +116,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                         "latest_items": items,
                         "series": _as_list(series),
                         "breakdown": _breakdown(data_dir, ref) if source == "pypi" else None,
+                        "versions": versions,
                     }
                 )
         repos = []
@@ -364,12 +367,14 @@ def _daily_series(rows: list[store.Row]) -> Series:
 
 def _cumulative_series(
     rows: list[store.Row], today: date
-) -> tuple[Series, int | None, list[dict] | None]:
+) -> tuple[Series, int | None, list[dict] | None, list[dict] | None]:
     """Delta between consecutive snapshots per item, summed per date.
 
     Also returns the latest snapshot's items (tag/asset or version/file plus
     their cumulative count and their own windowed deltas) so the dashboard
-    can break a repo down by release.
+    can break a repo down by release, and per-version weekly deltas (the
+    first key column, `tag` or `version`, dated by ISO week start) so it
+    can chart which versions people install over time.
     """
     by_item: dict[tuple, list[tuple[str, int]]] = defaultdict(list)
     key_cols: list[str] = []
@@ -380,13 +385,16 @@ def _cumulative_series(
     series: Series = defaultdict(int)
     latest_date = max((r["date"] for r in rows), default=None)
     latest_items: list[dict] = []
+    weekly_by_version: dict[str, Series] = defaultdict(lambda: defaultdict(int))
     for key, snapshots in by_item.items():
         snapshots.sort()
         item_series: Series = {}
+        version = key[0] if key else ""
         for (_, prev), (d, cur) in zip(snapshots, snapshots[1:], strict=False):
             delta = max(cur - prev, 0)  # counters never go down; guard anyway
             series[d] += delta
             item_series[d] = delta
+            weekly_by_version[version][_week_start(d)] += delta
         if snapshots and snapshots[-1][0] == latest_date:
             latest_items.append(
                 {
@@ -396,9 +404,20 @@ def _cumulative_series(
                 }
             )
     if latest_date is None:
-        return dict(series), None, None
+        return dict(series), None, None, None
     latest_items.sort(key=lambda i: -i["cumulative"])
-    return dict(series), sum(i["cumulative"] for i in latest_items), latest_items
+    versions = [
+        {"version": v, "series": _as_list(dict(weekly))}
+        for v, weekly in sorted(weekly_by_version.items())
+        if any(weekly.values())
+    ]
+    return dict(series), sum(i["cumulative"] for i in latest_items), latest_items, versions
+
+
+def _week_start(iso: str) -> str:
+    """Monday of the ISO week containing the date, as the dashboard buckets."""
+    d = date.fromisoformat(iso)
+    return (d - timedelta(days=d.weekday())).isoformat()
 
 
 def _totals(series: Series, today: date) -> dict[str, int]:

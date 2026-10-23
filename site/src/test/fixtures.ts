@@ -136,6 +136,10 @@ export const nic: Product = {
         },
       ],
       series: days('2026-10-05', [1, 2, 3]),
+      versions: [
+        { version: 'v0.16.0', series: [{ date: '2026-10-05', count: 6 }] },
+        { version: 'v0.15.0', series: [{ date: '2026-10-05', count: 0 }] },
+      ],
     }),
     artifact({
       source: 'pypi',

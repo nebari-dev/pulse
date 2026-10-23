@@ -107,6 +107,16 @@ export interface Artifact extends Countable {
   latest_items: LatestItem[] | null;
   /** PyPI only; null elsewhere. Optional for older files. */
   breakdown?: Breakdown | null;
+  /**
+   * Cumulative sources only: weekly (Monday-dated) downloads per version or
+   * tag, for version share over time. Null elsewhere; optional for older files.
+   */
+  versions?: VersionSeries[] | null;
+}
+
+export interface VersionSeries {
+  version: string;
+  series: Point[];
 }
 
 /** Artifacts of one product summed per (source, kind), as in the index. */
@@ -631,4 +641,32 @@ export function shareRows(
     return row;
   });
   return { rows, series };
+}
+
+/**
+ * Inputs for a version-share chart: every version of the cumulative
+ * artifacts merged by name, ranked by all-time downloads (from the latest
+ * snapshot) so hues stay put across ranges.
+ */
+export function versionShareInputs(artifacts: Artifact[]): ShareInput[] {
+  const byVersion = new Map<string, { series: Point[][]; rank: number }>();
+  for (const a of artifacts) {
+    const cumulative = new Map<string, number>();
+    for (const item of a.latest_items ?? []) {
+      const v = String(item.tag ?? item.version ?? '');
+      cumulative.set(v, (cumulative.get(v) ?? 0) + item.cumulative);
+    }
+    for (const v of a.versions ?? []) {
+      const entry = byVersion.get(v.version) ?? { series: [], rank: 0 };
+      entry.series.push(v.series);
+      entry.rank += cumulative.get(v.version) ?? 0;
+      byVersion.set(v.version, entry);
+    }
+  }
+  return [...byVersion].map(([version, { series, rank }]) => ({
+    id: version,
+    name: version,
+    rank,
+    series: sumSeries(series),
+  }));
 }
