@@ -63,6 +63,19 @@ describe('Product', () => {
     expect(screen.getByText('prerelease')).toBeInTheDocument();
   });
 
+  it('searches artifacts and repos together from the URL', async () => {
+    renderProduct('/product/nic?q=pypi');
+    await screen.findByRole('heading', { name: 'Nebari Infrastructure Core' });
+    expect(screen.getByRole('searchbox')).toHaveValue('pypi');
+    expect(screen.getByRole('link', { name: /^nic/ })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', {
+        name: /nebari-dev\/nebari-infrastructure-core/,
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('No repos match "pypi".')).toBeInTheDocument();
+  });
+
   it('shows not found for an unknown id', async () => {
     renderProduct('/product/nope');
     expect(
