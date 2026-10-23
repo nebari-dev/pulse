@@ -47,6 +47,7 @@ def test_daily_and_cumulative_sources_combine(tmp_path: Path):
     assert product["totals"]["7d"] == 12
     assert product["totals"]["all"] == 12
     gh = next(a for a in product["artifacts"] if a["source"] == "github_releases")
+    assert gh["latest_items"][0] == {"tag": "v1", "asset": "a.tgz", "cumulative": 15}
     assert gh["latest_cumulative"] == 16
     assert gh["series"] == [{"date": "2026-10-22", "count": 5}]
     assert out["sources"]["github_releases"]["kind"] == "cumulative"

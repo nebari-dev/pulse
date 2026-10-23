@@ -11,6 +11,7 @@ Shape:
           "series": [{"date": "YYYY-MM-DD", "count": N}, ...],   # daily, summed
           "artifacts": [
             {"source", "ref", "totals": {...}, "latest_cumulative": N|null,
+             "latest_items": [{<key cols>..., "cumulative": N}] | null,
              "series": [...]}
           ]
         }
@@ -52,9 +53,9 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                 rows = store.read(store.path_for(data_dir, "downloads", source, ref))
                 if source in DAILY_SOURCES:
                     series = _daily_series(rows)
-                    latest = None
+                    latest, items = None, None
                 else:
-                    series, latest = _cumulative_series(rows)
+                    series, latest, items = _cumulative_series(rows)
                 for d, n in series.items():
                     product_series[d] += n
                 source_counts[source] += 1
@@ -64,6 +65,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                         "ref": ref,
                         "totals": _totals(series, today),
                         "latest_cumulative": latest,
+                        "latest_items": items,
                         "series": _as_list(series),
                     }
                 )
@@ -96,22 +98,35 @@ def _daily_series(rows: list[store.Row]) -> Series:
     return {r["date"]: int(r["count"]) for r in rows}
 
 
-def _cumulative_series(rows: list[store.Row]) -> tuple[Series, int | None]:
-    """Delta between consecutive snapshots per item, summed per date."""
+def _cumulative_series(
+    rows: list[store.Row],
+) -> tuple[Series, int | None, list[dict] | None]:
+    """Delta between consecutive snapshots per item, summed per date.
+
+    Also returns the latest snapshot's items (tag/asset or version/file plus
+    their cumulative count) so the dashboard can break a repo down by release.
+    """
     by_item: dict[tuple, list[tuple[str, int]]] = defaultdict(list)
+    key_cols: list[str] = []
     for r in rows:
-        key = tuple(v for k, v in r.items() if k not in ("date", "cumulative"))
+        key_cols = [k for k in r if k not in ("date", "cumulative")]
+        key = tuple(r[k] for k in key_cols)
         by_item[key].append((r["date"], int(r["cumulative"])))
     series: Series = defaultdict(int)
     latest_date = max((r["date"] for r in rows), default=None)
-    latest_total = 0
-    for snapshots in by_item.values():
+    latest_items: list[dict] = []
+    for key, snapshots in by_item.items():
         snapshots.sort()
         for (_, prev), (d, cur) in zip(snapshots, snapshots[1:], strict=False):
             series[d] += max(cur - prev, 0)  # counters never go down; guard anyway
         if snapshots and snapshots[-1][0] == latest_date:
-            latest_total += snapshots[-1][1]
-    return dict(series), (latest_total if latest_date else None)
+            latest_items.append(
+                {**dict(zip(key_cols, key, strict=True)), "cumulative": snapshots[-1][1]}
+            )
+    if latest_date is None:
+        return dict(series), None, None
+    latest_items.sort(key=lambda i: -i["cumulative"])
+    return dict(series), sum(i["cumulative"] for i in latest_items), latest_items
 
 
 def _totals(series: Series, today: date) -> dict[str, int]:
