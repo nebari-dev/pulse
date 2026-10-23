@@ -47,7 +47,9 @@ import {
   chartRows,
   compareArtifacts,
   earliestDate,
+  excludesCharts,
   hasDataIn,
+  headlineArtifacts,
   KIND_LABEL,
   type LatestItem,
   latestDate,
@@ -233,7 +235,11 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
       end,
       weekly,
       artifacts,
-      overall: compareArtifacts(artifacts, start, end),
+      overall: compareArtifacts(
+        headlineArtifacts(artifacts, params),
+        start,
+        end,
+      ),
       allKnown: total(series),
       chartRows: chartRows(bySource, start, end, weekly),
       chartSeries,
@@ -344,9 +350,13 @@ function Product() {
           value={formatCompact(view.overall.current)}
           delta={view.overall.delta}
           hint={
-            view.overall.delta === null
+            (view.overall.delta === null
               ? 'no full previous period yet'
-              : 'vs. previous period'
+              : 'vs. previous period') +
+            (excludesCharts(params) &&
+            view.artifacts.some((a) => a.kind === 'chart')
+              ? ', excluding chart polls'
+              : '')
           }
         />
         <StatTile
