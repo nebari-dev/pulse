@@ -45,7 +45,9 @@ import {
   addDays,
   artifactsOf,
   artifactUrl,
+  BREAKDOWN_LABEL,
   between,
+  breakdownRows,
   chartRows,
   compareArtifacts,
   earliestDate,
@@ -222,8 +224,20 @@ function useProductView(
         }
       : null;
 
+    const pypi = artifacts.filter((a) => a.source === 'pypi');
+    const breakdowns = (['python_minor', 'system'] as const)
+      .map((dimension) => ({
+        dimension,
+        rows: breakdownRows(pypi, dimension, start, end).map((r) => ({
+          tag: r.category,
+          cumulative: r.count,
+        })),
+      }))
+      .filter((b) => b.rows.length > 0);
+
     return {
       stars,
+      breakdowns,
       cadence: cadence(stable, product.generated_at, 90),
       feed: feed.slice(0, 8),
       adoption: adoptionRows(artifacts),
@@ -497,6 +511,31 @@ function Product() {
               </CardContent>
             </Card>
           )}
+        </div>
+      )}
+
+      {view.breakdowns.length > 0 && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {view.breakdowns.map((b) => (
+            <Card key={b.dimension}>
+              <CardHeader>
+                <CardTitle>
+                  PyPI downloads by {BREAKDOWN_LABEL[b.dimension].toLowerCase()}
+                  , {rangeLabel.toLowerCase()}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                <ReleaseTable
+                  rows={b.rows}
+                  label={BREAKDOWN_LABEL[b.dimension]}
+                />
+                <p className="text-muted-foreground text-xs">
+                  As reported by pypistats. "unknown" is downloads whose
+                  installer did not say.
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 

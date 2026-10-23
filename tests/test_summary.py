@@ -257,3 +257,31 @@ def test_contributors_active_monthly_and_new_by_quarter():
         {"date": "2026-10-01", "count": 1},  # cid
     ]
     assert "new_by_quarter" not in summary.contributors(rows, TODAY)
+
+
+def test_pypi_breakdown_is_grouped_per_dimension_and_category(tmp_path: Path):
+    cfg = _cfg([{"id": "p", "pypi": ["pkg"], "quay": ["ns/r"]}])
+    store.upsert(
+        store.path_for(tmp_path, "downloads", "pypi_breakdown", "pkg"),
+        ["date", "dimension", "category", "count"],
+        ["date", "dimension", "category"],
+        [
+            {"date": "2026-10-22", "dimension": "python_minor", "category": "3.12", "count": 4},
+            {"date": "2026-10-21", "dimension": "python_minor", "category": "3.12", "count": 1},
+            {"date": "2026-10-22", "dimension": "python_minor", "category": "null", "count": 2},
+            {"date": "2026-10-22", "dimension": "system", "category": "Linux", "count": 6},
+        ],
+    )
+    arts = summary.build(cfg, tmp_path, TODAY)["products"][0]["artifacts"]
+    pypi = next(a for a in arts if a["source"] == "pypi")
+    assert pypi["breakdown"] == {
+        "python_minor": [
+            {
+                "category": "3.12",
+                "series": [{"date": "2026-10-21", "count": 1}, {"date": "2026-10-22", "count": 4}],
+            },
+            {"category": "null", "series": [{"date": "2026-10-22", "count": 2}]},
+        ],
+        "system": [{"category": "Linux", "series": [{"date": "2026-10-22", "count": 6}]}],
+    }
+    assert next(a for a in arts if a["source"] == "quay")["breakdown"] is None

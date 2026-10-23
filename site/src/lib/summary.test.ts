@@ -1,6 +1,7 @@
 import {
   type Artifact,
   addDays,
+  breakdownRows,
   bucketWeekly,
   chartRows,
   compare,
@@ -159,5 +160,29 @@ describe('headlineArtifacts', () => {
     expect(
       headlineArtifacts([image, chart], { source: 'all', type: 'chart' }),
     ).toEqual([image, chart]);
+  });
+});
+
+describe('breakdownRows', () => {
+  it('sums categories in the window and renames null', () => {
+    const a = {
+      breakdown: {
+        system: [
+          {
+            category: 'Linux',
+            series: [
+              { date: '2026-10-01', count: 5 },
+              { date: '2026-10-02', count: 5 },
+            ],
+          },
+          { category: 'null', series: [{ date: '2026-10-02', count: 1 }] },
+          { category: 'Windows', series: [{ date: '2026-09-01', count: 9 }] },
+        ],
+      },
+    } as unknown as Artifact;
+    expect(breakdownRows([a], 'system', '2026-10-01', '2026-10-02')).toEqual([
+      { category: 'Linux', count: 10 },
+      { category: 'unknown', count: 1 },
+    ]);
   });
 });

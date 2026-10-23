@@ -21,7 +21,9 @@ Full product shape (products/<id>.json, and the entries `build()` returns):
         {"source", "ref", "kind", "totals": {...}, "latest_cumulative": N|null,
          "latest_items": [{<key cols>..., "cumulative": N,
                            "totals": {"7d", "30d", "90d", "all"}}] | null,
-         "series": [...]}
+         "series": [...],
+         "breakdown": {"python_minor": [{"category", "series": [...]}],   # pypi only
+                       "system": [{"category", "series": [...]}]} | null}
       ],
       "repos": [
         {"repo": "owner/name",
@@ -111,6 +113,7 @@ def build(cfg: DownloadsConfig, data_dir: Path, today: date) -> dict:
                         "latest_cumulative": latest,
                         "latest_items": items,
                         "series": _as_list(series),
+                        "breakdown": _breakdown(data_dir, ref) if source == "pypi" else None,
                     }
                 )
         repos = []
@@ -240,6 +243,23 @@ def _repo(data_dir: Path, repo: str, commits: list[store.Row], today: date) -> d
 
 def _int_or_none(value: str | None) -> int | None:
     return int(value) if value not in (None, "") else None
+
+
+def _breakdown(data_dir: Path, ref: str) -> dict | None:
+    """pypistats' per-dimension daily series, one entry per category."""
+    rows = store.read(store.path_for(data_dir, "downloads", "pypi_breakdown", ref))
+    if not rows:
+        return None
+    per: dict[str, dict[str, Series]] = defaultdict(lambda: defaultdict(dict))
+    for r in rows:
+        per[r["dimension"]][r["category"]][r["date"]] = int(r["count"])
+    return {
+        dimension: [
+            {"category": category, "series": _as_list(series)}
+            for category, series in sorted(categories.items())
+        ]
+        for dimension, categories in sorted(per.items())
+    }
 
 
 def artifact_kind(source: str, ref: str) -> str:
