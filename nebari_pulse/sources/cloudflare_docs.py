@@ -11,9 +11,12 @@ gated and undercounts). Two CSV families under data/docs/:
     pages/<site>.csv    date,path,pageviews            top paths over the
                         last 7 days, snapshotted daily.
 
-Needs CLOUDFLARE_ANALYTICS_TOKEN: an API token with Zone:Read (to resolve
-the zone id by name) and Analytics:Read on the zone. Without it the source
-is skipped with a note, like repo traffic without a push-capable token.
+Needs an API token with Zone:Read (to resolve the zone id by name) and
+Analytics:Read on the zone: CLOUDFLARE_ANALYTICS_TOKEN, or the deploy
+token CLOUDFLARE_API_TOKEN if it has been granted those two as well.
+Without one the source is skipped with a note, like repo traffic without
+a push-capable token. A token without the scopes fails the zone lookup
+with a clear error instead.
 """
 
 from __future__ import annotations
@@ -76,7 +79,13 @@ query ($zone: String!, $hosts: [String!], $start: Date!, $end: Date!, $pagesStar
 
 
 def token() -> str | None:
-    return os.environ.get("CLOUDFLARE_ANALYTICS_TOKEN") or None
+    """CLOUDFLARE_ANALYTICS_TOKEN, or the deploy token (CLOUDFLARE_API_TOKEN)
+    when that one has been given Zone:Read and Analytics:Read as well."""
+    return (
+        os.environ.get("CLOUDFLARE_ANALYTICS_TOKEN")
+        or os.environ.get("CLOUDFLARE_API_TOKEN")
+        or None
+    )
 
 
 def headers() -> dict[str, str]:
@@ -88,8 +97,8 @@ def collect(cfg: DocsConfig, data_dir: Path, today: date) -> CollectResult:
     if not cfg.sites:
         return result
     if not token():
-        result.notes["skipped"] = "CLOUDFLARE_ANALYTICS_TOKEN not set"
-        log.warning("docs traffic skipped: CLOUDFLARE_ANALYTICS_TOKEN not set")
+        result.notes["skipped"] = "CLOUDFLARE_ANALYTICS_TOKEN (or CLOUDFLARE_API_TOKEN) not set"
+        log.warning("docs traffic skipped: no Cloudflare token set")
         return result
     try:
         zone = zone_id(cfg.cloudflare_zone)

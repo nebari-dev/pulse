@@ -182,7 +182,8 @@ groups and full artifacts.
   explicitly (pushes made with the Actions token do not trigger workflows).
 - Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` for deploys;
   `PULSE_GITHUB_TOKEN` (optional) for repo traffic; `CLOUDFLARE_ANALYTICS_TOKEN`
-  (optional, Zone:Read + Analytics:Read on nebari.dev) for docs traffic. Without it, traffic is
+  (optional, Zone:Read + Analytics:Read on nebari.dev) for docs traffic, with
+  `CLOUDFLARE_API_TOKEN` as the fallback if it carries those scopes. Without it, traffic is
   skipped with a note and the Traffic page explains why.
 
 ## Conventions

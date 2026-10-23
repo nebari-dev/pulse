@@ -76,10 +76,11 @@ the Traffic page says so.
 
 Documentation traffic comes from Cloudflare zone analytics for the hosts
 under `docs` in `sources.yaml`, counted at the edge so cookie consent does
-not hide it. Set the `CLOUDFLARE_ANALYTICS_TOKEN` repository secret to an
-API token with *Zone: Read* and *Analytics: Read* on the `nebari.dev`
-zone. Without it the source is skipped with a note and the Docs page says
-so.
+not hide it. It needs an API token with *Zone: Read* and *Analytics: Read*
+on the `nebari.dev` zone: either a dedicated `CLOUDFLARE_ANALYTICS_TOKEN`
+secret, or the existing `CLOUDFLARE_API_TOKEN` deploy token once those two
+permissions are added to it in the Cloudflare dashboard. Without either
+the source is skipped with a note and the Docs page says so.
 
 Not available anywhere: **GHCR pull counts**. GitHub exposes them only in
 the package UI. Images published solely to `ghcr.io/nebari-dev` are invisible

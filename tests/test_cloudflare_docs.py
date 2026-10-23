@@ -54,9 +54,18 @@ def test_skipped_without_token(tmp_path, monkeypatch):
     from nebari_pulse.config import DocsConfig, DocsSite
 
     monkeypatch.delenv("CLOUDFLARE_ANALYTICS_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
     cfg = DocsConfig(
         cloudflare_zone="nebari.dev", sites=(DocsSite("docs", "Docs", ("nebari.dev",)),)
     )
     res = cloudflare_docs.collect(cfg, tmp_path, TODAY)
     assert res.artifacts == 0 and not res.errors
     assert "CLOUDFLARE_ANALYTICS_TOKEN" in res.notes["skipped"]
+
+
+def test_falls_back_to_the_deploy_token(monkeypatch):
+    monkeypatch.delenv("CLOUDFLARE_ANALYTICS_TOKEN", raising=False)
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "deploy")
+    assert cloudflare_docs.token() == "deploy"
+    monkeypatch.setenv("CLOUDFLARE_ANALYTICS_TOKEN", "analytics")
+    assert cloudflare_docs.token() == "analytics"
