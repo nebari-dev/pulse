@@ -27,6 +27,25 @@ export const SOURCE_COLOR: Record<Source, string> = {
   github_releases: 'var(--chart-5)',
 };
 
+/** What one download is. Charts are kept apart because GitOps controllers
+ * poll them continuously, which says nothing about adoption. */
+export const ARTIFACT_KINDS = ['image', 'chart', 'package', 'binary'] as const;
+export type ArtifactKind = (typeof ARTIFACT_KINDS)[number];
+export const ARTIFACT_KIND_LABEL: Record<ArtifactKind, string> = {
+  image: 'Images',
+  chart: 'Helm charts',
+  package: 'Packages',
+  binary: 'Binaries',
+};
+/** Same validated hue order as SOURCE_COLOR. */
+export const ARTIFACT_KIND_COLOR: Record<ArtifactKind, string> = {
+  image: 'var(--chart-1)',
+  chart: 'var(--chart-3)',
+  package: 'var(--chart-4)',
+  binary: 'var(--chart-5)',
+};
+export type ArtifactKindFilter = ArtifactKind | 'all';
+
 export type Kind = 'product' | 'pack';
 export const KIND_LABEL: Record<Kind, string> = {
   product: 'Product',
@@ -53,6 +72,7 @@ export interface LatestItem {
 export interface Artifact {
   source: Source;
   ref: string;
+  kind: ArtifactKind;
   totals: Totals;
   latest_cumulative: number | null;
   latest_items: LatestItem[] | null;
@@ -196,17 +216,27 @@ export function matchesKind(product: Product, kind: KindFilter): boolean {
   return kind === 'all' || product.kind === kind;
 }
 
-export function artifactsOf(
-  product: Product,
-  source: SourceFilter,
-): Artifact[] {
-  return source === 'all'
-    ? product.artifacts
-    : product.artifacts.filter((a) => a.source === source);
+export interface ArtifactFilter {
+  source: SourceFilter;
+  type: ArtifactKindFilter;
 }
 
-export function productSeries(product: Product, source: SourceFilter): Point[] {
-  return sumSeries(artifactsOf(product, source).map((a) => a.series));
+export function artifactsOf(
+  product: Product,
+  { source, type }: ArtifactFilter,
+): Artifact[] {
+  return product.artifacts.filter(
+    (a) =>
+      (source === 'all' || a.source === source) &&
+      (type === 'all' || a.kind === type),
+  );
+}
+
+export function productSeries(
+  product: Product,
+  filter: ArtifactFilter,
+): Point[] {
+  return sumSeries(artifactsOf(product, filter).map((a) => a.series));
 }
 
 export interface Comparison {

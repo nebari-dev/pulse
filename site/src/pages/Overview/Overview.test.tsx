@@ -37,6 +37,20 @@ describe('Overview', () => {
     expect(screen.getByText(/from Quay/)).toBeInTheDocument();
   });
 
+  it('stacks the chart by artifact type and filters by type', async () => {
+    renderOverview();
+    const legend = await screen.findByRole('list', { name: 'Legend' });
+    expect(legend).toHaveTextContent('Images');
+    expect(legend).toHaveTextContent('Helm charts');
+    expect(legend).toHaveTextContent('Packages');
+    expect(legend).toHaveTextContent('Binaries');
+
+    renderOverview('/?type=chart');
+    expect(
+      await screen.findByText(/Daily helm charts by source/),
+    ).toBeInTheDocument();
+  });
+
   it('reports a load failure', async () => {
     vi.stubGlobal(
       'fetch',

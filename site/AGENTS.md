@@ -14,7 +14,7 @@ This file provides guidance for AI agents (Claude Code, Copilot, Cursor, etc.) w
 | **Component library** | @nebari/design (shadcn registry, Base UI–based)                                                                     |
 | **Routing**           | React Router v6                                                                                                     |
 | **Data fetching**     | TanStack Query v5                                                                                                   |
-| **Global state**      | Jotai v2                                                                                                            |
+| **Global state**      | URL search params via `useDashboardParams` (no store)                                                               |
 | **Testing**           | Vitest + Testing Library                                                                                            |
 | **Quality**           | Biome (format + lint + import sort)                                                                                 |
 | **Package manager**   | npm                                                                                                                 |
@@ -39,15 +39,9 @@ pulse-dashboard/
 │   │   ├── useDashboardParams.ts # range/kind/source filters in the URL
 │   ├── components/
 │   │   └── ui/            # Nebari components (installed via shadcn — managed)
-│   ├── providers/
-│   │   └── ThemeProvider/
-│   │       ├── ThemeProvider.tsx
-│   │       └── index.ts
 │   ├── pages/
-│   │   ├── Home/
-│   │   │   ├── Home.tsx
-│   │   │   ├── Home.test.tsx
-│   │   │   └── index.ts
+│   │   ├── Overview/      # / — filters, stat tiles, trend chart, leaderboard
+│   │   ├── Product/       # /product/:id — per-artifact, release and platform breakdowns
 │   │   └── NotFound/
 │   │       ├── NotFound.tsx
 │   │       ├── NotFound.test.tsx
@@ -145,86 +139,34 @@ curl -s https://nebari-dev.github.io/nebari-design/r/registry.json   # list the 
 
 ---
 
-## API Calls — TanStack Query Pattern
+## Data and state
 
-Create custom hooks in `src/hooks/` that wrap `useQuery` / `useMutation` using `src/lib/api.ts`.
+The only data source is `../data/summary.json`, written by the Python
+collector (see the root README for its shape). `useSummary()` loads it once;
+everything on screen is derived in `useMemo` from `src/lib/summary.ts`
+helpers, always from artifact-level series so the source and type filters
+stay consistent.
 
-```typescript
-// src/hooks/use-products.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+| State type                          | Where it lives                             |
+| ----------------------------------- | ------------------------------------------ |
+| Filters (range, kind, type, source) | URL search params via `useDashboardParams` |
+| Component-local (sort order, hover) | `useState` inside the component            |
+| summary.json                        | TanStack Query (`useSummary`)              |
 
-export function useProducts() {
-  return useQuery({
-    queryKey: ['products'],
-    queryFn: () => api.get<Product[]>('/products'),
-  });
-}
-
-export function useCreateProduct() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (body: CreateProductInput) =>
-      api.post<Product>('/products', body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    },
-  });
-}
-```
-
----
-
-## Global State — Jotai
-
-Use Jotai for client-side state shared across multiple unrelated components. All atoms live in `src/store/`.
-
-| State type                                             | Where it lives                              |
-| ------------------------------------------------------ | ------------------------------------------- |
-| Component-local (e.g. form input, toggle)              | `useState` inside the component             |
-| Server data (e.g. API responses)                       | TanStack Query (`useQuery` / `useMutation`) |
-| Shared client state (e.g. sidebar open, selected item) | Jotai atom in `src/store/`                  |
-
-**Never duplicate server state in atoms.** Derive from query data instead.
-
-```typescript
-// src/store/appAtoms.ts
-import { atom } from 'jotai';
-
-export const sidebarOpenAtom = atom<boolean>(false);
-export const selectedItemIdAtom = atom<string | null>(null);
-
-// Derived (read-only)
-export const hasSelectionAtom = atom((get) => get(selectedItemIdAtom) !== null);
-```
-
-```tsx
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { sidebarOpenAtom } from '@/store/appAtoms';
-
-const [open, setOpen] = useAtom(sidebarOpenAtom); // read + write
-const open = useAtomValue(sidebarOpenAtom); // read only
-const setOpen = useSetAtom(sidebarOpenAtom); // write only
-```
+Charts use Recharts with Nebari chart tokens (`var(--chart-N)`); each source
+and artifact type has a fixed color in `SOURCE_COLOR` / `ARTIFACT_KIND_COLOR`
+— never assign colors by rank.
 
 ---
 
 ## Theme / Dark Mode
 
-```tsx
-import { useTheme } from '@/providers/ThemeProvider';
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  return (
-    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-      Toggle theme
-    </button>
-  );
-}
-```
-
-The Nebari brand tokens are installed via `npx shadcn add @nebari/theme` into `src/index.css` — re-run that command to update them. Don't hand-copy token values into the stylesheet.
+Dark is the default (`seedDarkDefault` in `src/lib/theme.ts` plus the
+pre-paint script in `index.html`). The header toggle uses `useTheme` from
+`@/hooks/theme-provider` (the `@nebari/use-theme-preference` registry item).
+The Nebari brand tokens are installed via `npx shadcn add @nebari/theme` into
+`src/index.css` — re-run that command to update them. Don't hand-copy token
+values into the stylesheet.
 
 ---
 
@@ -264,7 +206,5 @@ Claude Code skills for this project:
 | Use raw Tailwind colors (`bg-white`, `text-gray-900`) or `dark:` variants | Use semantic tokens (`bg-background`, `text-foreground`) — they flip with `.dark` automatically                                    |
 | Hand-copy Nebari token values into `src/index.css`                        | Run `npx shadcn add @nebari/theme` — the theme item owns the tokens                                                                |
 | Fetch directly in components                                              | Create a hook in `src/hooks/` using TanStack Query                                                                                 |
-| Store server/API data in Jotai atoms                                      | Use TanStack Query — it owns server state                                                                                          |
-| Scatter atoms across component files                                      | Put all atoms in `src/store/`                                                                                                      |
 | Put a component in a flat file                                            | Give it its own PascalCase directory with a test file and `index.ts`                                                               |
 | Import from the component file directly                                   | Import from the folder (`@/components/UserCard`, not `@/components/UserCard/UserCard`)                                             |
