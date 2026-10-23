@@ -34,7 +34,6 @@ pulse-dashboard/
 │   │   ├── utils.ts
 │   │   ├── summary.ts     # summary.json types + pure helpers (windows, series, deltas, search)
 │   │   ├── repos.ts       # release cadence, repo health and traffic helpers
-│   │   ├── changes.ts     # "what changed this week": movers, recent releases, went quiet
 │   │   ├── anomalies.ts   # single-day spike detection + chart marker notes
 │   │   └── format.ts
 │   ├── hooks/
@@ -45,11 +44,10 @@ pulse-dashboard/
 │   │   ├── Header/        # brand, section nav, GitHub link, theme toggle; one hamburger below sm
 │   │   ├── PageHeader/    # title + description + controls row used by every page
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
-│   │   ├── WhatChanged/   # weekly strip: movers, releases, repos that went quiet (lib/changes.ts)
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
-│   │   ├── Overview/      # / — filters, stat tiles, trend chart, searchable leaderboard
+│   │   ├── Overview/      # / — filters, stat tiles, trend chart, share chart, searchable leaderboard
 │   │   ├── Product/       # /product/:id — artifacts, version adoption, releases, repos, traffic
 │   │   ├── Releases/      # /releases — cadence per product + release feed
 │   │   ├── Repos/         # /repos — health table per repo
@@ -177,10 +175,11 @@ three files from full product fixtures the way the collector does.
 | Component-local (sort order, hover)             | `useState` inside the component            |
 | summary.json                                    | TanStack Query (`useSummary`)              |
 
-Every table with more than a handful of rows gets a `SearchBox` bound to
-`params.q`, filtered with `matchesQuery` over the row's visible names and
-ids, and an empty-state row that echoes the query. Section navigation
-links carry the current query string so filters survive switching pages.
+Every table with more than a handful of rows gets a `SearchBox` placed
+directly above it (never in the page header), bound to `params.q`,
+filtered with `matchesQuery` over the row's visible names and ids, and an
+empty-state row that echoes the query. Section navigation links carry the
+current query string so filters survive switching pages.
 
 Repo-derived data (`product.repos`) is optional per product: a repo can
 exist without a health snapshot (`health: null`), traffic (`traffic: []`)

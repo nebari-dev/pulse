@@ -262,11 +262,6 @@ function Repos() {
               ))}
             </SelectContent>
           </Select>
-          <SearchBox
-            value={params.q}
-            onChange={(q) => setParams({ q })}
-            label="Search repos"
-          />
         </div>
       </PageHeader>
 
@@ -379,6 +374,11 @@ function Repos() {
             </Card>
           )}
 
+          <SearchBox
+            value={params.q}
+            onChange={(q) => setParams({ q })}
+            label="Search repos"
+          />
           <Table aria-label="Repository health">
             <TableHeader>
               <TableRow>
