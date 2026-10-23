@@ -1,0 +1,193 @@
+"""GitHub repository health, releases and traffic for every product's repos.
+
+Three families of CSV under data/repos/:
+
+    health/<repo>.csv   one snapshot row per day: stars, forks, subscribers,
+                        open issues, open PRs, 30-day throughput, last push.
+                        Fetched in one GraphQL query for all repos.
+    releases/<repo>.csv one row per release tag with its publish date, so
+                        release cadence can be computed. Upserted by tag.
+    traffic/<repo>.csv  daily views and clones (unique too). GitHub keeps
+                        only 14 days, so the history exists because we
+                        snapshot it. Needs push access to the repo
+                        (PULSE_GITHUB_TOKEN); otherwise skipped with a note.
+"""
+
+from __future__ import annotations
+
+import logging
+from datetime import date, timedelta
+from pathlib import Path
+
+from .. import store
+from ..config import DownloadsConfig
+from ..http import HttpError, get_json, github_headers, github_token, post_json
+from . import CollectResult
+from .github_releases import API, _all_releases
+
+log = logging.getLogger(__name__)
+
+GRAPHQL = "https://api.github.com/graphql"
+HEALTH_COLUMNS = [
+    "date",
+    "stars",
+    "forks",
+    "subscribers",
+    "open_issues",
+    "open_prs",
+    "merged_prs_30d",
+    "issues_opened_30d",
+    "issues_closed_30d",
+    "pushed_at",
+]
+RELEASE_COLUMNS = ["tag", "published_at", "prerelease"]
+TRAFFIC_COLUMNS = ["date", "views", "unique_views", "clones", "unique_clones"]
+
+# GraphQL aliases must be identifiers; one per repo, position-based.
+REPO_FRAGMENT = """
+%(alias)s: repository(owner: "%(owner)s", name: "%(name)s") {
+  stargazerCount forkCount pushedAt isArchived
+  watchers { totalCount }
+  issues(states: OPEN) { totalCount }
+  pullRequests(states: OPEN) { totalCount }
+}
+%(alias)s_merged: search(type: ISSUE,
+  query: "repo:%(repo)s is:pr is:merged merged:>=%(since)s") { issueCount }
+%(alias)s_opened: search(type: ISSUE,
+  query: "repo:%(repo)s is:issue created:>=%(since)s") { issueCount }
+%(alias)s_closed: search(type: ISSUE,
+  query: "repo:%(repo)s is:issue is:closed closed:>=%(since)s") { issueCount }
+"""
+BATCH = 15  # repos per GraphQL query; each costs 4 fields, keep well under limits
+
+
+def collect(cfg: DownloadsConfig, data_dir: Path, today: date) -> CollectResult:
+    result = CollectResult(source="github_repos")
+    pairs = cfg.repos()
+    if not pairs:
+        return result
+    repos = [repo for _, repo in pairs]
+
+    _collect_health(repos, data_dir, today, result)
+    _collect_releases(repos, data_dir, result)
+    _collect_traffic(repos, data_dir, today, result)
+    result.artifacts = len(repos)
+    return result
+
+
+# ---- health -----------------------------------------------------------------
+
+
+def _collect_health(repos: list[str], data_dir: Path, today: date, result: CollectResult) -> None:
+    if not github_token():
+        result.errors.append("health: GITHUB_TOKEN not set; GraphQL needs a token")
+        return
+    since = (today - timedelta(days=30)).isoformat()
+    for start in range(0, len(repos), BATCH):
+        batch = repos[start : start + BATCH]
+        query = "query {" + "".join(_fragment(i, repo, since) for i, repo in enumerate(batch)) + "}"
+        try:
+            payload = post_json(GRAPHQL, {"query": query}, headers=github_headers())
+        except HttpError as e:
+            result.errors.append(f"health batch {start // BATCH}: {e}")
+            continue
+        data = payload.get("data") or {}
+        for err in payload.get("errors") or []:
+            log.warning("graphql: %s", err.get("message"))
+        for i, repo in enumerate(batch):
+            node = data.get(f"r{i}")
+            if not node:
+                result.errors.append(f"health {repo}: not found or no access")
+                continue
+            row = {
+                "date": today.isoformat(),
+                "stars": node["stargazerCount"],
+                "forks": node["forkCount"],
+                "subscribers": node["watchers"]["totalCount"],
+                "open_issues": node["issues"]["totalCount"],
+                "open_prs": node["pullRequests"]["totalCount"],
+                "merged_prs_30d": (data.get(f"r{i}_merged") or {}).get("issueCount", ""),
+                "issues_opened_30d": (data.get(f"r{i}_opened") or {}).get("issueCount", ""),
+                "issues_closed_30d": (data.get(f"r{i}_closed") or {}).get("issueCount", ""),
+                "pushed_at": (node.get("pushedAt") or "")[:10],
+            }
+            path = store.path_for(data_dir, "repos", "health", repo)
+            result.rows_changed += store.upsert(path, HEALTH_COLUMNS, ["date"], [row])
+            log.info("health %s: %s stars, %s open issues", repo, row["stars"], row["open_issues"])
+
+
+def _fragment(i: int, repo: str, since: str) -> str:
+    owner, name = repo.split("/", 1)
+    return REPO_FRAGMENT % {
+        "alias": f"r{i}",
+        "owner": owner,
+        "name": name,
+        "repo": repo,
+        "since": since,
+    }
+
+
+# ---- releases ---------------------------------------------------------------
+
+
+def _collect_releases(repos: list[str], data_dir: Path, result: CollectResult) -> None:
+    for repo in repos:
+        try:
+            releases = _all_releases(repo)
+        except HttpError as e:
+            result.errors.append(f"releases {repo}: {e}")
+            continue
+        rows = [
+            {
+                "tag": rel["tag_name"],
+                "published_at": (rel.get("published_at") or rel.get("created_at") or "")[:10],
+                "prerelease": "true" if rel.get("prerelease") else "false",
+            }
+            for rel in releases
+            if not rel.get("draft")
+        ]
+        path = store.path_for(data_dir, "repos", "releases", repo)
+        result.rows_changed += store.upsert(path, RELEASE_COLUMNS, ["tag"], rows)
+        log.info("releases %s: %d", repo, len(rows))
+
+
+# ---- traffic ----------------------------------------------------------------
+
+
+def _collect_traffic(repos: list[str], data_dir: Path, today: date, result: CollectResult) -> None:
+    denied: list[str] = []
+    for repo in repos:
+        try:
+            views = get_json(f"{API}/repos/{repo}/traffic/views", headers=github_headers())
+            clones = get_json(f"{API}/repos/{repo}/traffic/clones", headers=github_headers())
+        except HttpError as e:
+            if e.status in (401, 403, 404):
+                denied.append(repo)
+            else:
+                result.errors.append(f"traffic {repo}: {e}")
+            continue
+        by_date: dict[str, dict[str, int]] = {}
+        for v in views.get("views", []):
+            d = v["timestamp"][:10]
+            by_date.setdefault(d, {})
+            by_date[d].update(views=v["count"], unique_views=v["uniques"])
+        for c in clones.get("clones", []):
+            d = c["timestamp"][:10]
+            by_date.setdefault(d, {})
+            by_date[d].update(clones=c["count"], unique_clones=c["uniques"])
+        # Today's bucket is still filling; keep only complete days.
+        rows = [
+            {"date": d, "views": 0, "unique_views": 0, "clones": 0, "unique_clones": 0, **v}
+            for d, v in sorted(by_date.items())
+            if d < today.isoformat()
+        ]
+        path = store.path_for(data_dir, "repos", "traffic", repo)
+        result.rows_changed += store.upsert(path, TRAFFIC_COLUMNS, ["date"], rows)
+        log.info("traffic %s: %d days", repo, len(rows))
+    if denied:
+        result.notes["traffic_denied"] = denied
+        log.warning(
+            "traffic: no push access to %d repo(s) (set PULSE_GITHUB_TOKEN): %s",
+            len(denied),
+            ", ".join(denied),
+        )

@@ -5,6 +5,9 @@ import { ThemeProvider } from '@/hooks/theme-provider';
 import NotFound from '@/pages/NotFound';
 import Overview from '@/pages/Overview';
 import Product from '@/pages/Product';
+import Releases from '@/pages/Releases';
+import Repos from '@/pages/Repos';
+import Traffic from '@/pages/Traffic';
 
 const queryClient = new QueryClient();
 
@@ -19,6 +22,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Overview />} />
                 <Route path="/product/:id" element={<Product />} />
+                <Route path="/releases" element={<Releases />} />
+                <Route path="/repos" element={<Repos />} />
+                <Route path="/traffic" element={<Traffic />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

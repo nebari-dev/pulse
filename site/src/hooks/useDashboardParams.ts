@@ -17,6 +17,8 @@ export interface DashboardParams {
   /** Artifact type: image, chart, package, binary. */
   type: ArtifactKindFilter;
   source: SourceFilter;
+  /** Free-text search over table rows. */
+  q: string;
 }
 
 const DEFAULTS: DashboardParams = {
@@ -24,6 +26,7 @@ const DEFAULTS: DashboardParams = {
   kind: 'all',
   type: 'all',
   source: 'all',
+  q: '',
 };
 
 function isRange(v: string | null): v is Range {
@@ -57,6 +60,7 @@ export function useDashboardParams(): [
     kind: isKind(kind) ? kind : DEFAULTS.kind,
     type: isType(type) ? type : DEFAULTS.type,
     source: isSource(source) ? source : DEFAULTS.source,
+    q: params.get('q') ?? DEFAULTS.q,
   };
 
   const update = useCallback(

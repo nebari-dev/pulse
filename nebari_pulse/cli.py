@@ -1,6 +1,8 @@
 """`pulse` command line.
 
 pulse collect [--only quay,pypi] [--dry-run]   fetch sources, upsert data/, rebuild summary
+                                                (sources: quay, pypi, conda, github_releases,
+                                                 github_repos)
 pulse summarize                                 rebuild data/summary.json from data/ only
 pulse check                                     validate sources.yaml
 """
@@ -15,13 +17,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from . import config, summary
-from .sources import CollectResult, conda, github_releases, pypi, quay
+from .sources import CollectResult, conda, github_releases, github_repos, pypi, quay
 
 COLLECTORS = {
     "quay": quay.collect,
     "pypi": pypi.collect,
     "conda": conda.collect,
     "github_releases": github_releases.collect,
+    "github_repos": github_repos.collect,
 }
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -56,7 +59,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "check":
         n = sum(len(p.artifacts.get(s, [])) for p in cfg.downloads.products for s in config.SOURCES)
-        print(f"ok: {len(cfg.downloads.products)} products, {n} artifact refs")
+        repos = len(cfg.downloads.repos())
+        print(f"ok: {len(cfg.downloads.products)} products, {n} artifact refs, {repos} repos")
         return 0
 
     today = datetime.now(UTC).date()
@@ -100,6 +104,11 @@ def _collect(cfg: config.DownloadsConfig, args: argparse.Namespace, today) -> in
             print(f"  ! {err}")
 
     for res in results:
+        if res.source == "github_repos" and res.notes.get("traffic_denied"):
+            denied = res.notes["traffic_denied"]
+            print(
+                f"traffic skipped for {len(denied)} repo(s): PULSE_GITHUB_TOKEN needs push access"
+            )
         if res.source == "quay":
             untracked = res.notes.get("untracked", [])
             (data_dir / "untracked.json").parent.mkdir(parents=True, exist_ok=True)

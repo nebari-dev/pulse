@@ -38,8 +38,29 @@ describe('Product', () => {
       'href',
       'https://github.com/nebari-dev/nebari-infrastructure-core/releases',
     );
-    expect(screen.getByText('v0.16.0')).toBeInTheDocument();
+    // Listed under both all-time downloads and 30-day version adoption.
+    expect(screen.getAllByText('v0.16.0')).toHaveLength(2);
+    // v0.15.0 had no downloads in the window, so adoption leaves it out.
+    expect(screen.getAllByText('v0.15.0')).toHaveLength(1);
     expect(screen.getByText('linux/x86_64')).toBeInTheDocument();
+    // A repo without a health snapshot shows dashes, and no release tiles.
+    expect(screen.getByText('no GitHub releases')).toBeInTheDocument();
+  });
+
+  it('shows repo health, cadence and traffic when a product has repos', async () => {
+    renderProduct('/product/nebari-operator');
+    await screen.findByRole('heading', { name: 'Nebari Operator' });
+    expect(screen.getByText('Latest release')).toBeInTheDocument();
+    // In the latest-release tile and in the recent releases list.
+    expect(screen.getAllByText('v1.2.0')).toHaveLength(2);
+    expect(screen.getByText('median 30 days apart')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /^nebari-operator/ }),
+    ).toHaveAttribute('href', 'https://github.com/nebari-dev/nebari-operator');
+    expect(screen.getByText('Views, 14 days')).toBeInTheDocument();
+    expect(screen.getByText('60')).toBeInTheDocument();
+    expect(screen.getByText('Recent releases')).toBeInTheDocument();
+    expect(screen.getByText('prerelease')).toBeInTheDocument();
   });
 
   it('shows not found for an unknown id', async () => {

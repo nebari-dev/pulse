@@ -16,6 +16,12 @@
 #                    (CLIs, Homebrew taps). Cumulative per asset; daily
 #                    series derived from snapshots.
 #
+# Products also list their GitHub repos:
+#   repos:           owner/name repos whose stars, issues, PR throughput,
+#                    releases (cadence) and traffic (views/clones, needs
+#                    PULSE_GITHUB_TOKEN with push access) count for the
+#                    product. Independent of the download sources above.
+#
 # kind: product (core platform piece) | pack (software pack).
 
 downloads:
@@ -38,6 +44,13 @@ downloads:
     - id: nebari-classic
       name: Nebari Classic
       kind: product
+      repos:
+        - nebari-dev/nebari
+        - nebari-dev/nebari-docker-images
+        - nebari-dev/nebari-workflow-controller
+        - nebari-dev/nebari-self-registration
+        - nebari-dev/nebari-jupyterlite-plugin
+        - nebari-dev/backup-restore
       pypi: [nebari, nebari-workflow-controller]
       conda: [conda-forge/nebari]
       quay:
@@ -56,6 +69,8 @@ downloads:
     - id: nebari-operator
       name: Nebari Operator
       kind: product
+      repos:
+        - nebari-dev/nebari-operator
       quay:
         - nebari/nebari-operator
         - nebari/charts/nebari-operator
@@ -66,6 +81,10 @@ downloads:
     - id: nic
       name: Nebari Infrastructure Core
       kind: product
+      repos:
+        - nebari-dev/nebari-infrastructure-core
+        - nebari-dev/nebari-keycloak-theme
+        - nebari-dev/deploy-nebari-action
       pypi: [nic]
       github_releases:
         - nebari-dev/nebari-infrastructure-core
@@ -79,6 +98,9 @@ downloads:
     - id: nebi
       name: Nebi
       kind: product
+      repos:
+        - nebari-dev/nebi
+        - nebari-dev/nebari-environments
       conda: [conda-forge/nebi]
       github_releases: [nebari-dev/nebi]
       quay:
@@ -89,6 +111,8 @@ downloads:
     - id: nebari-landing
       name: Nebari Landing
       kind: product
+      repos:
+        - nebari-dev/nebari-landing
       quay:
         - nebari/nebari-landing
         - nebari/charts/nebari-landing
@@ -98,6 +122,8 @@ downloads:
     - id: apps-pack
       name: Apps Pack
       kind: pack
+      repos:
+        - nebari-dev/apps-pack
       quay:
         - nebari/charts/nebari-apps
         - nebari/apps-pack-api
@@ -109,6 +135,9 @@ downloads:
     - id: chat-pack
       name: Chat Pack
       kind: pack
+      repos:
+        - nebari-dev/chat-pack
+        - nebari-dev/ravnar
       quay:
         - nebari/charts/nebari-chat
         - nebari/nebari-chat-backend
@@ -126,6 +155,8 @@ downloads:
     - id: data-science-pack
       name: Data Science Pack
       kind: pack
+      repos:
+        - nebari-dev/data-science-pack
       quay:
         - nebari/charts/nebari-data-science-pack
         - nebari/nebari-data-science-pack-jupyterhub
@@ -137,18 +168,24 @@ downloads:
     - id: langfuse-pack
       name: Langfuse Pack
       kind: pack
+      repos:
+        - nebari-dev/langfuse-pack
       quay:
         - nebari/charts/nebari-langfuse
 
     - id: lgtm-pack
       name: LGTM Pack
       kind: pack
+      repos:
+        - nebari-dev/lgtm-pack
       quay:
         - nebari/charts/nebari-lgtm-pack
 
     - id: llm-serving-pack
       name: LLM Serving Pack
       kind: pack
+      repos:
+        - nebari-dev/llm-serving-pack
       quay:
         - nebari/charts/nebari-llm-serving
         - nebari/llm-serving-pack-frontend
@@ -159,6 +196,8 @@ downloads:
     - id: nebari-frames
       name: Nebari Frames
       kind: pack
+      repos:
+        - nebari-dev/nebari-frames
       quay:
         - nebari/nebari-frames
         - nebari/charts/nebari-frames
@@ -167,12 +206,16 @@ downloads:
     - id: nebi-pack
       name: Nebi Pack
       kind: pack
+      repos:
+        - nebari-dev/nebi-pack
       quay:
         - nebari/charts/nebari-nebi-pack
 
     - id: nexus-pack
       name: Nexus Pack
       kind: pack
+      repos:
+        - nebari-dev/nebari-nexus-pack
       quay:
         - nebari/charts/nebari-nexus
         - nebari/nebari-nexus-api
@@ -180,6 +223,8 @@ downloads:
     - id: provenance-collector-pack
       name: Provenance Collector
       kind: pack
+      repos:
+        - nebari-dev/provenance-collector-pack
       quay:
         - nebari/provenance-collector
         - nebari/charts/provenance-collector
@@ -187,18 +232,24 @@ downloads:
     - id: rayserve-pack
       name: Rayserve Pack
       kind: pack
+      repos:
+        - nebari-dev/rayserve-pack
       quay:
         - nebari/charts/nebari-rayserve-pack
 
     - id: superset-pack
       name: Superset Pack
       kind: pack
+      repos:
+        - nebari-dev/superset-pack
       quay:
         - nebari/charts/nebari-superset
 
     - id: skillsctl
       name: skillsctl
       kind: pack
+      repos:
+        - nebari-dev/skillsctl
       quay:
         - nebari/skillsctl
         - nebari/charts/skillsctl
@@ -207,6 +258,8 @@ downloads:
     - id: unity-catalog-pack
       name: Unity Catalog Pack
       kind: pack
+      repos:
+        - nebari-dev/unity-catalog-pack
       quay:
         - nebari/unity-catalog-pack-unity-catalog-keycloak-sync
         - nebari/unity-catalog-pack-unity-catalog-ui

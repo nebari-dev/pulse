@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import Filters from '@/components/Filters';
 import Leaderboard, { type LeaderboardRow } from '@/components/Leaderboard';
+import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +21,7 @@ import {
   hasDataIn,
   latestDate,
   matchesKind,
+  matchesQuery,
   type Point,
   productSeries,
   RANGE_LABEL,
@@ -200,7 +202,22 @@ function Overview() {
             </CardContent>
           </Card>
 
-          <Leaderboard rows={view.rows} rangeLabel={rangeLabel} />
+          <div className="flex flex-col gap-3">
+            <SearchBox
+              value={params.q}
+              onChange={(q) => setParams({ q })}
+              label="Search products"
+            />
+            <Leaderboard
+              rows={view.rows.filter((r) =>
+                matchesQuery(params.q, r.product.name, r.product.id),
+              )}
+              rangeLabel={rangeLabel}
+              emptyMessage={
+                params.q ? `No products match "${params.q}".` : undefined
+              }
+            />
+          </div>
         </>
       )}
     </div>

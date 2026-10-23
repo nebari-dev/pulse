@@ -3,25 +3,31 @@
 Adoption and health metrics for the Nebari ecosystem: downloads, releases,
 repos, community.
 
-Phase 1 tracks **downloads** of Nebari Classic, the operator, NIC, Nebi and every
+Tracks **downloads** of Nebari Classic, the operator, NIC, Nebi and every
 software pack, across Quay (images and Helm charts), PyPI, conda-forge and
-GitHub Releases. A GitHub Action runs the collector daily and commits the
-results under `data/`, so the repo itself is the database: every source
-upstream is either a rolling window (Quay: ~90 days, PyPI: ~180 days) or a
-cumulative counter (GitHub, conda), and the history only exists because we
-snapshot it.
+GitHub Releases, plus **release cadence**, **repository health** (stars,
+open issues and PRs, merge throughput) and **GitHub traffic** (views and
+clones) for each product's repos. A GitHub Action runs the collector daily
+and commits the results under `data/`, so the repo itself is the database:
+every upstream is either a rolling window (Quay: ~90 days, PyPI: ~180 days,
+GitHub traffic: 14 days) or a cumulative counter (GitHub, conda), and the
+history only exists because we snapshot it.
 
 ## Layout
 
 ```
-sources.yaml            what is tracked - products, packs, their artifacts per source
+sources.yaml            what is tracked - products, packs, their artifacts per source, their repos
 nebari_pulse/           collector (Python 3.12, stdlib + pyyaml)
   sources/<source>.py   one fetcher per upstream
   summary.py            builds data/summary.json, the dashboard's contract
 data/
   downloads/<source>/<artifact>.csv   raw rows, one file per artifact
-  summary.json                        per-product daily series + 7/30/90d totals
+  repos/health/<repo>.csv             daily snapshot: stars, forks, open issues/PRs, throughput
+  repos/releases/<repo>.csv           one row per release tag with its date
+  repos/traffic/<repo>.csv            daily views and clones (needs PULSE_GITHUB_TOKEN)
+  summary.json                        per-product daily series + 7/30/90d totals + repos
   untracked.json                      Quay repos not yet in sources.yaml
+AGENTS.md               guidance for AI agents; site/AGENTS.md covers the dashboard
 site/                   dashboard (Vite + React + Nebari design system)
 .github/workflows/
   collect.yml           daily cron -> pulse collect -> commit data/ -> dispatch deploy
@@ -39,9 +45,23 @@ site/                   dashboard (Vite + React + Nebari design system)
 | `conda` | `date,version,file,cumulative` | daily snapshot of per-file totals from api.anaconda.org |
 | `github_releases` | `date,tag,asset,cumulative` | daily snapshot of per-asset `download_count` |
 
+| `repos/health` | `date,stars,forks,subscribers,open_issues,open_prs,merged_prs_30d,issues_opened_30d,issues_closed_30d,pushed_at` | daily snapshot via GraphQL |
+| `repos/releases` | `tag,published_at,prerelease` | one row per release tag |
+| `repos/traffic` | `date,views,unique_views,clones,unique_clones` | daily, 14-day window from GitHub |
+
 For cumulative sources the daily series in `summary.json` is the delta
-between consecutive snapshots. Attestation and checksum assets are excluded
-(`github_releases_ignore_suffixes` in `sources.yaml`).
+between consecutive snapshots, kept per version/tag as well so the
+dashboard can show which versions people install now. Attestation and
+checksum assets are excluded (`github_releases_ignore_suffixes` in
+`sources.yaml`).
+
+Each product also lists its GitHub `repos`. Health and releases need any
+GitHub token (GraphQL refuses anonymous calls). Traffic is only shared with
+accounts that can push to the repo, which the Actions token cannot do for
+other repos: set the `PULSE_GITHUB_TOKEN` repository secret to a
+fine-grained PAT with *Administration: read* on the tracked repos (or a
+classic PAT with `repo`). Without it, traffic is skipped with a note and
+the Traffic page says so.
 
 Not available anywhere: **GHCR pull counts**. GitHub exposes them only in
 the package UI. Images published solely to `ghcr.io/nebari-dev` are invisible
@@ -59,13 +79,22 @@ uv run pytest && uv run ruff check .
 ```
 
 `GITHUB_TOKEN` is optional locally (`export GITHUB_TOKEN=$(gh auth token)`)
-but avoids the 60 req/h anonymous limit.
+but avoids the 60 req/h anonymous limit and is required for repo health.
+`PULSE_GITHUB_TOKEN`, if set, is used instead and also unlocks traffic.
 
 ## Dashboard
 
 `site/` is a static Vite + React app that fetches `data/summary.json` at
 runtime (served from `../data` in dev, copied into `dist/data` on build).
-Filters live in the URL, so any view is shareable.
+Filters and the table search live in the URL, so any view is shareable.
+
+| Page | What it shows |
+|---|---|
+| `/` Downloads | totals, trend by artifact type or source, searchable leaderboard |
+| `/product/:id` | one product: artifacts, version adoption, releases, repo health, traffic |
+| `/releases` | cadence per product (latest, count in window, median gap) and a release feed |
+| `/repos` | stars, stars gained, open issues/PRs, merged PRs, last push per repo |
+| `/traffic` | GitHub views and clones, 14-day totals and all collected history |
 
 ```sh
 cd site
@@ -90,5 +119,5 @@ own; add them to a product or to `quay_ignore`.
 
 ## Roadmap
 
-- Phase 3: GitHub traffic (clones/views), repo health (stars, issues, PR
-  throughput, release cadence), docs traffic from the analytics pack.
+- Docs traffic (docs.nebari.dev, classic.nebari.dev) from the analytics
+  pack; PyPI downloads by Python version and OS; issue time-to-first-response.
