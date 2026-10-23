@@ -9,6 +9,7 @@ import {
   fillDaily,
   headlineArtifacts,
   platformOf,
+  shareRows,
   sumSeries,
   weekStart,
   windowFor,
@@ -184,5 +185,65 @@ describe('breakdownRows', () => {
       { category: 'Linux', count: 10 },
       { category: 'unknown', count: 1 },
     ]);
+  });
+});
+
+describe('shareRows', () => {
+  it('splits the weekly total into top products and Other', () => {
+    const week = (c: number) => [
+      { date: '2026-10-05', count: c },
+      { date: '2026-10-06', count: c },
+    ];
+    const { rows, series } = shareRows(
+      [
+        { id: 'a', name: 'A', rank: 100, series: week(3) },
+        { id: 'b', name: 'B', rank: 50, series: week(1) },
+        { id: 'c', name: 'C', rank: 10, series: week(1) },
+      ],
+      '2026-10-05',
+      '2026-10-11',
+      2,
+    );
+    expect(series.map((s) => s.key)).toEqual(['a', 'b', 'other']);
+    expect(series.map((s) => s.label)).toEqual(['A', 'B', 'Other']);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      date: '2026-10-05',
+      a: 60,
+      a_n: 6,
+      b: 20,
+      b_n: 2,
+      other: 20,
+      other_n: 2,
+    });
+  });
+
+  it("keeps a product's hue by all-time rank, not window rank", () => {
+    const a = {
+      id: 'a',
+      name: 'A',
+      rank: 100,
+      series: [{ date: '2026-10-05', count: 1 }],
+    };
+    const b = {
+      id: 'b',
+      name: 'B',
+      rank: 200,
+      series: [{ date: '2026-10-05', count: 9 }],
+    };
+    const one = shareRows([a, b], '2026-10-05', '2026-10-05').series;
+    const two = shareRows(
+      [
+        { ...a, series: [{ date: '2026-10-05', count: 9 }] },
+        { ...b, series: [{ date: '2026-10-05', count: 1 }] },
+      ],
+      '2026-10-05',
+      '2026-10-05',
+    ).series;
+    const color = (list: typeof one, key: string) =>
+      list.find((s) => s.key === key)?.color;
+    expect(color(one, 'a')).toBe(color(two, 'a'));
+    expect(color(one, 'b')).toBe(color(two, 'b'));
+    expect(color(one, 'a')).not.toBe(color(one, 'b'));
   });
 });
