@@ -15,6 +15,12 @@ Three families of CSV under data/repos/:
                         stargazers API (which gives a timestamp per star),
                         then kept current from the daily health snapshot so
                         unstars are reflected too.
+    contributors/<repo>.csv
+                        commits per (date, author) on the default branch,
+                        bots excluded. Backfilled once from the commits
+                        list, then refreshed from the start of the latest
+                        month seen. Authors are GitHub logins, or
+                        "email:<address>" for commits without a GitHub user.
 """
 
 from __future__ import annotations
@@ -47,6 +53,7 @@ HEALTH_COLUMNS = [
 RELEASE_COLUMNS = ["tag", "published_at", "prerelease"]
 TRAFFIC_COLUMNS = ["date", "views", "unique_views", "clones", "unique_clones"]
 STARS_COLUMNS = ["date", "stars"]
+CONTRIBUTOR_COLUMNS = ["date", "author", "commits"]
 STAR_HEADERS = {"Accept": "application/vnd.github.star+json"}
 
 # GraphQL aliases must be identifiers; one per repo, position-based.
@@ -78,6 +85,7 @@ def collect(cfg: DownloadsConfig, data_dir: Path, today: date) -> CollectResult:
     _collect_releases(repos, data_dir, result)
     _collect_traffic(repos, data_dir, today, result)
     _collect_stars(repos, data_dir, today, stars_today, result)
+    _collect_contributors(repos, data_dir, result)
     result.artifacts = len(repos)
     return result
 
@@ -256,3 +264,61 @@ def _backfill_stars(repo: str) -> list[store.Row]:
         total += per_day[d]
         rows.append({"date": d, "stars": total})
     return rows
+
+
+# ---- contributors ------------------------------------------------------------
+
+
+def _collect_contributors(repos: list[str], data_dir: Path, result: CollectResult) -> None:
+    for repo in repos:
+        path = store.path_for(data_dir, "repos", "contributors", repo)
+        existing = store.read(path)
+        since = None
+        if existing:
+            latest = max(r["date"] for r in existing)
+            since = f"{latest[:7]}-01T00:00:00Z"  # refetch the latest month
+        try:
+            rows = _commits_by_author(repo, since)
+        except HttpError as e:
+            result.errors.append(f"contributors {repo}: {e}")
+            continue
+        if rows:
+            result.rows_changed += store.upsert(path, CONTRIBUTOR_COLUMNS, ["date", "author"], rows)
+        log.info(
+            "contributors %s: %d author-days%s", repo, len(rows), " (backfill)" if not since else ""
+        )
+
+
+def _commits_by_author(repo: str, since: str | None) -> list[store.Row]:
+    counts: dict[tuple[str, str], int] = {}
+    page = 1
+    while True:
+        url = f"{API}/repos/{repo}/commits?per_page=100&page={page}"
+        if since:
+            url += f"&since={since}"
+        batch = get_json(url, headers=github_headers())
+        for c in batch:
+            author = commit_author(c)
+            if author is None:
+                continue
+            d = (c.get("commit", {}).get("author", {}).get("date") or "")[:10]
+            if d:
+                counts[(d, author)] = counts.get((d, author), 0) + 1
+        if len(batch) < 100:
+            break
+        page += 1
+    return [{"date": d, "author": a, "commits": n} for (d, a), n in sorted(counts.items())]
+
+
+def commit_author(commit: dict) -> str | None:
+    """A stable author key, or None for bots."""
+    user = commit.get("author") or {}
+    login = user.get("login")
+    if login:
+        if user.get("type") == "Bot" or login.endswith("[bot]"):
+            return None
+        return login
+    email = (commit.get("commit", {}).get("author", {}).get("email") or "").strip().lower()
+    if not email or "[bot]" in email or email.endswith("noreply.github.com"):
+        return None
+    return f"email:{email}"

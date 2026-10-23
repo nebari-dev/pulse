@@ -26,6 +26,7 @@ data/
   repos/releases/<repo>.csv           one row per release tag with its date
   repos/traffic/<repo>.csv            daily views and clones (needs PULSE_GITHUB_TOKEN)
   repos/stars/<repo>.csv              cumulative stars per date, back to the first star
+  repos/contributors/<repo>.csv       commits per author per day, bots excluded
   summary.json                        index: products with totals + series per source and type
   repos.json                          every product's repos: health, traffic, releases
   products/<id>.json                  one product in full, loaded by its page
@@ -52,6 +53,7 @@ site/                   dashboard (Vite + React + Nebari design system)
 | `repos/releases` | `tag,published_at,prerelease` | one row per release tag |
 | `repos/traffic` | `date,views,unique_views,clones,unique_clones` | daily, 14-day window from GitHub |
 | `repos/stars` | `date,stars` | cumulative; backfilled once from each star's timestamp, then daily |
+| `repos/contributors` | `date,author,commits` | commits per author per day on the default branch, bots excluded; backfilled once, then the latest month refreshed daily |
 
 For cumulative sources the daily series in `summary.json` is the delta
 between consecutive snapshots, kept per version/tag as well so the
@@ -99,7 +101,7 @@ Filters and the table search live in the URL, so any view is shareable.
 | `/` Downloads | totals, trend by artifact type or source, searchable leaderboard |
 | `/product/:id` | one product: artifacts, version adoption, releases, repo health, traffic |
 | `/releases` | cadence per product (latest, count in window, median gap) and a release feed |
-| `/repos` | stars, stars gained, open issues/PRs, merged PRs, last push per repo |
+| `/repos` | stars, stars gained, open issues/PRs, merged PRs, authors per repo; new and active contributors over time |
 | `/traffic` | GitHub views and clones, 14-day totals and all collected history |
 
 ```sh

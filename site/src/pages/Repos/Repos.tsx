@@ -5,6 +5,8 @@ import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
+import TrendChart from '@/components/TrendChart';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -61,6 +63,7 @@ type SortKey =
   | 'issues'
   | 'prs'
   | 'merged'
+  | 'contributors'
   | 'push';
 const RIGHT = 'text-right [&>button]:justify-end';
 const KIND_ITEMS: Array<{ value: KindFilter; label: string }> = [
@@ -93,7 +96,19 @@ function useRepos(summary: ReposFile | undefined) {
     const totals = healthTotals(rows.map((r) => r.repo));
     const quiet = rows.filter((r) => (r.pushAge ?? 0) > 90).length;
     const gained = rows.reduce((n, r) => n + (r.starsGained ?? 0), 0);
-    return { asOf, rows, totals, quiet, gained };
+    const c = summary.contributors;
+    const monthsBack = 24;
+    const charts = {
+      newByQuarter: c.new_by_quarter.slice(-12).map((p) => ({
+        date: p.date,
+        count: p.count,
+      })),
+      monthly: c.monthly.slice(-monthsBack).map((m) => ({
+        date: m.date,
+        authors: m.authors,
+      })),
+    };
+    return { asOf, rows, totals, quiet, gained, contributors: c, charts };
   }, [summary, params.kind]);
   return { params, setParams, view };
 }
@@ -127,6 +142,8 @@ function compareRows(a: Row, b: Row, key: SortKey) {
         num(a.repo.health?.merged_prs_30d ?? null) -
         num(b.repo.health?.merged_prs_30d ?? null)
       );
+    case 'contributors':
+      return a.repo.contributors.active_30d - b.repo.contributors.active_30d;
     case 'push':
       // Most recent push first when descending: fewer days ago = larger.
       return -(num(a.pushAge) - num(b.pushAge));
@@ -246,10 +263,59 @@ function Repos() {
               hint="all tracked repos"
             />
             <StatTile
-              label="Quiet repos"
-              value={String(view.quiet)}
-              hint="no push in 90 days"
+              label="Contributors, 30 days"
+              value={formatNumber(view.contributors.active_30d)}
+              hint={`${view.quiet} quiet ${view.quiet === 1 ? 'repo' : 'repos'}, no push in 90 days`}
             />
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>New contributors per quarter</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrendChart
+                  rows={view.charts.newByQuarter}
+                  series={[
+                    {
+                      key: 'count',
+                      label: 'First-time contributors',
+                      color: 'var(--chart-1)',
+                    },
+                  ]}
+                  bucket="quarter"
+                  title="First-time contributors per quarter across all tracked repos"
+                />
+                <p className="mt-2 text-muted-foreground text-xs">
+                  A person counts once, in the quarter of their first commit to
+                  any tracked repo. The current quarter is still filling.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Active contributors per month</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrendChart
+                  rows={view.charts.monthly}
+                  series={[
+                    {
+                      key: 'authors',
+                      label: 'Authors',
+                      color: 'var(--chart-4)',
+                    },
+                  ]}
+                  bucket="month"
+                  title="Unique commit authors per month across all tracked repos"
+                />
+                <p className="mt-2 text-muted-foreground text-xs">
+                  Commit authors on each repo's default branch, bots excluded.
+                  The current month is still filling.
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           <Table aria-label="Repository health">
@@ -262,6 +328,7 @@ function Repos() {
                 {head('issues', 'Open issues', RIGHT)}
                 {head('prs', 'Open PRs', RIGHT)}
                 {head('merged', 'Merged, 30d', RIGHT)}
+                {head('contributors', 'Authors, 30d', RIGHT)}
                 {head('push', 'Last push')}
                 <TableHead>Stars, 90d</TableHead>
               </TableRow>
@@ -269,7 +336,7 @@ function Repos() {
             <TableBody>
               {rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-muted-foreground">
+                  <TableCell colSpan={10} className="text-muted-foreground">
                     {params.q
                       ? `No repos match "${params.q}".`
                       : 'No repos tracked yet.'}

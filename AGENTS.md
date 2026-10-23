@@ -65,10 +65,10 @@ nebari_pulse/
     pypi.py                  daily downloads (no mirrors) from pypistats, ~180d
     conda.py                 cumulative per-file totals from anaconda.org, snapshotted daily
     github_releases.py       cumulative per-asset download_count, snapshotted daily
-    github_repos.py          repo health (GraphQL), release tags/dates, traffic, star history (REST)
+    github_repos.py          repo health (GraphQL), release tags/dates, traffic, stars, contributors (REST)
 data/
   downloads/<source>/<artifact>.csv
-  repos/health|releases|traffic|stars/<owner>__<name>.csv
+  repos/health|releases|traffic|stars|contributors/<owner>__<name>.csv
   summary.json               index: products with totals + series per (source, kind)
   repos.json                 every product's repos: health, traffic, releases
   products/<id>.json         one product in full: artifacts with series + items, repos
@@ -89,6 +89,7 @@ site/                        see site/AGENTS.md
 | repos/releases | `tag,published_at,prerelease` | one row per release tag |
 | repos/traffic | `date,views,unique_views,clones,unique_clones` | daily |
 | repos/stars | `date,stars` | cumulative; backfilled once from the stargazers API (timestamp per star), then today's count from the health snapshot |
+| repos/contributors | `date,author,commits` | per author per day on the default branch; bots excluded; author is a login or `email:<address>`; backfilled once, then the latest month refetched |
 
 Rules the collector relies on:
 
@@ -155,7 +156,7 @@ so each page loads only what it shows:
 | File | Loaded by | Carries |
 |---|---|---|
 | `summary.json` | Downloads page (`useSummary`) | every product: totals + series grouped by (source, artifact kind), with `since` per group |
-| `repos.json` | Releases, Repos, Traffic (`useRepos`) | every product's repos: latest health, health series, traffic, releases |
+| `repos.json` | Releases, Repos, Traffic (`useRepos`) | every product's repos: latest health, health series, traffic, stars, contributors, releases; plus ecosystem contributors (active, monthly, new per quarter) |
 | `products/<id>.json` | product page (`useProduct`) | one product in full: each artifact's series and latest items (with per-item totals, for version adoption), plus repos |
 
 The index is ~15% of the full data, and grows per group rather than per

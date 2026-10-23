@@ -63,6 +63,13 @@ export const operatorRepo: Repo = {
     clones: 2,
     unique_clones: 1,
   })),
+  contributors: {
+    active_30d: 3,
+    monthly: [
+      { date: '2026-09-01', authors: 2 },
+      { date: '2026-10-01', authors: 3 },
+    ],
+  },
   stars_series: [
     { date: '2026-08-01', stars: 30 },
     { date: '2026-09-15', stars: 40 },
@@ -105,6 +112,7 @@ export const nic: Product = {
       health_series: [],
       traffic: [],
       stars_series: [],
+      contributors: { active_30d: 0, monthly: [] },
       releases: [],
     },
   ],
@@ -209,6 +217,17 @@ export function toRepos(
 ): ReposFile {
   return {
     generated_at,
+    contributors: {
+      active_30d: 3,
+      monthly: [
+        { date: '2026-09-01', authors: 2 },
+        { date: '2026-10-01', authors: 3 },
+      ],
+      new_by_quarter: [
+        { date: '2026-07-01', count: 2 },
+        { date: '2026-10-01', count: 1 },
+      ],
+    },
     products: list.map(({ id, name, kind, repos }) => ({
       id,
       name,
