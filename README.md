@@ -1,4 +1,4 @@
-# pulse
+# Nebari Pulse
 
 Adoption and health metrics for the Nebari ecosystem, as a dashboard at
 the `nebari-pulse` Cloudflare Worker and as plain CSV in this repo.
