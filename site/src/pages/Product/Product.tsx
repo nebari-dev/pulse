@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import Filters from '@/components/Filters';
 import SearchBox from '@/components/SearchBox';
+import ShareChart from '@/components/ShareChart';
 import StatTile from '@/components/StatTile';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Badge } from '@/components/ui/badge';
@@ -70,8 +71,10 @@ import {
   SOURCE_LABEL,
   SOURCES,
   type Summary,
+  shareRows,
   sumSeries,
   total,
+  versionShareInputs,
   windowFor,
 } from '@/lib/summary';
 import NotFound from '@/pages/NotFound';
@@ -232,6 +235,15 @@ function useProductView(
         }
       : null;
 
+    const versionShare = shareRows(
+      versionShareInputs(
+        artifacts.filter(
+          (a) => a.source === 'conda' || a.source === 'github_releases',
+        ),
+      ),
+      start,
+      end,
+    );
     const pypi = artifacts.filter((a) => a.source === 'pypi');
     const breakdowns = (['python_minor', 'system'] as const)
       .map((dimension) => ({
@@ -245,6 +257,7 @@ function useProductView(
 
     return {
       openWork,
+      versionShare,
       stars,
       breakdowns,
       cadence: cadence(stable, product.generated_at, 90),
@@ -484,6 +497,27 @@ function Product() {
         total" is the cumulative counter reported by GitHub or conda-forge,
         which predates collection; Quay and PyPI do not expose one.
       </p>
+
+      {view.versionShare.series.length > 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Version share over time, weekly</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <ShareChart
+              rows={view.versionShare.rows}
+              series={view.versionShare.series}
+              title={`${product.name} version share by week, ${rangeLabel}`}
+            />
+            <p className="text-muted-foreground text-xs">
+              How quickly a new release displaces the previous one, from
+              conda-forge and GitHub Releases. The five largest versions in the
+              period get a band; the rest are "Other". PyPI and Quay do not
+              report per-version counts.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {(view.releases.length > 0 || view.adoption.length > 0) && (
         <div className="grid gap-6 lg:grid-cols-2">

@@ -61,6 +61,10 @@ def test_daily_and_cumulative_sources_combine(tmp_path: Path):
     assert out["repos"] == {"count": 0, "traffic": 0}
     assert gh["latest_cumulative"] == 16
     assert gh["series"] == [{"date": "2026-10-22", "count": 5}]
+    # Weekly deltas per tag (2026-10-22 is a Thursday; the week starts Oct 19).
+    # v2 has no delta yet, so it is left out until it does.
+    assert gh["versions"] == [{"version": "v1", "series": [{"date": "2026-10-19", "count": 5}]}]
+    assert next(a for a in product["artifacts"] if a["source"] == "quay")["versions"] is None
     assert out["sources"]["github_releases"]["kind"] == "cumulative"
 
 
