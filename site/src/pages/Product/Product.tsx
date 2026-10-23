@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
-import { useSummary } from '@/hooks/useSummary';
+import { useProduct, useSummary } from '@/hooks/useSummary';
 import {
   formatAgo,
   formatCompact,
@@ -55,6 +55,7 @@ import {
   latestDate,
   matchesQuery,
   type Point,
+  type ProductDetail,
   platformOf,
   productSeries,
   RANGE_LABEL,
@@ -136,16 +137,20 @@ function platformRows(items: LatestItem[]): ReleaseRow[] {
     .sort((a, b) => b.cumulative - a.cumulative);
 }
 
-function useProductView(summary: Summary | undefined, id: string | undefined) {
+function useProductView(
+  summary: Summary | undefined,
+  product: ProductDetail | null | undefined,
+) {
   const [params, setParams] = useDashboardParams();
   const view = useMemo(() => {
-    const product = summary?.products.find((p) => p.id === id);
     if (!summary || !product) return null;
+    // The window is the dashboard's, from the index, so a product page and
+    // the Downloads page agree on "as of" and on what a full period is.
     const asOf = latestDate(summary);
     const earliest = earliestDate(summary);
     const { start, end, days } = windowFor(params.range, asOf, earliest);
     const weekly = days > 120;
-    const artifacts = artifactsOf(product, params);
+    const artifacts = artifactsOf(product.artifacts, params);
 
     const bySource: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
@@ -161,7 +166,7 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
         color: SOURCE_COLOR[source],
       });
     }
-    const series = productSeries(product, params);
+    const series = productSeries(product.artifacts, params);
     const releases = artifacts
       .filter((a) => a.source === 'github_releases' && a.latest_items?.length)
       .flatMap((a) => a.latest_items ?? []);
@@ -202,7 +207,7 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
       : [];
 
     return {
-      cadence: cadence(stable, summary.generated_at, 90),
+      cadence: cadence(stable, product.generated_at, 90),
       feed: feed.slice(0, 8),
       adoption: adoptionRows(artifacts),
       traffic: traffic && {
@@ -246,7 +251,7 @@ function useProductView(summary: Summary | undefined, id: string | undefined) {
       releases: releaseRows(releases),
       platforms: platformRows(releases),
     };
-  }, [summary, id, params]);
+  }, [summary, product, params]);
   return { params, setParams, view };
 }
 
@@ -302,10 +307,12 @@ function ArtifactRow({
 function Product() {
   const { id } = useParams();
   const { search } = useLocation();
-  const { data, error, isPending } = useSummary();
-  const { params, setParams, view } = useProductView(data, id);
+  const index = useSummary();
+  const detail = useProduct(id);
+  const { params, setParams, view } = useProductView(index.data, detail.data);
   const rangeLabel = RANGE_LABEL[params.range];
 
+  const error = index.error ?? detail.error;
   if (error) {
     return (
       <p role="alert" className="text-destructive-foreground">
@@ -313,7 +320,9 @@ function Product() {
       </p>
     );
   }
-  if (isPending) return <Skeleton className="h-64" shape="block" />;
+  if (index.isPending || detail.isPending) {
+    return <Skeleton className="h-64" shape="block" />;
+  }
   if (!view) return <NotFound />;
 
   const { product } = view;
@@ -550,7 +559,7 @@ function Product() {
                   <HealthCell value={r.health?.open_prs} />
                   <HealthCell value={r.health?.merged_prs_30d} />
                   <TableCell className="tabular-nums">
-                    {formatAgo(daysSincePush(r, data.generated_at))}
+                    {formatAgo(daysSincePush(r, product.generated_at))}
                   </TableCell>
                 </TableRow>
               ))}

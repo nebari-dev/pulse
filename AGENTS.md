@@ -12,14 +12,15 @@ runs daily in GitHub Actions, fetches public counters from Quay, PyPI,
 conda-forge and GitHub, and commits the results as CSV under `data/`. The
 repo is the database: upstreams only keep rolling windows (Quay ~90 days,
 PyPI ~180 days, GitHub traffic 14 days) or cumulative counters, so the
-history exists only because we snapshot it. `data/summary.json` is the one
-file the dashboard reads.
+history exists only because we snapshot it. The dashboard reads three kinds
+of JSON written by `pulse summarize`: `data/summary.json` (the index),
+`data/repos.json` and `data/products/<id>.json`.
 
 | Part | Where | Stack |
 |---|---|---|
 | Config | `sources.yaml` | what is tracked: products, packs, their artifacts per source, their GitHub repos |
 | Collector | `nebari_pulse/` | Python 3.12, stdlib + pyyaml, `uv`, pytest, ruff |
-| Data | `data/` | CSV per (source, artifact) + `summary.json` + `untracked.json` |
+| Data | `data/` | CSV per (source, artifact) + `summary.json`, `repos.json`, `products/*.json` + `untracked.json` |
 | Dashboard | `site/` | Vite + React 19 + TypeScript, Nebari design system, Cloudflare Worker |
 | CI | `.github/workflows/` | `collect.yml` (daily cron), `deploy.yml`, `preview-deploy.yml`, `ci.yml` |
 
@@ -31,7 +32,7 @@ uv run pulse check                       # validate sources.yaml
 uv run pulse collect --dry-run -v        # fetch into a temp dir, leave data/ alone
 uv run pulse collect --only github_repos # one source only
 uv run pulse collect                     # update data/ (what the cron does)
-uv run pulse summarize                   # rebuild summary.json from data/ only
+uv run pulse summarize                   # rebuild summary.json, repos.json, products/ from data/
 uv run pytest && uv run ruff check . && uv run ruff format --check .
 
 cd site && npm install
@@ -58,7 +59,7 @@ nebari_pulse/
   config.py                  loads/validates sources.yaml -> Config dataclasses
   http.py                    stdlib HTTP with retries; get_json, post_json, github_headers
   store.py                   CSV upsert; one file per (family, source, artifact)
-  summary.py                 builds data/summary.json (the dashboard's contract)
+  summary.py                 builds the dashboard's JSON (the contract): index, repos, products
   sources/
     quay.py                  daily pulls per repo, ~90d window; scans namespace for untracked repos
     pypi.py                  daily downloads (no mirrors) from pypistats, ~180d
@@ -68,7 +69,9 @@ nebari_pulse/
 data/
   downloads/<source>/<artifact>.csv
   repos/health|releases|traffic/<owner>__<name>.csv
-  summary.json               per-product series, totals, artifacts, repos
+  summary.json               index: products with totals + series per (source, kind)
+  repos.json                 every product's repos: health, traffic, releases
+  products/<id>.json         one product in full: artifacts with series + items, repos
   untracked.json             Quay repos in the namespace not in sources.yaml
 tests/                       pytest; fixtures build tiny CSVs in tmp_path and call summary.build
 site/                        see site/AGENTS.md
@@ -145,14 +148,24 @@ per source (`quay`, `pypi`, `conda`, `github_releases`) and `repos`
 
 ## Dashboard contract
 
-`summary.json` is the only thing the site reads, loaded once. Per product
-it carries the daily series, windowed totals (7/30/90d/all), every artifact
-with its own series and latest cumulative items (with per-item windowed
-totals, for version adoption), and `repos` with the latest health snapshot,
-a health series, traffic points and releases (newest first). Keep it
-additive: adding fields is fine, renaming or removing breaks deployed
-dashboards until the next data commit, since the site is deployed
-separately from the data.
+`summary.write_all` splits one full build into the files a page fetches,
+so each page loads only what it shows:
+
+| File | Loaded by | Carries |
+|---|---|---|
+| `summary.json` | Downloads page (`useSummary`) | every product: totals + series grouped by (source, artifact kind), with `since` per group |
+| `repos.json` | Releases, Repos, Traffic (`useRepos`) | every product's repos: latest health, health series, traffic, releases |
+| `products/<id>.json` | product page (`useProduct`) | one product in full: each artifact's series and latest items (with per-item totals, for version adoption), plus repos |
+
+The index is ~15% of the full data, and grows per group rather than per
+artifact. Files are compact JSON. The full shapes are in the docstring at
+the top of `summary.py`; the TypeScript types in `site/src/lib/summary.ts`
+mirror them. Keep the contract additive: adding fields is fine, renaming
+or removing breaks deployed dashboards until the next data commit, since
+the site is deployed separately from the data. Helpers that filter or sum
+series (`artifactsOf`, `compareArtifacts`, `headlineArtifacts`) take
+anything `Countable` (source, kind, series), so they work on both index
+groups and full artifacts.
 
 ## Workflows and secrets
 

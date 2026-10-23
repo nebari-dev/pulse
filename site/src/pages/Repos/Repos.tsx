@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
-import { useSummary } from '@/hooks/useSummary';
+import { useRepos as useReposFile } from '@/hooks/useSummary';
 import { formatAgo, formatDate, formatNumber } from '@/lib/format';
 import {
   daysSincePush,
@@ -35,15 +35,15 @@ import {
   type KindFilter,
   matchesKind,
   matchesQuery,
-  type Product,
+  type ProductRepos,
   type Repo,
-  type Summary,
+  type ReposFile,
   windowFor,
 } from '@/lib/summary';
 import { cn } from '@/lib/utils';
 
 interface Row {
-  product: Product;
+  product: ProductRepos;
   repo: Repo;
   starsGained: number | null;
   pushAge: number | null;
@@ -64,7 +64,7 @@ const KIND_ITEMS: Array<{ value: KindFilter; label: string }> = [
   { value: 'pack', label: 'Packs' },
 ];
 
-function useRepos(summary: Summary | undefined) {
+function useRepos(summary: ReposFile | undefined) {
   const [params, setParams] = useDashboardParams();
   const view = useMemo(() => {
     if (!summary) return null;
@@ -139,7 +139,7 @@ function Cell({ value }: { value: number | null | undefined }) {
 }
 
 function Repos() {
-  const { data, error, isPending } = useSummary();
+  const { data, error, isPending } = useReposFile();
   const { params, setParams, view } = useRepos(data);
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
     key: 'stars',

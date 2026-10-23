@@ -50,7 +50,10 @@ function useOverview(summary: Summary | undefined) {
     // the chart type is selected). The trend chart below still draws charts
     // as their own band so the polling volume stays visible, apart.
     const rows: LeaderboardRow[] = products.map((product) => {
-      const counted = headlineArtifacts(artifactsOf(product, params), params);
+      const counted = headlineArtifacts(
+        artifactsOf(product.groups, params),
+        params,
+      );
       const series = sumSeries(counted.map((a) => a.series));
       return {
         product,
@@ -65,7 +68,7 @@ function useOverview(summary: Summary | undefined) {
     // Chart: stacked by artifact type (images vs charts vs ...) unless a
     // type is selected, then by source. A single remaining series is drawn
     // as a plain area.
-    const all = products.flatMap((p) => artifactsOf(p, params));
+    const all = products.flatMap((p) => artifactsOf(p.groups, params));
     const byGroup: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
     if (params.type === 'all') {

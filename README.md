@@ -25,7 +25,9 @@ data/
   repos/health/<repo>.csv             daily snapshot: stars, forks, open issues/PRs, throughput
   repos/releases/<repo>.csv           one row per release tag with its date
   repos/traffic/<repo>.csv            daily views and clones (needs PULSE_GITHUB_TOKEN)
-  summary.json                        per-product daily series + 7/30/90d totals + repos
+  summary.json                        index: products with totals + series per source and type
+  repos.json                          every product's repos: health, traffic, releases
+  products/<id>.json                  one product in full, loaded by its page
   untracked.json                      Quay repos not yet in sources.yaml
 AGENTS.md               guidance for AI agents; site/AGENTS.md covers the dashboard
 site/                   dashboard (Vite + React + Nebari design system)
@@ -74,7 +76,7 @@ uv sync
 uv run pulse check                    # validate sources.yaml
 uv run pulse collect --dry-run -v     # fetch into a temp dir
 uv run pulse collect                  # update data/
-uv run pulse summarize                # rebuild summary.json only
+uv run pulse summarize                # rebuild the dashboard JSON only
 uv run pytest && uv run ruff check .
 ```
 
@@ -84,8 +86,10 @@ but avoids the 60 req/h anonymous limit and is required for repo health.
 
 ## Dashboard
 
-`site/` is a static Vite + React app that fetches `data/summary.json` at
-runtime (served from `../data` in dev, copied into `dist/data` on build).
+`site/` is a static Vite + React app that fetches the collector's JSON at
+runtime (served from `../data` in dev, copied into `dist/data` on build):
+the index for the Downloads page, `repos.json` for the repo pages, and one
+file per product for its page.
 Filters and the table search live in the URL, so any view is shareable.
 
 | Page | What it shows |

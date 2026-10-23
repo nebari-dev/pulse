@@ -6,6 +6,8 @@ on:
     paths:
       - 'site/**'
       - 'data/summary.json'
+      - 'data/repos.json'
+      - 'data/products/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch: {}   # collect.yml dispatches this after committing data
 

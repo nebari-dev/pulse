@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsIndicator, TabsList, TabsTab } from '@/components/ui/tabs';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
-import { useSummary } from '@/hooks/useSummary';
+import { useRepos } from '@/hooks/useSummary';
 import { formatAgo, formatDate } from '@/lib/format';
 import {
   type Cadence,
@@ -34,17 +34,17 @@ import {
   matchesKind,
   matchesQuery,
   type Point,
-  type Product,
+  type ProductRepos,
   RANGE_LABEL,
   RANGES,
   type Range,
-  type Summary,
+  type ReposFile,
   windowFor,
 } from '@/lib/summary';
 import { cn } from '@/lib/utils';
 
 interface Row {
-  product: Product;
+  product: ProductRepos;
   cadence: Cadence;
   points: Point[];
 }
@@ -52,7 +52,7 @@ interface Row {
 type SortKey = 'name' | 'latest' | 'recent' | 'gap';
 const RIGHT = 'text-right [&>button]:justify-end';
 
-function useReleases(summary: Summary | undefined) {
+function useReleases(summary: ReposFile | undefined) {
   const [params, setParams] = useDashboardParams();
   const view = useMemo(() => {
     if (!summary) return null;
@@ -69,7 +69,7 @@ function useReleases(summary: Summary | undefined) {
         points: releasesPerWeek(releases, start, end),
       };
     });
-    const feed: Array<ReleaseWithRepo & { product: Product }> = products
+    const feed: Array<ReleaseWithRepo & { product: ProductRepos }> = products
       .flatMap((product) =>
         productReleases(product, { includePrereleases: true })
           .filter((r) => r.date >= start && r.date <= end)
@@ -102,7 +102,7 @@ function compareRows(a: Row, b: Row, key: SortKey) {
 }
 
 function Releases() {
-  const { data, error, isPending } = useSummary();
+  const { data, error, isPending } = useRepos();
   const { params, setParams, view } = useReleases(data);
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
     key: 'latest',
