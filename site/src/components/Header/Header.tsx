@@ -3,12 +3,18 @@ import { Link, useLocation } from 'react-router-dom';
 import logoDark from '@/assets/nebari-logo_dark.svg';
 import logoLight from '@/assets/nebari-logo_light.svg';
 import { Button } from '@/components/ui/button';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   MenuBarActions,
   MenuBarBrand,
   MenuBarNav,
-  NavDropdownMenu,
   NavigationMenu,
   NavLink,
 } from '@/components/ui/navigation-menu';
@@ -44,7 +50,10 @@ export const NAV = [
 function Header() {
   const { isDarkMode, setThemeMode } = useTheme();
   const { pathname, search } = useLocation();
-  const current = NAV.find((item) => item.match(pathname)) ?? NAV[0];
+  const themeLabel = isDarkMode
+    ? 'Switch to light mode'
+    : 'Switch to dark mode';
+  const toggleTheme = () => setThemeMode(isDarkMode ? 'light' : 'dark');
   return (
     <NavigationMenu className="h-14 justify-between border-border bg-header pl-4 text-header-foreground">
       <MenuBarBrand href="/" aria-label="Pulse home" className="gap-3">
@@ -69,27 +78,7 @@ function Header() {
           </NavLink>
         ))}
       </MenuBarNav>
-      {/* Below the sm breakpoint the links collapse into one menu named
-          after the current section, so every page stays reachable. */}
-      <MenuBarNav aria-label="Sections menu" className="ml-2 sm:hidden">
-        <NavDropdownMenu
-          active
-          icon={<Menu aria-hidden="true" />}
-          trigger={current.label}
-          triggerProps={{ 'aria-label': `Sections, current: ${current.label}` }}
-        >
-          {NAV.map((item) => (
-            <DropdownMenuItem
-              key={item.to}
-              aria-current={item.match(pathname) ? 'page' : undefined}
-              render={<Link to={{ pathname: item.to, search }} />}
-            >
-              {item.label}
-            </DropdownMenuItem>
-          ))}
-        </NavDropdownMenu>
-      </MenuBarNav>
-      <MenuBarActions className="gap-2">
+      <MenuBarActions className="hidden gap-2 sm:flex">
         <Button
           variant="ghost"
           size="icon"
@@ -101,14 +90,54 @@ function Header() {
         <Button
           variant="ghost"
           size="icon"
-          aria-label={
-            isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
-          }
+          aria-label={themeLabel}
           aria-pressed={isDarkMode}
-          onClick={() => setThemeMode(isDarkMode ? 'light' : 'dark')}
+          onClick={toggleTheme}
         >
           {isDarkMode ? <Sun /> : <Moon />}
         </Button>
+      </MenuBarActions>
+      {/* Below the sm breakpoint everything that is not the brand lives in
+          one hamburger menu, so nothing competes for the remaining width. */}
+      <MenuBarActions className="pr-2 sm:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            variant="ghost"
+            aria-label="Menu"
+            render={<Button variant="ghost" size="icon" />}
+          >
+            <Menu />
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end" className="min-w-48">
+              {NAV.map((item) => (
+                <DropdownMenuItem
+                  key={item.to}
+                  aria-current={item.match(pathname) ? 'page' : undefined}
+                  className="aria-[current=page]:font-semibold"
+                  render={<Link to={{ pathname: item.to, search }} />}
+                >
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                render={<a href={REPO_URL} target="_blank" rel="noreferrer" />}
+              >
+                <Github aria-hidden="true" />
+                View source on GitHub
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={toggleTheme}>
+                {isDarkMode ? (
+                  <Sun aria-hidden="true" />
+                ) : (
+                  <Moon aria-hidden="true" />
+                )}
+                {themeLabel}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenu>
       </MenuBarActions>
     </NavigationMenu>
   );
