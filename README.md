@@ -3,7 +3,7 @@
 Adoption and health metrics for the Nebari ecosystem: downloads, releases,
 repos, community.
 
-Phase 1 tracks **downloads** of Nebari, the operator, NIC, Nebi and every
+Phase 1 tracks **downloads** of Nebari Classic, the operator, NIC, Nebi and every
 software pack, across Quay (images and Helm charts), PyPI, conda-forge and
 GitHub Releases. A GitHub Action runs the collector daily and commits the
 results under `data/`, so the repo itself is the database: every source
