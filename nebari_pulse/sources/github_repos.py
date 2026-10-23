@@ -26,6 +26,7 @@ Three families of CSV under data/repos/:
 from __future__ import annotations
 
 import logging
+import os
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -177,6 +178,7 @@ def _collect_releases(repos: list[str], data_dir: Path, result: CollectResult) -
 
 def _collect_traffic(repos: list[str], data_dir: Path, today: date, result: CollectResult) -> None:
     denied: list[str] = []
+    reason: str | None = None
     for repo in repos:
         try:
             views = get_json(f"{API}/repos/{repo}/traffic/views", headers=github_headers())
@@ -184,6 +186,9 @@ def _collect_traffic(repos: list[str], data_dir: Path, today: date, result: Coll
         except HttpError as e:
             if e.status in (401, 403, 404):
                 denied.append(repo)
+                # GitHub's message says whether the token is the wrong kind,
+                # lacks the permission, or is still awaiting org approval.
+                reason = reason or str(e)
             else:
                 result.errors.append(f"traffic {repo}: {e}")
             continue
@@ -207,10 +212,12 @@ def _collect_traffic(repos: list[str], data_dir: Path, today: date, result: Coll
         log.info("traffic %s: %d days", repo, len(rows))
     if denied:
         result.notes["traffic_denied"] = denied
+        result.notes["traffic_reason"] = reason
         log.warning(
-            "traffic: no push access to %d repo(s) (set PULSE_GITHUB_TOKEN): %s",
+            "traffic: denied for %d repo(s) using %s; first answer: %s",
             len(denied),
-            ", ".join(denied),
+            "PULSE_GITHUB_TOKEN" if os.environ.get("PULSE_GITHUB_TOKEN") else "GITHUB_TOKEN",
+            reason,
         )
 
 
