@@ -20,6 +20,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: site
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -28,12 +31,11 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
       - run: npm ci
-        working-directory: site
       - run: npm run build
-        working-directory: site
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy Worker (static assets)
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site/dist --project-name=pulse --branch=main
+          workingDirectory: site
+          command: deploy

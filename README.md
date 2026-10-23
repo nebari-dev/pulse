@@ -25,8 +25,8 @@ data/
 site/                   dashboard (Vite + React + Nebari design system)
 .github/workflows/
   collect.yml           daily cron -> pulse collect -> commit data/ -> dispatch deploy
-  deploy.yml            build site/ and deploy to Cloudflare Pages (project: pulse)
-  preview-deploy.yml    per-PR preview deployment for site/ changes
+  deploy.yml            build site/ and deploy the nebari-pulse Worker (static assets)
+  preview-deploy.yml    Workers Preview per PR touching site/; deleted on close
   ci.yml                collector lint/tests/dry-run + site lint/tests/build on PRs
 ```
 
@@ -74,9 +74,12 @@ npm run dev            # http://localhost:5173, reads ../data/summary.json
 npm run build && npm run test -- --run && npm run check
 ```
 
-Deploys go to Cloudflare Pages via `wrangler-action`; the repo needs the
-`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets and a Pages
-project named `pulse`. Each daily data commit redeploys the site.
+The site deploys as a static-assets-only Cloudflare Worker named
+`nebari-pulse` (`site/wrangler.jsonc`; `cd site && npm run deploy` does it
+from a laptop). CI uses `wrangler-action` with the `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repo secrets. Each daily data commit redeploys the
+site, and every PR that touches `site/` gets a Workers Preview URL commented
+on it.
 
 ## Adding a product or pack
 
