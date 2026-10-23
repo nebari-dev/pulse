@@ -6,8 +6,10 @@ import StatTile from '@/components/StatTile';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import WhatChanged from '@/components/WhatChanged';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
-import { useSummary } from '@/hooks/useSummary';
+import { useRepos, useSummary } from '@/hooks/useSummary';
+import { movers, recentReleases, wentQuiet } from '@/lib/changes';
 import { formatCompact, formatDate } from '@/lib/format';
 import {
   ARTIFACT_KIND_COLOR,
@@ -26,6 +28,7 @@ import {
   matchesQuery,
   type Point,
   RANGE_LABEL,
+  type ReposFile,
   SOURCE_COLOR,
   SOURCE_LABEL,
   SOURCES,
@@ -34,8 +37,19 @@ import {
   windowFor,
 } from '@/lib/summary';
 
-function useOverview(summary: Summary | undefined) {
+function useOverview(
+  summary: Summary | undefined,
+  repos: ReposFile | undefined,
+) {
   const [params, setParams] = useDashboardParams();
+  const changes = useMemo(() => {
+    if (!summary) return null;
+    return {
+      movers: movers(summary.products, params, latestDate(summary)),
+      releases: repos ? recentReleases(repos, params.kind) : [],
+      quiet: repos ? wentQuiet(repos, params.kind) : [],
+    };
+  }, [summary, repos, params]);
   const view = useMemo(() => {
     if (!summary) return null;
     const asOf = latestDate(summary);
@@ -118,12 +132,13 @@ function useOverview(summary: Summary | undefined) {
       count: products.length,
     };
   }, [summary, params]);
-  return { params, setParams, view };
+  return { params, setParams, view, changes };
 }
 
 function Overview() {
   const { data, error, isPending } = useSummary();
-  const { params, setParams, view } = useOverview(data);
+  const repos = useRepos();
+  const { params, setParams, view, changes } = useOverview(data, repos.data);
   const rangeLabel = RANGE_LABEL[params.range];
 
   if (error) {
@@ -194,6 +209,15 @@ function Overview() {
               hint={`collected ${formatDate(data.generated_at, true)}`}
             />
           </div>
+
+          {changes && (
+            <WhatChanged
+              movers={changes.movers}
+              releases={changes.releases}
+              quiet={changes.quiet}
+              asOf={view.asOf}
+            />
+          )}
 
           <Card>
             <CardHeader>
