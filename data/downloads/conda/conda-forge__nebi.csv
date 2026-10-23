@@ -8,8 +8,8 @@ date,version,file,cumulative
 2026-10-23,0.12,linux-64/nebi-0.12-hfc2019e_0.conda,430
 2026-10-23,0.13,linux-64/nebi-0.13-hfc2019e_0.conda,532
 2026-10-23,0.14,linux-64/nebi-0.14-hfc2019e_0.conda,912
-2026-10-23,0.15,linux-64/nebi-0.15-hfc2019e_0.conda,922
-2026-10-23,0.16,linux-64/nebi-0.16-hfc2019e_0.conda,20
+2026-10-23,0.15,linux-64/nebi-0.15-hfc2019e_0.conda,923
+2026-10-23,0.16,linux-64/nebi-0.16-hfc2019e_0.conda,23
 2026-10-23,0.7,linux-64/nebi-0.7-hfc2019e_0.conda,695
 2026-10-23,0.9,linux-64/nebi-0.9-hfc2019e_0.conda,678
 2026-10-23,0.9,linux-64/nebi-0.9-hfc2019e_1.conda,618
@@ -23,7 +23,7 @@ date,version,file,cumulative
 2026-10-23,0.13,osx-64/nebi-0.13-h8822bef_0.conda,49
 2026-10-23,0.14,osx-64/nebi-0.14-h8822bef_0.conda,45
 2026-10-23,0.15,osx-64/nebi-0.15-h8822bef_0.conda,44
-2026-10-23,0.16,osx-64/nebi-0.16-h9b258c2_0.conda,13
+2026-10-23,0.16,osx-64/nebi-0.16-h9b258c2_0.conda,15
 2026-10-23,0.7,osx-64/nebi-0.7-h5839d16_0.conda,69
 2026-10-23,0.9,osx-64/nebi-0.9-h5839d16_0.conda,76
 2026-10-23,0.9,osx-64/nebi-0.9-h8822bef_0.conda,96
@@ -38,7 +38,7 @@ date,version,file,cumulative
 2026-10-23,0.12,osx-arm64/nebi-0.12-h820172f_0.conda,52
 2026-10-23,0.13,osx-arm64/nebi-0.13-h820172f_0.conda,52
 2026-10-23,0.14,osx-arm64/nebi-0.14-h820172f_0.conda,59
-2026-10-23,0.16,osx-arm64/nebi-0.16-h5ce3bf5_0.conda,12
+2026-10-23,0.16,osx-arm64/nebi-0.16-h5ce3bf5_0.conda,15
 2026-10-23,0.9,osx-arm64/nebi-0.9-h820172f_0.conda,80
 2026-10-23,0.9,osx-arm64/nebi-0.9-h89545e0_0.conda,82
 2026-10-23,0.9,osx-arm64/nebi-0.9-h89545e0_1.conda,55
@@ -52,7 +52,7 @@ date,version,file,cumulative
 2026-10-23,0.13,win-64/nebi-0.13-h11686cb_0.conda,64
 2026-10-23,0.14,win-64/nebi-0.14-h11686cb_0.conda,55
 2026-10-23,0.15,win-64/nebi-0.15-h11686cb_0.conda,63
-2026-10-23,0.16,win-64/nebi-0.16-h11686cb_0.conda,16
+2026-10-23,0.16,win-64/nebi-0.16-h11686cb_0.conda,20
 2026-10-23,0.7,win-64/nebi-0.7-h11686cb_0.conda,94
 2026-10-23,0.9,win-64/nebi-0.9-h11686cb_0.conda,96
 2026-10-23,0.9,win-64/nebi-0.9-h11686cb_1.conda,74
