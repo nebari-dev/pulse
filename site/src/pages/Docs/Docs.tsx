@@ -122,11 +122,6 @@ function Docs() {
           <TabsIndicator />
         </TabsList>
       </Tabs>
-      <SearchBox
-        value={params.q}
-        onChange={(q) => setParams({ q })}
-        label="Search pages"
-      />
     </div>
   );
   const header = (
@@ -214,6 +209,11 @@ function Docs() {
         </CardContent>
       </Card>
 
+      <SearchBox
+        value={params.q}
+        onChange={(q) => setParams({ q })}
+        label="Search pages"
+      />
       <div className="grid gap-6 lg:grid-cols-2">
         {view.sites.map((site) => {
           const rows = site.top_pages.filter((p) =>

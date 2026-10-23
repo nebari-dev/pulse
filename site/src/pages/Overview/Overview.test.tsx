@@ -23,7 +23,7 @@ describe('Overview', () => {
 
   it('shows totals and every product once data loads', async () => {
     renderOverview();
-    // In the leaderboard, the what-changed strip and the share chart legend.
+    // In the leaderboard and in the share chart legend.
     expect(await screen.findAllByText('Nebari Operator')).not.toHaveLength(0);
     expect(screen.getByText('Chat Pack')).toBeInTheDocument();
     // operator 550 + nic 6 + 15 = 571 over the 90d window; Chat Pack's 10
@@ -31,15 +31,6 @@ describe('Overview', () => {
     expect(screen.getByText('571')).toBeInTheDocument();
     expect(screen.getByText(/excluding chart polls/)).toBeInTheDocument();
     expect(screen.getByText('Data through')).toBeInTheDocument();
-  });
-
-  it("shows this week's releases in the what-changed strip", async () => {
-    renderOverview();
-    const strip = await screen.findByRole('region', {
-      name: 'Releases this week',
-    });
-    expect(strip).toHaveTextContent('v1.2.0');
-    expect(strip).not.toHaveTextContent('v1.1.0');
   });
 
   it("charts each product's share of the weekly total", async () => {

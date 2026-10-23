@@ -111,7 +111,7 @@ Filters and the table search live in the URL, so any view is shareable.
 
 | Page | What it shows |
 |---|---|
-| `/` Downloads | totals, what changed this week, trend by artifact type or source, weekly share by product, searchable leaderboard |
+| `/` Downloads | totals, trend by artifact type or source, weekly share by product, searchable leaderboard |
 | `/product/:id` | one product: artifacts, version adoption and version share over time, PyPI Python/OS mix, releases, repo health, traffic |
 | `/releases` | cadence per product (latest, count in window, median gap) and a release feed |
 | `/repos` | stars, stars gained, open issues/PRs, merged PRs, authors per repo; new and active contributors, and open issues/PRs over time |

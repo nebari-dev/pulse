@@ -169,11 +169,6 @@ function Releases() {
               <TabsIndicator />
             </TabsList>
           </Tabs>
-          <SearchBox
-            value={params.q}
-            onChange={(q) => setParams({ q })}
-            label="Search products"
-          />
         </div>
       </PageHeader>
 
@@ -199,6 +194,11 @@ function Releases() {
             />
           </div>
 
+          <SearchBox
+            value={params.q}
+            onChange={(q) => setParams({ q })}
+            label="Search products"
+          />
           <Table aria-label={`Release cadence by product, ${rangeLabel}`}>
             <TableHeader>
               <TableRow>

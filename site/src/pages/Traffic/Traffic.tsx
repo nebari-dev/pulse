@@ -221,11 +221,6 @@ function Traffic() {
           ))}
         </SelectContent>
       </Select>
-      <SearchBox
-        value={params.q}
-        onChange={(q) => setParams({ q })}
-        label="Search repos"
-      />
     </div>
   );
 
@@ -331,6 +326,11 @@ function Traffic() {
         ))}
       </div>
 
+      <SearchBox
+        value={params.q}
+        onChange={(q) => setParams({ q })}
+        label="Search repos"
+      />
       <Table aria-label="Traffic by repository, last 14 days">
         <TableHeader>
           <TableRow>
