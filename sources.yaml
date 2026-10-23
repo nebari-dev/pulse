@@ -1,0 +1,216 @@
+# sources.yaml - what pulse tracks.
+#
+# Each top-level key is a metric family. A family maps to one collector
+# module per source under nebari_pulse/sources/. Adding a product or pack
+# here is the formal moment of admitting it to the dashboard; both
+# operations require a PR to this repo.
+#
+# Products reference artifacts by source:
+#   quay:            quay.io repositories (images and OCI Helm charts).
+#                    Daily pull counts, ~90-day window from the Quay API.
+#   pypi:            PyPI package names. Daily downloads (no mirrors) from
+#                    pypistats.org, ~180-day window.
+#   conda:           anaconda.org <channel>/<package>. Cumulative per-file
+#                    downloads; the daily series is derived from snapshots.
+#   github_releases: GitHub repos whose Release assets count as downloads
+#                    (CLIs, Homebrew taps). Cumulative per asset; daily
+#                    series derived from snapshots.
+#
+# kind: product (core platform piece) | pack (software pack).
+
+downloads:
+  quay_namespace: nebari   # scanned for repos not listed below -> data/untracked.json
+
+  # Release assets that are attestations or checksums, not downloads
+  # people choose. Matched as suffixes against asset filenames.
+  github_releases_ignore_suffixes:
+    - .sbom.json
+    - .sigstore.json
+    - .sig
+    - .pem
+    - .intoto.jsonl
+    - checksums.txt
+
+  products:
+    - id: nebari
+      name: Nebari
+      kind: product
+      pypi: [nebari]
+      conda: [conda-forge/nebari]
+      quay:
+        - nebari/nebari-jupyterhub
+        - nebari/nebari-jupyterhub-gpu
+        - nebari/nebari-jupyterlab
+        - nebari/nebari-jupyterlab-gpu
+        - nebari/nebari-dask-worker
+        - nebari/nebari-dask-worker-gpu
+        - nebari/nebari-workflow-controller
+        - nebari/nebari-self-registration
+        - nebari/nebari-jupyterlite-plugin
+        - nebari/nebari-keycloak-theme
+        - nebari/keycloak
+        - nebari/nebari-backup-restore
+
+    - id: nebari-operator
+      name: Nebari Operator
+      kind: product
+      quay:
+        - nebari/nebari-operator
+        - nebari/charts/nebari-operator
+        - nebari/charts/nebari-app
+        - nebari/nebari-webapi
+      github_releases: [nebari-dev/nebari-operator]
+
+    - id: nic
+      name: Nebari Infrastructure Core
+      kind: product
+      pypi: [nic]
+      github_releases: [nebari-dev/nebari-infrastructure-core]
+      quay:
+        - nebari/starters/aws
+        - nebari/starters/demo
+        - nebari/starters/local
+
+    - id: nebi
+      name: Nebi
+      kind: product
+      conda: [conda-forge/nebi]
+      github_releases: [nebari-dev/nebi]
+      quay:
+        - nebari/nebi
+        - nebari/nebi-web
+        - nebari/nebi-environments
+
+    - id: nebari-landing
+      name: Nebari Landing
+      kind: product
+      quay:
+        - nebari/nebari-landing
+        - nebari/charts/nebari-landing
+
+    # ---- Software packs -------------------------------------------------
+
+    - id: apps-pack
+      name: Apps Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-apps
+        - nebari/apps-pack-api
+        - nebari/apps-pack-mcp
+        - nebari/apps-pack-operator
+        - nebari/apps-pack-proxy
+        - nebari/apps-pack-ui
+
+    - id: chat-pack
+      name: Chat Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-chat
+        - nebari/nebari-chat-backend
+        - nebari/nebari-chat-frontend
+        - nebari/charts/ravnar
+        - nebari/ravnar
+        - nebari/ravnar-nebari
+
+    - id: collab-hub-pack
+      name: Collab Hub Pack
+      kind: pack
+      quay:
+        - nebari/charts/collab-hub
+
+    - id: data-science-pack
+      name: Data Science Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-data-science-pack
+        - nebari/nebari-data-science-pack-jupyterhub
+        - nebari/nebari-data-science-pack-jupyterlab
+        - nebari/nebari-data-science-pack-jupyterlab-base
+        - nebari/nebari-data-science-pack-jupyterlab-gpu
+        - nebari/nebari-data-science-pack-jupyterlab-gpu-base
+
+    - id: langfuse-pack
+      name: Langfuse Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-langfuse
+
+    - id: lgtm-pack
+      name: LGTM Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-lgtm-pack
+
+    - id: llm-serving-pack
+      name: LLM Serving Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-llm-serving
+        - nebari/llm-serving-pack-frontend
+        - nebari/llm-serving-pack-key-manager
+        - nebari/llm-serving-pack-model-downloader
+        - nebari/llm-serving-pack-operator
+
+    - id: nebari-frames
+      name: Nebari Frames
+      kind: pack
+      quay:
+        - nebari/nebari-frames
+        - nebari/charts/nebari-frames
+      github_releases: [nebari-dev/nebari-frames]
+
+    - id: nebi-pack
+      name: Nebi Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-nebi-pack
+
+    - id: nexus-pack
+      name: Nexus Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-nexus
+        - nebari/nebari-nexus-api
+
+    - id: provenance-collector-pack
+      name: Provenance Collector
+      kind: pack
+      quay:
+        - nebari/provenance-collector
+        - nebari/charts/provenance-collector
+
+    - id: rayserve-pack
+      name: Rayserve Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-rayserve-pack
+
+    - id: superset-pack
+      name: Superset Pack
+      kind: pack
+      quay:
+        - nebari/charts/nebari-superset
+
+    - id: skillsctl
+      name: skillsctl
+      kind: pack
+      quay:
+        - nebari/skillsctl
+        - nebari/charts/skillsctl
+      github_releases: [nebari-dev/skillsctl]
+
+    - id: unity-catalog-pack
+      name: Unity Catalog Pack
+      kind: pack
+      quay:
+        - nebari/unity-catalog-pack-unity-catalog-keycloak-sync
+        - nebari/unity-catalog-pack-unity-catalog-ui
+
+  # Quay repos in the namespace that are intentionally not tracked
+  # (experiments, templates). They are excluded from data/untracked.json.
+  quay_ignore:
+    - nebari/charts/my-pack
+    - nebari/datascience-spin-poc
+    - nebari/datascience-spin-poc_render-applications
+    - nebari/software-pack-template-auth-fastapi-example
+    - nebari/volume-nfs
