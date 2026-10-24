@@ -42,7 +42,8 @@ pulse-dashboard/
 │   ├── components/
 │   │   ├── ui/            # Nebari components (installed via shadcn — managed)
 │   │   ├── Header/        # brand, section nav, GitHub link, theme toggle; one hamburger below sm
-│   │   ├── PageHeader/    # title + description + controls row used by every page
+│   │   ├── PageHeader/    # title + description + page-wide controls row used by every page
+│   │   ├── TableCard/     # card around one table; that table's controls sit top right
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
@@ -220,6 +221,11 @@ values into the stylesheet.
 4. Add it to `NAV` in `src/components/Header/Header.tsx` with a `match`
    predicate (the desktop links and the small-screen hamburger both read
    it), and use `PageHeader` for the title row so pages look alike
+5. Place controls by what they filter. Page-wide filters go in
+   `PageHeader` as `<Filters show={[...]} />`, which always renders range,
+   kind, type, source in that order. Controls for one table go in that
+   table's `TableCard` (`controls`), selects first and `SearchBox` last.
+   Don't hand-roll range tabs or kind selects on a page
 
 ---
 

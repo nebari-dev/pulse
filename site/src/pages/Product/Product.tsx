@@ -2,9 +2,11 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import Filters from '@/components/Filters';
+import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import ShareChart from '@/components/ShareChart';
 import StatTile from '@/components/StatTile';
+import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -383,9 +385,6 @@ function Product() {
   const shownArtifacts = view.artifacts.filter((a) =>
     matchesQuery(params.q, a.ref, SOURCE_LABEL[a.source], a.kind),
   );
-  const shownRepos = product.repos.filter((r) =>
-    matchesQuery(params.q, r.repo),
-  );
   return (
     <div className="flex flex-col gap-6">
       <Link
@@ -395,17 +394,20 @@ function Product() {
         <ArrowLeft className="size-4" aria-hidden="true" />
         All products
       </Link>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="font-semibold text-2xl tracking-tight">
-            {product.name}
-          </h1>
+      <PageHeader
+        title={product.name}
+        badge={
           <Badge variant={product.kind === 'pack' ? 'secondary' : 'outline'}>
             {KIND_LABEL[product.kind]}
           </Badge>
-        </div>
-        <Filters params={params} onChange={setParams} showKind={false} />
-      </div>
+        }
+      >
+        <Filters
+          params={params}
+          onChange={setParams}
+          show={['range', 'type', 'source']}
+        />
+      </PageHeader>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatTile
@@ -456,47 +458,49 @@ function Product() {
         </Card>
       )}
 
-      <SearchBox
-        value={params.q}
-        onChange={(q) => setParams({ q })}
-        label="Search artifacts and repos"
-      />
-      <Table aria-label={`${product.name} artifacts`}>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Source</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Artifact</TableHead>
-            <TableHead className="text-right">{rangeLabel}</TableHead>
-            <TableHead className="text-right">All recorded</TableHead>
-            <TableHead className="text-right">Upstream total</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {shownArtifacts.length === 0 && (
+      <TableCard
+        title="Artifacts"
+        controls={
+          <SearchBox
+            value={params.q}
+            onChange={(q) => setParams({ q })}
+            label="Search artifacts"
+          />
+        }
+        footnote='"All recorded" sums the daily counts Pulse has collected. "Upstream total" is the cumulative counter reported by GitHub or conda-forge, which predates collection; Quay and PyPI do not expose one.'
+      >
+        <Table aria-label={`${product.name} artifacts`}>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-muted-foreground">
-                {params.q
-                  ? `No artifacts match "${params.q}".`
-                  : 'No artifacts for this filter.'}
-              </TableCell>
+              <TableHead>Source</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Artifact</TableHead>
+              <TableHead className="text-right">{rangeLabel}</TableHead>
+              <TableHead className="text-right">All recorded</TableHead>
+              <TableHead className="text-right">Upstream total</TableHead>
             </TableRow>
-          )}
-          {shownArtifacts.map((a) => (
-            <ArtifactRow
-              key={`${a.source}:${a.ref}`}
-              artifact={a}
-              start={view.start}
-              end={view.end}
-            />
-          ))}
-        </TableBody>
-      </Table>
-      <p className="text-muted-foreground text-xs">
-        "All recorded" sums the daily counts Pulse has collected. "Upstream
-        total" is the cumulative counter reported by GitHub or conda-forge,
-        which predates collection; Quay and PyPI do not expose one.
-      </p>
+          </TableHeader>
+          <TableBody>
+            {shownArtifacts.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-muted-foreground">
+                  {params.q
+                    ? `No artifacts match "${params.q}".`
+                    : 'No artifacts for this filter.'}
+                </TableCell>
+              </TableRow>
+            )}
+            {shownArtifacts.map((a) => (
+              <ArtifactRow
+                key={`${a.source}:${a.ref}`}
+                artifact={a}
+                start={view.start}
+                end={view.end}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableCard>
 
       {view.versionShare.series.length > 1 && (
         <Card>
@@ -677,49 +681,44 @@ function Product() {
             </Card>
           )}
 
-          <Table aria-label={`${product.name} repositories`}>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Repository</TableHead>
-                <TableHead className="text-right">Stars</TableHead>
-                <TableHead className="text-right">Open issues</TableHead>
-                <TableHead className="text-right">Open PRs</TableHead>
-                <TableHead className="text-right">Merged, 30d</TableHead>
-                <TableHead>Last push</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {shownRepos.length === 0 && (
+          <TableCard title="Repositories">
+            <Table aria-label={`${product.name} repositories`}>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-muted-foreground">
-                    No repos match "{params.q}".
-                  </TableCell>
+                  <TableHead>Repository</TableHead>
+                  <TableHead className="text-right">Stars</TableHead>
+                  <TableHead className="text-right">Open issues</TableHead>
+                  <TableHead className="text-right">Open PRs</TableHead>
+                  <TableHead className="text-right">Merged, 30d</TableHead>
+                  <TableHead>Last push</TableHead>
                 </TableRow>
-              )}
-              {shownRepos.map((r) => (
-                <TableRow key={r.repo}>
-                  <TableCell className="font-medium">
-                    <a
-                      href={repoUrl(r.repo)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                    >
-                      {repoName(r.repo)}
-                      <ExternalLink className="size-3" aria-hidden="true" />
-                    </a>
-                  </TableCell>
-                  <HealthCell value={r.health?.stars} />
-                  <HealthCell value={r.health?.open_issues} />
-                  <HealthCell value={r.health?.open_prs} />
-                  <HealthCell value={r.health?.merged_prs_30d} />
-                  <TableCell className="tabular-nums">
-                    {formatAgo(daysSincePush(r, product.generated_at))}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {product.repos.map((r) => (
+                  <TableRow key={r.repo}>
+                    <TableCell className="font-medium">
+                      <a
+                        href={repoUrl(r.repo)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                      >
+                        {repoName(r.repo)}
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                      </a>
+                    </TableCell>
+                    <HealthCell value={r.health?.stars} />
+                    <HealthCell value={r.health?.open_issues} />
+                    <HealthCell value={r.health?.open_prs} />
+                    <HealthCell value={r.health?.merged_prs_30d} />
+                    <TableCell className="tabular-nums">
+                      {formatAgo(daysSincePush(r, product.generated_at))}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableCard>
 
           {view.feed.length > 0 && (
             <Card>

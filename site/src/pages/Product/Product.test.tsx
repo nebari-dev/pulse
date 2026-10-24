@@ -84,17 +84,17 @@ describe('Product', () => {
     expect(screen.getByText('prerelease')).toBeInTheDocument();
   });
 
-  it('searches artifacts and repos together from the URL', async () => {
+  it('searches the artifacts table from the URL, leaving repos alone', async () => {
     renderProduct('/product/nic?q=pypi');
     await screen.findByRole('heading', { name: 'Nebari Infrastructure Core' });
-    expect(screen.getByRole('searchbox')).toHaveValue('pypi');
-    expect(screen.getByRole('link', { name: /^nic/ })).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', {
-        name: /nebari-dev\/nebari-infrastructure-core/,
-      }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText('No repos match "pypi".')).toBeInTheDocument();
+      screen.getByRole('searchbox', { name: 'Search artifacts' }),
+    ).toHaveValue('pypi');
+    expect(screen.getByRole('link', { name: /^nic/ })).toBeInTheDocument();
+    const repos = screen.getByRole('table', {
+      name: 'Nebari Infrastructure Core repositories',
+    });
+    expect(within(repos).getAllByRole('row')).toHaveLength(2);
   });
 
   it('charts version share once two versions have downloads', async () => {

@@ -1,10 +1,12 @@
 import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
+import TableCard from '@/components/TableCard';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,7 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Tabs, TabsIndicator, TabsList, TabsTab } from '@/components/ui/tabs';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useRepos } from '@/hooks/useSummary';
 import { formatAgo, formatDate } from '@/lib/format';
@@ -36,8 +37,6 @@ import {
   type Point,
   type ProductRepos,
   RANGE_LABEL,
-  RANGES,
-  type Range,
   type ReposFile,
   windowFor,
 } from '@/lib/summary';
@@ -155,21 +154,11 @@ function Releases() {
         title="Releases"
         description="How often each product ships, from GitHub Releases. Prereleases are listed in the feed but do not count towards cadence."
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <Tabs
-            value={params.range}
-            onValueChange={(value) => setParams({ range: value as Range })}
-          >
-            <TabsList aria-label="Date range">
-              {RANGES.map((r) => (
-                <TabsTab key={r} value={r}>
-                  {RANGE_LABEL[r]}
-                </TabsTab>
-              ))}
-              <TabsIndicator />
-            </TabsList>
-          </Tabs>
-        </div>
+        <Filters
+          params={params}
+          onChange={setParams}
+          show={['range', 'kind']}
+        />
       </PageHeader>
 
       {isPending || !view ? (
@@ -194,104 +183,111 @@ function Releases() {
             />
           </div>
 
-          <SearchBox
-            value={params.q}
-            onChange={(q) => setParams({ q })}
-            label="Search products"
-          />
-          <Table aria-label={`Release cadence by product, ${rangeLabel}`}>
-            <TableHeader>
-              <TableRow>
-                {head('name', 'Product')}
-                <TableHead>Kind</TableHead>
-                {head('latest', 'Latest release')}
-                {head('recent', rangeLabel, RIGHT)}
-                {head('gap', 'Median gap', RIGHT)}
-                <TableHead>Releases per week</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.length === 0 && (
+          <TableCard
+            title={`Release cadence by product, ${rangeLabel.toLowerCase()}`}
+            controls={
+              <SearchBox
+                value={params.q}
+                onChange={(q) => setParams({ q })}
+                label="Search products"
+              />
+            }
+            footnote="Median gap is measured over the last year of stable releases. Products whose latest release is more than six months old are marked."
+          >
+            <Table aria-label={`Release cadence by product, ${rangeLabel}`}>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-muted-foreground">
-                    {params.q
-                      ? `No products match "${params.q}".`
-                      : 'No products with repos yet.'}
-                  </TableCell>
+                  {head('name', 'Product')}
+                  <TableHead>Kind</TableHead>
+                  {head('latest', 'Latest release')}
+                  {head('recent', rangeLabel, RIGHT)}
+                  {head('gap', 'Median gap', RIGHT)}
+                  <TableHead>Releases per week</TableHead>
                 </TableRow>
-              )}
-              {rows.map(({ product, cadence: c, points }) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="underline-offset-4 hover:underline focus-visible:underline"
-                    >
-                      {product.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        product.kind === 'pack' ? 'secondary' : 'outline'
-                      }
-                    >
-                      {KIND_LABEL[product.kind]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {c.latest ? (
-                      <span className="flex flex-col">
-                        <a
-                          href={releaseUrl(c.latest.repo, c.latest.tag)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
-                        >
-                          {c.latest.tag}
-                          <ExternalLink className="size-3" aria-hidden="true" />
-                        </a>
-                        <span
-                          className={cn(
-                            'text-muted-foreground text-xs',
-                            (c.daysSince ?? 0) > 180 &&
-                              'text-destructive-foreground',
-                          )}
-                        >
-                          {formatAgo(c.daysSince)}
-                          {product.repos.length > 1 &&
-                            ` · ${repoName(c.latest.repo)}`}
+              </TableHeader>
+              <TableBody>
+                {rows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-muted-foreground">
+                      {params.q
+                        ? `No products match "${params.q}".`
+                        : 'No products with repos yet.'}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {rows.map(({ product, cadence: c, points }) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="underline-offset-4 hover:underline focus-visible:underline"
+                      >
+                        {product.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          product.kind === 'pack' ? 'secondary' : 'outline'
+                        }
+                      >
+                        {KIND_LABEL[product.kind]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {c.latest ? (
+                        <span className="flex flex-col">
+                          <a
+                            href={releaseUrl(c.latest.repo, c.latest.tag)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
+                          >
+                            {c.latest.tag}
+                            <ExternalLink
+                              className="size-3"
+                              aria-hidden="true"
+                            />
+                          </a>
+                          <span
+                            className={cn(
+                              'text-muted-foreground text-xs',
+                              (c.daysSince ?? 0) > 180 &&
+                                'text-destructive-foreground',
+                            )}
+                          >
+                            {formatAgo(c.daysSince)}
+                            {product.repos.length > 1 &&
+                              ` · ${repoName(c.latest.repo)}`}
+                          </span>
                         </span>
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">no releases</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {c.recent}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {c.medianGapDays === null ? (
-                      <span className="text-muted-foreground">—</span>
-                    ) : (
-                      `${c.medianGapDays} d`
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Sparkline
-                      points={points}
-                      label={`${product.name} releases, ${rangeLabel}`}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <p className="text-muted-foreground text-xs">
-            Median gap is measured over the last year of stable releases.
-            Products whose latest release is more than six months old are
-            marked.
-          </p>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          no releases
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {c.recent}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {c.medianGapDays === null ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : (
+                        `${c.medianGapDays} d`
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Sparkline
+                        points={points}
+                        label={`${product.name} releases, ${rangeLabel}`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableCard>
 
           <Card>
             <CardHeader>

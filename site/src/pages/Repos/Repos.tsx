@@ -1,19 +1,14 @@
 import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
+import TableCard from '@/components/TableCard';
 import TrendChart from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -40,7 +35,6 @@ import {
 import {
   diffDays,
   KIND_LABEL,
-  type KindFilter,
   matchesKind,
   matchesQuery,
   type Point,
@@ -72,11 +66,6 @@ type SortKey =
   | 'contributors'
   | 'push';
 const RIGHT = 'text-right [&>button]:justify-end';
-const KIND_ITEMS: Array<{ value: KindFilter; label: string }> = [
-  { value: 'all', label: 'Products and packs' },
-  { value: 'product', label: 'Products' },
-  { value: 'pack', label: 'Packs' },
-];
 
 function useRepos(summary: ReposFile | undefined) {
   const [params, setParams] = useDashboardParams();
@@ -245,24 +234,7 @@ function Repos() {
         title="Repositories"
         description="Stars, open work and throughput for every GitHub repo behind a product or pack."
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <Select
-            items={KIND_ITEMS}
-            value={params.kind}
-            onValueChange={(value) => setParams({ kind: value as KindFilter })}
-          >
-            <SelectTrigger aria-label="Kind" className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {KIND_ITEMS.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Filters params={params} onChange={setParams} show={['kind']} />
       </PageHeader>
 
       {isPending || !view ? (
@@ -374,121 +346,123 @@ function Repos() {
             </Card>
           )}
 
-          <SearchBox
-            value={params.q}
-            onChange={(q) => setParams({ q })}
-            label="Search repos"
-          />
-          <Table aria-label="Repository health">
-            <TableHeader>
-              <TableRow>
-                {head('repo', 'Repository')}
-                <TableHead>Product</TableHead>
-                {head('stars', 'Stars', RIGHT)}
-                {head('gained', '+30d', RIGHT)}
-                {head('issues', 'Open issues', RIGHT)}
-                {head('prs', 'Open PRs', RIGHT)}
-                {head('merged', 'Merged, 30d', RIGHT)}
-                {head('contributors', 'Authors, 30d', RIGHT)}
-                {head('push', 'Last push')}
-                <TableHead>Stars, 90d</TableHead>
-                <TableHead>Issues, 90d</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.length === 0 && (
+          <TableCard
+            title="Repositories"
+            controls={
+              <SearchBox
+                value={params.q}
+                onChange={(q) => setParams({ q })}
+                label="Search repos"
+              />
+            }
+            footnote={`Snapshot taken ${formatDate(view.asOf, true)}. "+30d" is stars gained in the last 30 days, from each star's own timestamp. Repos with no push in 90 days are marked.`}
+          >
+            <Table aria-label="Repository health">
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={11} className="text-muted-foreground">
-                    {params.q
-                      ? `No repos match "${params.q}".`
-                      : 'No repos tracked yet.'}
-                  </TableCell>
+                  {head('repo', 'Repository')}
+                  <TableHead>Product</TableHead>
+                  {head('stars', 'Stars', RIGHT)}
+                  {head('gained', '+30d', RIGHT)}
+                  {head('issues', 'Open issues', RIGHT)}
+                  {head('prs', 'Open PRs', RIGHT)}
+                  {head('merged', 'Merged, 30d', RIGHT)}
+                  {head('contributors', 'Authors, 30d', RIGHT)}
+                  {head('push', 'Last push')}
+                  <TableHead>Stars, 90d</TableHead>
+                  <TableHead>Issues, 90d</TableHead>
                 </TableRow>
-              )}
-              {rows.map(
-                ({
-                  product,
-                  repo,
-                  starsGained,
-                  starsTrend,
-                  issuesTrend,
-                  pushAge,
-                }) => (
-                  <TableRow key={repo.repo}>
-                    <TableCell className="font-medium">
-                      <a
-                        href={repoUrl(repo.repo)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                        title={repo.repo}
-                      >
-                        {repoName(repo.repo)}
-                        <ExternalLink className="size-3" aria-hidden="true" />
-                      </a>
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        to={`/product/${product.id}`}
-                        className="text-muted-foreground underline-offset-4 hover:underline"
-                      >
-                        {product.name}
-                      </Link>
-                      <span className="sr-only">
-                        {' '}
-                        ({KIND_LABEL[product.kind]})
-                      </span>
-                    </TableCell>
-                    <Cell value={repo.health?.stars} />
-                    <TableCell
-                      className={cn(
-                        'text-right tabular-nums',
-                        starsGained === null && 'text-muted-foreground',
-                      )}
-                    >
-                      {starsGained === null
-                        ? '—'
-                        : `${starsGained > 0 ? '+' : ''}${starsGained}`}
-                    </TableCell>
-                    <Cell value={repo.health?.open_issues} />
-                    <Cell value={repo.health?.open_prs} />
-                    <Cell value={repo.health?.merged_prs_30d} />
-                    <Cell value={repo.contributors.active_30d} />
-                    <TableCell
-                      className={cn(
-                        'tabular-nums',
-                        (pushAge ?? 0) > 90 && 'text-destructive-foreground',
-                      )}
-                      title={repo.health?.pushed_at ?? undefined}
-                    >
-                      {formatAgo(pushAge)}
-                    </TableCell>
-                    <TableCell>
-                      {starsTrend.length > 0 && (
-                        <Sparkline
-                          points={starsTrend}
-                          label={`${repo.repo} stars, last 90 days`}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {issuesTrend.length > 1 && (
-                        <Sparkline
-                          points={issuesTrend}
-                          label={`${repo.repo} open issues, last 90 days`}
-                        />
-                      )}
+              </TableHeader>
+              <TableBody>
+                {rows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={11} className="text-muted-foreground">
+                      {params.q
+                        ? `No repos match "${params.q}".`
+                        : 'No repos tracked yet.'}
                     </TableCell>
                   </TableRow>
-                ),
-              )}
-            </TableBody>
-          </Table>
-          <p className="text-muted-foreground text-xs">
-            Snapshot taken {formatDate(view.asOf, true)}. "+30d" is stars gained
-            in the last 30 days, from each star's own timestamp. Repos with no
-            push in 90 days are marked.
-          </p>
+                )}
+                {rows.map(
+                  ({
+                    product,
+                    repo,
+                    starsGained,
+                    starsTrend,
+                    issuesTrend,
+                    pushAge,
+                  }) => (
+                    <TableRow key={repo.repo}>
+                      <TableCell className="font-medium">
+                        <a
+                          href={repoUrl(repo.repo)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                          title={repo.repo}
+                        >
+                          {repoName(repo.repo)}
+                          <ExternalLink className="size-3" aria-hidden="true" />
+                        </a>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          to={`/product/${product.id}`}
+                          className="text-muted-foreground underline-offset-4 hover:underline"
+                        >
+                          {product.name}
+                        </Link>
+                        <span className="sr-only">
+                          {' '}
+                          ({KIND_LABEL[product.kind]})
+                        </span>
+                      </TableCell>
+                      <Cell value={repo.health?.stars} />
+                      <TableCell
+                        className={cn(
+                          'text-right tabular-nums',
+                          starsGained === null && 'text-muted-foreground',
+                        )}
+                      >
+                        {starsGained === null
+                          ? '—'
+                          : `${starsGained > 0 ? '+' : ''}${starsGained}`}
+                      </TableCell>
+                      <Cell value={repo.health?.open_issues} />
+                      <Cell value={repo.health?.open_prs} />
+                      <Cell value={repo.health?.merged_prs_30d} />
+                      <Cell value={repo.contributors.active_30d} />
+                      <TableCell
+                        className={cn(
+                          'tabular-nums',
+                          (pushAge ?? 0) > 90 && 'text-destructive-foreground',
+                        )}
+                        title={repo.health?.pushed_at ?? undefined}
+                      >
+                        {formatAgo(pushAge)}
+                      </TableCell>
+                      <TableCell>
+                        {starsTrend.length > 0 && (
+                          <Sparkline
+                            points={starsTrend}
+                            label={`${repo.repo} stars, last 90 days`}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {issuesTrend.length > 1 && (
+                          <Sparkline
+                            points={issuesTrend}
+                            label={`${repo.repo} open issues, last 90 days`}
+                          />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ),
+                )}
+              </TableBody>
+            </Table>
+          </TableCard>
         </>
       )}
     </div>
