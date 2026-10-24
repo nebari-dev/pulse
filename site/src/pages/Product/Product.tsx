@@ -413,27 +413,37 @@ function Product() {
           label={`Downloads, ${rangeLabel.toLowerCase()}`}
           value={formatCompact(view.overall.current)}
           delta={view.overall.delta}
-          hint={
-            (view.overall.delta === null
-              ? 'no full previous period yet'
-              : 'vs. previous period') +
-            (excludesCharts(params) &&
-            view.artifacts.some((a) => a.kind === 'chart')
-              ? ', Helm charts not included'
-              : '')
+          info={
+            <p>
+              Downloads across the selected sources and types
+              {excludesCharts(params) &&
+                view.artifacts.some((a) => a.kind === 'chart') &&
+                ', Helm charts not included'}
+              .{' '}
+              {view.overall.delta === null
+                ? 'No full previous period to compare yet.'
+                : 'The change is against the period before.'}
+            </p>
           }
         />
         <StatTile
           label="All recorded"
           value={formatCompact(view.allKnown)}
-          hint="since collection began"
+          info={
+            <p>
+              Every download recorded since collection began, all sources and
+              types.
+            </p>
+          }
         />
         <StatTile
           label="Artifacts"
           value={String(view.artifacts.length)}
-          hint={
-            view.chartSeries.map((s) => s.label).join(', ') ||
-            'none for this source'
+          info={
+            <p>
+              {view.chartSeries.map((s) => s.label).join(', ') ||
+                'None for this source.'}
+            </p>
           }
         />
       </StatRow>
@@ -660,19 +670,27 @@ function Product() {
             <StatTile
               label="Latest release"
               value={view.cadence.latest?.tag ?? '—'}
-              hint={
-                view.cadence.latest
-                  ? `${formatAgo(view.cadence.daysSince)} · ${formatDate(view.cadence.latest.date, true)}`
-                  : 'no GitHub releases'
+              info={
+                view.cadence.latest ? (
+                  <p>
+                    {formatAgo(view.cadence.daysSince)}, on{' '}
+                    {formatDate(view.cadence.latest.date, true)}. Newest stable
+                    release across the product's repos.
+                  </p>
+                ) : (
+                  <p>No GitHub releases.</p>
+                )
               }
             />
             <StatTile
               label="Releases, 90 days"
               value={String(view.cadence.recent)}
-              hint={
-                view.cadence.medianGapDays === null
-                  ? 'stable releases only'
-                  : `median ${view.cadence.medianGapDays} days apart`
+              info={
+                <p>
+                  Stable releases only.{' '}
+                  {view.cadence.medianGapDays !== null &&
+                    `Median ${view.cadence.medianGapDays} days apart over the last year.`}
+                </p>
               }
             />
             <StatTile
@@ -680,11 +698,14 @@ function Product() {
               value={formatNumber(
                 product.repos.reduce((n, r) => n + (r.health?.stars ?? 0), 0),
               )}
-              hint={
-                `${product.repos.length} ${product.repos.length === 1 ? 'repo' : 'repos'}` +
-                (view.stars
-                  ? `, ${view.stars.gained >= 0 ? '+' : ''}${formatNumber(view.stars.gained)} ${rangeLabel.toLowerCase()}`
-                  : '')
+              info={
+                <p>
+                  Across {product.repos.length}{' '}
+                  {product.repos.length === 1 ? 'repo' : 'repos'}
+                  {view.stars &&
+                    `; ${view.stars.gained >= 0 ? '+' : ''}${formatNumber(view.stars.gained)} ${rangeLabel.toLowerCase()}`}
+                  .
+                </p>
               }
             />
           </StatRow>
@@ -872,18 +893,30 @@ function Product() {
                 </ul>
               }
             >
-              <StatRow
-                note={`${formatDate(view.traffic.windowStart)} – ${formatDate(view.traffic.end)}`}
-              >
+              <StatRow>
                 <StatTile
                   label="Unique visitors, 14 days"
                   value={formatCompact(view.traffic.uniqueViews)}
-                  hint={`${formatCompact(view.traffic.views)} views in all`}
+                  info={
+                    <p>
+                      {formatCompact(view.traffic.views)} views in all,{' '}
+                      {formatDate(view.traffic.windowStart)} –{' '}
+                      {formatDate(view.traffic.end)}, the 14 days GitHub
+                      reports.
+                    </p>
+                  }
                 />
                 <StatTile
                   label="Unique cloners, 14 days"
                   value={formatCompact(view.traffic.uniqueClones)}
-                  hint={`${formatCompact(view.traffic.clones)} clones, incl. CI`}
+                  info={
+                    <p>
+                      {formatCompact(view.traffic.clones)} clones in all,
+                      including CI and mirrors,{' '}
+                      {formatDate(view.traffic.windowStart)} –{' '}
+                      {formatDate(view.traffic.end)}.
+                    </p>
+                  }
                 />
               </StatRow>
               <div className="grid gap-6 lg:grid-cols-2">

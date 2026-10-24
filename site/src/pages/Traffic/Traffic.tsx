@@ -253,31 +253,42 @@ function Traffic() {
           label="Unique visitors, last 14 days"
           value={formatCompact(view.uniqueViews.current)}
           delta={view.uniqueViews.delta}
-          hint={
-            view.uniqueViews.delta === null
-              ? 'no full previous period yet'
-              : 'vs. previous 14 days'
+          info={
+            <p>
+              Unique visitors summed per repo per day, {windowLabel}.{' '}
+              {view.uniqueViews.delta === null
+                ? 'No full previous 14 days to compare yet.'
+                : 'The change is against the 14 days before.'}
+            </p>
           }
         />
         <StatTile
           label="Unique cloners, last 14 days"
           value={formatCompact(view.uniqueClones.current)}
           delta={view.uniqueClones.delta}
-          hint={
-            view.uniqueClones.delta === null
-              ? 'no full previous period yet'
-              : 'vs. previous 14 days'
+          info={
+            <p>
+              Unique cloners summed per repo per day, {windowLabel}.{' '}
+              {view.uniqueClones.delta === null
+                ? 'No full previous 14 days to compare yet.'
+                : 'The change is against the 14 days before.'}
+            </p>
           }
         />
         <StatTile
           label="Total views"
           value={formatCompact(view.views)}
-          hint="summed per repo per day"
+          info={<p>Page views summed per repo per day, {windowLabel}.</p>}
         />
         <StatTile
           label="Total clones"
           value={formatCompact(view.clones)}
-          hint={`${windowLabel} · includes CI and mirrors`}
+          info={
+            <p>
+              Git clones summed per repo per day, {windowLabel}. Includes CI
+              checkouts and mirrors.
+            </p>
+          }
         />
       </StatRow>
 

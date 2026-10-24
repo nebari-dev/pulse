@@ -78,7 +78,17 @@ function useReleases(summary: ReposFile | undefined) {
       .sort((a, b) => (a.date > b.date ? -1 : a.date < b.date ? 1 : 0));
     const recent = rows.reduce((acc, r) => acc + r.cadence.recent, 0);
     const active = rows.filter((r) => r.cadence.recent > 0).length;
-    return { asOf, start, end, rows, feed, recent, active };
+    // The newest stable release of any product.
+    const latest = rows.reduce<Row | null>(
+      (best, r) =>
+        r.cadence.latest &&
+        (!best?.cadence.latest ||
+          r.cadence.latest.date > best.cadence.latest.date)
+          ? r
+          : best,
+      null,
+    );
+    return { asOf, start, end, rows, feed, recent, active, latest };
   }, [summary, params.range, params.kind]);
   return { params, setParams, view };
 }
@@ -166,18 +176,48 @@ function Releases() {
         <Skeleton className="h-64" shape="block" />
       ) : (
         <>
-          <StatRow
-            note={`Data through ${formatDate(view.asOf)}, release dates from GitHub`}
-          >
+          <StatRow>
             <StatTile
               label={`Releases, ${rangeLabel.toLowerCase()}`}
               value={String(view.recent)}
-              hint="stable releases across all products"
+              info={
+                <>
+                  <p>
+                    Stable GitHub releases across all products; prereleases are
+                    left out.
+                  </p>
+                  <p>
+                    Data through {formatDate(view.asOf)}, release dates from
+                    GitHub.
+                  </p>
+                </>
+              }
             />
             <StatTile
               label="Products that shipped"
               value={`${view.active} of ${view.rows.length}`}
-              hint={`at least one release, ${rangeLabel.toLowerCase()}`}
+              info={
+                <p>
+                  Products with at least one stable release,{' '}
+                  {rangeLabel.toLowerCase()}, out of those with a GitHub repo.
+                </p>
+              }
+            />
+            <StatTile
+              label="Latest release"
+              value={view.latest?.cadence.latest?.tag ?? '—'}
+              info={
+                view.latest?.cadence.latest ? (
+                  <p>
+                    {view.latest.product.name},{' '}
+                    {formatAgo(view.latest.cadence.daysSince)} on{' '}
+                    {formatDate(view.latest.cadence.latest.date, true)}. The
+                    newest stable release of any product.
+                  </p>
+                ) : (
+                  <p>No stable releases yet.</p>
+                )
+              }
             />
           </StatRow>
 
