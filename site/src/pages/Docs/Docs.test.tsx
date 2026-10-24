@@ -110,7 +110,7 @@ describe('Docs', () => {
     ).toHaveAttribute('href', 'https://nebari.dev/get-started/');
   });
 
-  it('filters the table by site and by search from the URL', async () => {
+  it('filters the table by site from the URL', async () => {
     stub(docs);
     renderPage('/docs?site=classic-docs');
     const table = await screen.findByRole('table', {
@@ -120,6 +120,23 @@ describe('Docs', () => {
     expect(within(table).getByText('/welcome/')).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Site' })).toHaveTextContent(
       'Nebari Classic docs',
+    );
+  });
+
+  it('accepts several sites', async () => {
+    stub(docs);
+    renderPage('/docs?site=classic-docs,packs-docs');
+    const table = await screen.findByRole('table', {
+      name: /Top documentation pages/,
+    });
+    expect(
+      within(table)
+        .getAllByRole('row')
+        .slice(1)
+        .map((r) => within(r).getAllByRole('cell')[1].textContent),
+    ).toEqual(['/welcome/', '/packs/chat/']);
+    expect(screen.getByRole('combobox', { name: 'Site' })).toHaveTextContent(
+      'All but Nebari docs',
     );
   });
 

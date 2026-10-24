@@ -17,13 +17,15 @@ import {
 } from '@/lib/summary';
 
 /** The page-wide controls, always rendered in this order. */
-export type FilterControl = 'range' | 'kind' | 'type' | 'source';
+export type FilterControl = 'range' | 'kind' | 'type' | 'source' | 'site';
 
 interface FiltersProps {
   params: DashboardParams;
   onChange: (patch: Partial<DashboardParams>) => void;
   /** Which controls this page offers; order is fixed regardless. */
   show?: FilterControl[];
+  /** Docs sites to choose from; the site control needs them. */
+  sites?: MultiSelectItem<string>[];
 }
 
 const ALL: FilterControl[] = ['range', 'kind', 'type', 'source'];
@@ -45,11 +47,11 @@ const SOURCE_ITEMS: MultiSelectItem<Source>[] = SOURCES.map((s) => ({
 
 /**
  * The page-wide controls, placed in the PageHeader by every page: date range,
- * kind, artifact type, source, in that order, each only where the page uses
- * it. Kind, type and source are multi-selects. State is in the URL, so a
+ * kind, artifact type, source, docs site, in that order, each only where the
+ * page uses it. All but the range are multi-selects. State is in the URL, so a
  * filter set on one page carries to the next.
  */
-function Filters({ params, onChange, show = ALL }: FiltersProps) {
+function Filters({ params, onChange, show = ALL, sites }: FiltersProps) {
   const has = (c: FilterControl) => show.includes(c);
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -99,6 +101,22 @@ function Filters({ params, onChange, show = ALL }: FiltersProps) {
           onChange={(source) => onChange({ source })}
           allLabel="All sources"
           className="w-48"
+        />
+      )}
+
+      {has('site') && sites && sites.length > 0 && (
+        <MultiSelect
+          label="Site"
+          items={sites}
+          // No site in the URL means every site, including ones added later.
+          value={
+            params.site.length > 0 ? params.site : sites.map((s) => s.value)
+          }
+          onChange={(next) =>
+            onChange({ site: next.length === sites.length ? [] : next })
+          }
+          allLabel="All sites"
+          className="w-56"
         />
       )}
     </div>
