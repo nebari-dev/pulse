@@ -283,3 +283,9 @@ docs:
     - id: packs-docs
       name: Software Packs docs
       hosts: [packs.nebari.dev]
+    - id: nebi-docs
+      name: Nebi docs
+      hosts: [nebi.nebari.dev]
+    - id: jhub-apps-docs
+      name: JHub Apps docs
+      hosts: [jhub-apps.nebari.dev]

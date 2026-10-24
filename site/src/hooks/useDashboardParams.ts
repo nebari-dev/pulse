@@ -19,6 +19,8 @@ export interface DashboardParams {
   source: SourceFilter;
   /** Free-text search over table rows. */
   q: string;
+  /** Docs site id, or 'all'. */
+  site: string;
 }
 
 const DEFAULTS: DashboardParams = {
@@ -27,6 +29,7 @@ const DEFAULTS: DashboardParams = {
   type: 'all',
   source: 'all',
   q: '',
+  site: 'all',
 };
 
 function isRange(v: string | null): v is Range {
@@ -61,6 +64,7 @@ export function useDashboardParams(): [
     type: isType(type) ? type : DEFAULTS.type,
     source: isSource(source) ? source : DEFAULTS.source,
     q: params.get('q') ?? DEFAULTS.q,
+    site: params.get('site') ?? DEFAULTS.site,
   };
 
   const update = useCallback(

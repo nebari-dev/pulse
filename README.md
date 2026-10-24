@@ -26,7 +26,7 @@ Pulse snapshots it.
 | `/releases` | Release cadence per product: latest release and age, releases in the period, median gap over the last year, releases per week, and a feed with prereleases marked. |
 | `/repos` | Repository health: stars and stars gained, open issues and PRs, PRs merged in 30 days, authors in 30 days, last push, with new and active contributors over time and open issues and PRs over time. |
 | `/traffic` | GitHub traffic: unique visitors and cloners for the last 14 days with change vs. the 14 before, totals, and daily history for all tracked repos. |
-| `/docs` | Documentation traffic: visits and page views per docs site over time, and each site's top pages for the last 7 days. |
+| `/docs` | Documentation traffic for the docs sites (Nebari, Nebari Classic, Software Packs, Nebi, JHub Apps): visits per site with change vs. the previous period, visits over time by site, and one table of the top pages over the last 7 days across all sites, with a site filter and search. |
 
 Filters (range, product or pack, artifact type, source) and the table
 search live in the URL, so any view can be shared as a link.
@@ -124,8 +124,9 @@ unique cloners and shows totals second.
 
 Sites are listed under `docs` in `sources.yaml` with the hostnames that
 serve them: the Nebari docs (`nebari.dev`, `www.nebari.dev`), the Classic
-docs (`classic.nebari.dev`) and the Software Packs docs
-(`packs.nebari.dev`). All are on the `nebari.dev` Cloudflare zone.
+docs (`classic.nebari.dev`), the Software Packs docs (`packs.nebari.dev`),
+the Nebi docs (`nebi.nebari.dev`) and the JHub Apps docs
+(`jhub-apps.nebari.dev`). All are on the `nebari.dev` Cloudflare zone.
 
 **Traffic** (`docs/traffic/<site>.csv`, `date,host,pageviews,visits`)
 HTML responses with status 200 to real browsers (`requestSource:
