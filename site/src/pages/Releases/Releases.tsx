@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
@@ -8,7 +9,6 @@ import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -192,7 +192,19 @@ function Releases() {
                 label="Search products"
               />
             }
-            footnote="Median gap is measured over the last year of stable releases. Products whose latest release is more than six months old are marked."
+            info={
+              <ul>
+                <li>GitHub releases of each product's repos.</li>
+                <li>
+                  Median gap is measured over the last year of stable releases;
+                  prereleases are left out.
+                </li>
+                <li>
+                  Products whose latest release is more than six months old are
+                  marked.
+                </li>
+              </ul>
+            }
           >
             <Table aria-label={`Release cadence by product, ${rangeLabel}`}>
               <TableHeader>
@@ -289,49 +301,55 @@ function Releases() {
             </Table>
           </TableCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Release feed, {rangeLabel.toLowerCase()}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {view.feed.length === 0 ? (
-                <p className="text-muted-foreground text-sm">
-                  No releases in this period.
-                </p>
-              ) : (
-                <ol className="flex flex-col divide-y divide-border">
-                  {view.feed.slice(0, 50).map((r) => (
-                    <li
-                      key={`${r.repo}:${r.tag}`}
-                      className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm"
+          <ChartCard
+            title={`Release feed, ${rangeLabel.toLowerCase()}`}
+            info={
+              <ul>
+                <li>
+                  Every GitHub release in the period, newest first, prereleases
+                  included.
+                </li>
+                <li>Dates are when the release was published on GitHub.</li>
+              </ul>
+            }
+          >
+            {view.feed.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No releases in this period.
+              </p>
+            ) : (
+              <ol className="flex flex-col divide-y divide-border">
+                {view.feed.slice(0, 50).map((r) => (
+                  <li
+                    key={`${r.repo}:${r.tag}`}
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm"
+                  >
+                    <span className="w-20 shrink-0 text-muted-foreground tabular-nums">
+                      {formatDate(r.date)}
+                    </span>
+                    <Link
+                      to={`/product/${r.product.id}`}
+                      className="font-medium underline-offset-4 hover:underline"
                     >
-                      <span className="w-20 shrink-0 text-muted-foreground tabular-nums">
-                        {formatDate(r.date)}
-                      </span>
-                      <Link
-                        to={`/product/${r.product.id}`}
-                        className="font-medium underline-offset-4 hover:underline"
-                      >
-                        {r.product.name}
-                      </Link>
-                      <a
-                        href={releaseUrl(r.repo, r.tag)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
-                      >
-                        {r.tag}
-                        <ExternalLink className="size-3" aria-hidden="true" />
-                      </a>
-                      {r.prerelease && (
-                        <Badge variant="secondary">prerelease</Badge>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </CardContent>
-          </Card>
+                      {r.product.name}
+                    </Link>
+                    <a
+                      href={releaseUrl(r.repo, r.tag)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
+                    >
+                      {r.tag}
+                      <ExternalLink className="size-3" aria-hidden="true" />
+                    </a>
+                    {r.prerelease && (
+                      <Badge variant="secondary">prerelease</Badge>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </ChartCard>
         </>
       )}
     </div>

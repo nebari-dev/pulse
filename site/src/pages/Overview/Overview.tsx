@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import Leaderboard, { type LeaderboardRow } from '@/components/Leaderboard';
 import PageHeader from '@/components/PageHeader';
@@ -7,7 +8,6 @@ import ShareChart from '@/components/ShareChart';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   type DashboardParams,
@@ -15,6 +15,7 @@ import {
 } from '@/hooks/useDashboardParams';
 import { useSummary } from '@/hooks/useSummary';
 import { markersFor } from '@/lib/anomalies';
+import { coverageLines, partialNote, sourceList } from '@/lib/coverage';
 import { formatCompact, formatDate } from '@/lib/format';
 import {
   ARTIFACT_KIND_COLOR,
@@ -24,6 +25,7 @@ import {
   between,
   chartRows,
   compareArtifacts,
+  coverage,
   earliestDate,
   excludesCharts,
   HEADLINE_KINDS,
@@ -47,8 +49,6 @@ import {
 const DOWNLOADS_DEFAULTS: Partial<DashboardParams> = {
   type: [...HEADLINE_KINDS],
 };
-
-const list = new Intl.ListFormat('en', { type: 'conjunction' });
 
 function useOverview(summary: Summary | undefined) {
   const [params, setParams] = useDashboardParams(DOWNLOADS_DEFAULTS);
@@ -89,10 +89,23 @@ function useOverview(summary: Summary | undefined) {
         );
         if (!hasDataIn(series, start, end)) continue;
         byGroup[kind] = series;
+        // Each band's sources, for the tooltip.
+        const parts = [];
+        for (const source of SOURCES) {
+          const own = sumSeries(
+            all
+              .filter((a) => a.kind === kind && a.source === source)
+              .map((a) => a.series),
+          );
+          if (!hasDataIn(own, start, end)) continue;
+          byGroup[`${kind}:${source}`] = own;
+          parts.push({ key: `${kind}:${source}`, label: SOURCE_LABEL[source] });
+        }
         chartSeries.push({
           key: kind,
           label: ARTIFACT_KIND_LABEL[kind],
           color: ARTIFACT_KIND_COLOR[kind],
+          parts: parts.length > 1 ? parts : undefined,
         });
       }
     } else {
@@ -121,10 +134,12 @@ function useOverview(summary: Summary | undefined) {
       start,
       end,
     );
+    const cov = coverage(all, start, end, weekly);
     const markers = weekly
       ? []
       : markersFor(between(sumSeries(all.map((a) => a.series)), start, end));
     return {
+      coverage: cov,
       markers,
       share,
       asOf,
@@ -147,6 +162,15 @@ function Overview() {
   const { data, error, isPending } = useSummary();
   const { params, setParams, view } = useOverview(data);
   const rangeLabel = RANGE_LABEL[params.range];
+  const trendTitle = `${view?.weekly ? 'Weekly' : 'Daily'} ${
+    params.type.length > 1
+      ? 'downloads by type'
+      : `${ARTIFACT_KIND_LABEL[params.type[0]].toLowerCase()} by source`
+  }${
+    params.source.length < SOURCES.length
+      ? ` from ${sourceList(params.source)}`
+      : ''
+  }`;
 
   if (error) {
     return (
@@ -212,57 +236,98 @@ function Overview() {
             />
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {view.weekly ? 'Weekly' : 'Daily'}{' '}
-                {params.type.length > 1
-                  ? 'downloads by type'
-                  : `${ARTIFACT_KIND_LABEL[params.type[0]].toLowerCase()} by source`}
-                {params.source.length < SOURCES.length &&
-                  ` from ${list.format(params.source.map((s) => SOURCE_LABEL[s]))}`}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TrendChart
-                rows={view.chartRows}
-                series={view.chartSeries}
-                weekly={view.weekly}
-                markers={view.markers}
-                title={`${view.weekly ? 'Weekly' : 'Daily'} downloads, ${rangeLabel}`}
-              />
-              {view.markers.length > 0 && (
-                <p className="mt-2 text-muted-foreground text-xs">
-                  Marked days are more than three standard deviations above the
-                  trailing four-week average; hover one for the numbers. They
-                  stay in the totals.
+          <ChartCard
+            title={trendTitle}
+            info={
+              <>
+                <p>
+                  Downloads per {view.weekly ? 'week' : 'day'}, stacked so the
+                  top edge is the total.{' '}
+                  {params.type.length > 1
+                    ? 'Each band is one artifact type; hover a day to split a band by source.'
+                    : 'Each band is one source.'}
                 </p>
-              )}
-            </CardContent>
-          </Card>
+                <ul>
+                  <li>Images and Helm charts are pulls from Quay.</li>
+                  <li>Packages are PyPI and conda-forge installs.</li>
+                  <li>Binaries are GitHub release asset downloads.</li>
+                  <li>
+                    Helm charts start unchecked: their pulls are mostly GitOps
+                    controllers polling, not new installs.
+                  </li>
+                  <li>
+                    A dashed line marks where a source's data begins; before it
+                    that source is missing, not zero.
+                  </li>
+                  <li>
+                    The shaded tail is incomplete: some sources report a day
+                    late.
+                  </li>
+                  <li>
+                    Yellow dots are spike days, more than three standard
+                    deviations above the trailing four-week average, usually CI
+                    or mirrors. They stay in the totals.
+                  </li>
+                </ul>
+              </>
+            }
+          >
+            <TrendChart
+              rows={view.chartRows}
+              series={view.chartSeries}
+              weekly={view.weekly}
+              markers={view.markers}
+              lines={coverageLines(view.coverage)}
+              partialFrom={view.coverage.partialFrom}
+              partialNote={partialNote(view.coverage, view.weekly)}
+              title={`${view.weekly ? 'Weekly' : 'Daily'} downloads, ${rangeLabel}`}
+            />
+          </ChartCard>
 
           {view.share.series.length > 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Share of downloads by product, weekly</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                <ShareChart
-                  rows={view.share.rows}
-                  series={view.share.series}
-                  title={`Weekly share of downloads by product, ${rangeLabel}`}
-                />
-                <p className="text-muted-foreground text-xs">
-                  The five largest products in the period get their own band;
-                  the rest are "Other". Same counts as the leaderboard
-                  {excludesCharts(params) && ', Helm charts not included'}.
-                </p>
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Share of downloads by product, weekly"
+              info={
+                <>
+                  <p>
+                    Each product's share of the week's downloads, so growth in
+                    one product shows even when the total moves.
+                  </p>
+                  <ul>
+                    <li>
+                      The five largest products in the period get their own
+                      band; the rest are "Other".
+                    </li>
+                    <li>
+                      Same counts as the leaderboard and the type and source
+                      filters
+                      {excludesCharts(params) && ', Helm charts not included'}.
+                    </li>
+                  </ul>
+                </>
+              }
+            >
+              <ShareChart
+                rows={view.share.rows}
+                series={view.share.series}
+                title={`Weekly share of downloads by product, ${rangeLabel}`}
+              />
+            </ChartCard>
           )}
 
           <TableCard
             title={`Downloads by product, ${rangeLabel.toLowerCase()}`}
+            info={
+              <ul>
+                <li>
+                  Downloads in the period, with the change from the period
+                  before it. No change is shown until a full previous period has
+                  been collected.
+                </li>
+                <li>Share is of the total across the listed products.</li>
+                <li>The sparkline is the same period, day by day.</li>
+              </ul>
+            }
             controls={
               <SearchBox
                 value={params.q}

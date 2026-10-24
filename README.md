@@ -153,6 +153,12 @@ A daily snapshot of the 200 most viewed paths over the last 7 days.
   multi-selects, kept in the URL as comma-separated lists. Everything is
   selected by default, except on Downloads, where Helm charts start
   deselected; selecting them adds chart pulls to every number on the page.
+- **Coverage.** Download charts draw a dashed line where a source's data
+  begins inside the window (before it the source is missing, not zero), and
+  shade the trailing days or week some source has not reported yet (PyPI
+  runs a day behind). The tooltip names the sources still missing.
+- **Explanations.** Each chart and table has an (i) popover on how to read
+  it; the Data sources page (the (?) in the header) has the full detail.
 - **Anomalies.** A day more than three standard deviations above the
   trailing 28-day mean, at least three times that mean and at least 50 in
   absolute terms, is marked on the daily charts with a note. Values are
