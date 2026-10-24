@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
 import Filters from '@/components/Filters';
-import MultiSelect from '@/components/MultiSelect';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
@@ -62,11 +61,15 @@ function useDocsView(docs: DocsFile | undefined) {
   const [params, setParams] = useDashboardParams();
   const view = useMemo(() => {
     if (!docs) return null;
-    const sites = docs.sites.filter((s) => s.series.length > 0);
-    if (sites.length === 0) return { empty: true as const };
+    const collected = docs.sites.filter((s) => s.series.length > 0);
+    if (collected.length === 0) return { empty: true as const };
+    // The site filter narrows the chart and the table; tiles stay fixed.
+    const sites = collected.filter(
+      (s) => params.site.length === 0 || params.site.includes(s.id),
+    );
     let asOf = '';
     let earliest = '';
-    for (const s of sites) {
+    for (const s of collected) {
       const first = s.series[0]?.date ?? '';
       const last = s.series.at(-1)?.date ?? '';
       if (last > asOf) asOf = last;
@@ -76,16 +79,18 @@ function useDocsView(docs: DocsFile | undefined) {
     const weekly = days > 120;
     const bySite: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
-    sites.forEach((site, i) => {
+    for (const site of sites) {
       bySite[site.id] = points(site, 'visits');
+      // Hue by position among all sites, so filtering keeps colors stable.
+      const i = collected.indexOf(site);
       chartSeries.push({
         key: site.id,
         label: site.name,
         color: SITE_COLORS[i % SITE_COLORS.length],
       });
-    });
+    }
     const tiles = TILE_SITES.map(({ id, name }) => {
-      const site = sites.find((s) => s.id === id);
+      const site = collected.find((s) => s.id === id);
       return {
         id,
         name: site?.name ?? name,
@@ -123,9 +128,8 @@ function useDocsView(docs: DocsFile | undefined) {
       chartRows: chartRows(bySite, start, end, weekly),
       chartSeries,
       markers: weekly ? [] : markersFor(between(all, start, end), 'visits'),
-      sites,
     };
-  }, [docs, params.range]);
+  }, [docs, params.range, params.site]);
   return { params, setParams, view };
 }
 
@@ -147,7 +151,14 @@ function Docs() {
       title="Docs"
       description="Visits and page views of the documentation sites, counted at the Cloudflare edge so cookie consent does not hide them."
     >
-      <Filters params={params} onChange={setParams} show={['range']} />
+      <Filters
+        params={params}
+        onChange={setParams}
+        show={['range', 'site']}
+        sites={data?.sites
+          .filter((s) => s.series.length > 0)
+          .map((s) => ({ value: s.id, label: s.name }))}
+      />
     </PageHeader>
   );
 
@@ -178,16 +189,8 @@ function Docs() {
     );
   }
 
-  const siteItems = view.sites.map((site) => ({
-    value: site.id,
-    label: site.name,
-  }));
-  // No site in the URL means every site, including ones added later.
-  const sites =
-    params.site.length > 0 ? params.site : siteItems.map((i) => i.value);
-  const rows = view.pages.filter(
-    (r) =>
-      sites.includes(r.site.id) && matchesQuery(params.q, r.path, r.site.name),
+  const rows = view.pages.filter((r) =>
+    matchesQuery(params.q, r.path, r.site.name),
   );
   const max = Math.max(...rows.map((r) => r.pageviews), 1);
 
@@ -252,25 +255,11 @@ function Docs() {
       <TableCard
         title="Top pages, last 7 days"
         controls={
-          <>
-            <MultiSelect
-              label="Site"
-              items={siteItems}
-              value={sites}
-              onChange={(next) =>
-                setParams({
-                  site: next.length === siteItems.length ? [] : next,
-                })
-              }
-              allLabel="All sites"
-              className="w-56"
-            />
-            <SearchBox
-              value={params.q}
-              onChange={(q) => setParams({ q })}
-              label="Search pages"
-            />
-          </>
+          <SearchBox
+            value={params.q}
+            onChange={(q) => setParams({ q })}
+            label="Search pages"
+          />
         }
         footnote={
           <>
