@@ -82,24 +82,40 @@ describe('Docs', () => {
     expect(
       screen.getByRole('figure', { name: /Daily docs visits by site/ }),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole('table', { name: /top pages$/ })).toHaveLength(
-      3,
-    );
-    const table = screen.getByRole('table', { name: 'Nebari docs top pages' });
+    const table = screen.getByRole('table', {
+      name: /Top documentation pages/,
+    });
+    const rows = within(table).getAllByRole('row').slice(1);
+    // Every site's pages in one table, biggest first.
+    expect(
+      rows.map((r) => within(r).getAllByRole('cell')[1].textContent),
+    ).toEqual(['/', '/get-started/', '/welcome/', '/packs/chat/']);
+    expect(within(rows[0]).getByText('Nebari docs')).toBeInTheDocument();
     expect(
       within(table).getByRole('link', { name: /get-started/ }),
     ).toHaveAttribute('href', 'https://nebari.dev/get-started/');
   });
 
-  it('filters the page tables by search', async () => {
+  it('filters the table by site and by search from the URL', async () => {
     stub(docs);
-    renderPage('/docs?q=welcome');
-    const classic = await screen.findByRole('table', {
-      name: 'Nebari Classic docs top pages',
+    renderPage('/docs?site=classic-docs');
+    const table = await screen.findByRole('table', {
+      name: /Top documentation pages/,
     });
-    expect(within(classic).getByText('/welcome/')).toBeInTheDocument();
-    const main = screen.getByRole('table', { name: 'Nebari docs top pages' });
-    expect(main).toHaveTextContent('No pages match "welcome".');
+    expect(within(table).getAllByRole('row').slice(1)).toHaveLength(1);
+    expect(within(table).getByText('/welcome/')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Site' })).toHaveTextContent(
+      'Nebari Classic docs',
+    );
+  });
+
+  it('shows an empty row when the search matches nothing', async () => {
+    stub(docs);
+    renderPage('/docs?q=nothing-here');
+    const table = await screen.findByRole('table', {
+      name: /Top documentation pages/,
+    });
+    expect(table).toHaveTextContent('No pages match "nothing-here".');
   });
 
   it('explains the token when there is no data', async () => {

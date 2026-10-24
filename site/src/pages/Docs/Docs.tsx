@@ -5,6 +5,13 @@ import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -32,6 +39,9 @@ import {
   type Range,
   windowFor,
 } from '@/lib/summary';
+
+/** Rows shown in the top-pages table before asking the reader to narrow down. */
+const PAGE_ROWS = 50;
 
 /** Fixed hue per site, consistent across the chart and the tiles. */
 const SITE_COLORS = [
@@ -78,8 +88,23 @@ function useDocsView(docs: DocsFile | undefined) {
       };
     });
     const all = Object.values(bySite).flat();
+    const pages = sites
+      .flatMap((site) =>
+        site.top_pages.map((p) => ({
+          site,
+          path: p.path,
+          pageviews: p.pageviews,
+        })),
+      )
+      .sort((a, b) => b.pageviews - a.pageviews);
+    const pagesDate = sites
+      .map((s) => s.top_pages_date ?? '')
+      .sort()
+      .at(-1);
     return {
       empty: false as const,
+      pages,
+      pagesDate: pagesDate || null,
       asOf,
       start,
       end,
@@ -160,6 +185,17 @@ function Docs() {
     );
   }
 
+  const siteItems = [
+    { value: 'all', label: 'All sites' },
+    ...view.sites.map((site) => ({ value: site.id, label: site.name })),
+  ];
+  const rows = view.pages.filter(
+    (r) =>
+      (params.site === 'all' || r.site.id === params.site) &&
+      matchesQuery(params.q, r.path, r.site.name),
+  );
+  const max = Math.max(...rows.map((r) => r.pageviews), 1);
+
   return (
     <div className="flex flex-col gap-6">
       {header}
@@ -209,86 +245,93 @@ function Docs() {
         </CardContent>
       </Card>
 
-      <SearchBox
-        value={params.q}
-        onChange={(q) => setParams({ q })}
-        label="Search pages"
-      />
-      {/* One full-width table per site, so paths stay readable. */}
-      <div className="flex flex-col gap-6">
-        {view.sites.map((site) => {
-          const rows = site.top_pages.filter((p) =>
-            matchesQuery(params.q, p.path),
-          );
-          const max = Math.max(...site.top_pages.map((p) => p.pageviews), 1);
-          return (
-            <Card key={site.id}>
-              <CardHeader>
-                <CardTitle>{site.name}: top pages, last 7 days</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                <Table aria-label={`${site.name} top pages`}>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Path</TableHead>
-                      <TableHead className="w-1/2">Share</TableHead>
-                      <TableHead className="text-right">Page views</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rows.length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={3}
-                          className="text-muted-foreground"
-                        >
-                          {params.q
-                            ? `No pages match "${params.q}".`
-                            : 'No page data yet.'}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {rows.slice(0, 25).map((p) => (
-                      <TableRow key={p.path}>
-                        <TableCell className="font-mono text-xs">
-                          <a
-                            href={`https://${site.hosts[0]}${p.path}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                          >
-                            {p.path}
-                            <ExternalLink
-                              className="size-3"
-                              aria-hidden="true"
-                            />
-                          </a>
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-2 w-full rounded-full bg-muted">
-                            <div
-                              className="h-2 rounded-full bg-chart-1"
-                              style={{ width: `${(p.pageviews / max) * 100}%` }}
-                            />
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {formatNumber(p.pageviews)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {site.top_pages_date && (
-                  <p className="text-muted-foreground text-xs">
-                    Snapshot taken {formatDate(site.top_pages_date, true)}.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Top pages, last 7 days</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              items={siteItems}
+              value={params.site}
+              onValueChange={(value) => setParams({ site: value as string })}
+            >
+              <SelectTrigger aria-label="Site" className="w-56">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {siteItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <SearchBox
+              value={params.q}
+              onChange={(q) => setParams({ q })}
+              label="Search pages"
+            />
+          </div>
+          <Table aria-label="Top documentation pages, last 7 days">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Site</TableHead>
+                <TableHead>Path</TableHead>
+                <TableHead className="w-1/3">Share</TableHead>
+                <TableHead className="text-right">Page views</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-muted-foreground">
+                    {params.q
+                      ? `No pages match "${params.q}".`
+                      : 'No page data yet.'}
+                  </TableCell>
+                </TableRow>
+              )}
+              {rows.slice(0, PAGE_ROWS).map((r) => (
+                <TableRow key={`${r.site.id}:${r.path}`}>
+                  <TableCell className="whitespace-nowrap text-muted-foreground">
+                    {r.site.name}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    <a
+                      href={`https://${r.site.hosts[0]}${r.path}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                    >
+                      {r.path}
+                      <ExternalLink className="size-3" aria-hidden="true" />
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-2 w-full rounded-full bg-muted">
+                      <div
+                        className="h-2 rounded-full bg-chart-1"
+                        style={{ width: `${(r.pageviews / max) * 100}%` }}
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatNumber(r.pageviews)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <p className="text-muted-foreground text-xs">
+            {rows.length > PAGE_ROWS &&
+              `Showing ${PAGE_ROWS} of ${rows.length} pages; narrow with the site filter or search. `}
+            {view.pagesDate &&
+              `Snapshot taken ${formatDate(view.pagesDate, true)}. `}
+            HTML pages only, as counted at the Cloudflare edge.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
