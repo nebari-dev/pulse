@@ -109,11 +109,11 @@ date,tag,asset,cumulative
 2026-10-23,v0.2.4,skillsctl_0.2.4_windows_amd64.zip,0
 2026-10-24,v0.1.0,skillsctl-server_0.1.0_darwin_amd64.tar.gz,2
 2026-10-24,v0.1.0,skillsctl-server_0.1.0_darwin_arm64.tar.gz,5
-2026-10-24,v0.1.0,skillsctl-server_0.1.0_linux_amd64.tar.gz,2
+2026-10-24,v0.1.0,skillsctl-server_0.1.0_linux_amd64.tar.gz,3
 2026-10-24,v0.1.0,skillsctl-server_0.1.0_linux_arm64.tar.gz,2
 2026-10-24,v0.1.0,skillsctl_0.1.0_darwin_amd64.tar.gz,2
 2026-10-24,v0.1.0,skillsctl_0.1.0_darwin_arm64.tar.gz,2
-2026-10-24,v0.1.0,skillsctl_0.1.0_linux_amd64.tar.gz,2
+2026-10-24,v0.1.0,skillsctl_0.1.0_linux_amd64.tar.gz,3
 2026-10-24,v0.1.0,skillsctl_0.1.0_linux_arm64.tar.gz,3
 2026-10-24,v0.1.0,skillsctl_0.1.0_windows_amd64.zip,2
 2026-10-24,v0.1.1,skillsctl-server_0.1.1_darwin_amd64.tar.gz,0
