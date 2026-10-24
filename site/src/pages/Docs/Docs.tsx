@@ -1,19 +1,13 @@
 import { ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
 import Filters from '@/components/Filters';
+import MultiSelect from '@/components/MultiSelect';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -184,14 +178,16 @@ function Docs() {
     );
   }
 
-  const siteItems = [
-    { value: 'all', label: 'All sites' },
-    ...view.sites.map((site) => ({ value: site.id, label: site.name })),
-  ];
+  const siteItems = view.sites.map((site) => ({
+    value: site.id,
+    label: site.name,
+  }));
+  // No site in the URL means every site, including ones added later.
+  const sites =
+    params.site.length > 0 ? params.site : siteItems.map((i) => i.value);
   const rows = view.pages.filter(
     (r) =>
-      (params.site === 'all' || r.site.id === params.site) &&
-      matchesQuery(params.q, r.path, r.site.name),
+      sites.includes(r.site.id) && matchesQuery(params.q, r.path, r.site.name),
   );
   const max = Math.max(...rows.map((r) => r.pageviews), 1);
 
@@ -257,22 +253,18 @@ function Docs() {
         title="Top pages, last 7 days"
         controls={
           <>
-            <Select
+            <MultiSelect
+              label="Site"
               items={siteItems}
-              value={params.site}
-              onValueChange={(value) => setParams({ site: value as string })}
-            >
-              <SelectTrigger aria-label="Site" className="w-56">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {siteItems.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              value={sites}
+              onChange={(next) =>
+                setParams({
+                  site: next.length === siteItems.length ? [] : next,
+                })
+              }
+              allLabel="All sites"
+              className="w-56"
+            />
             <SearchBox
               value={params.q}
               onChange={(q) => setParams({ q })}

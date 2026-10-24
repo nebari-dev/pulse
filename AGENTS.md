@@ -171,7 +171,7 @@ the top of `summary.py`; the TypeScript types in `site/src/lib/summary.ts`
 mirror them. Keep the contract additive: adding fields is fine, renaming
 or removing breaks deployed dashboards until the next data commit, since
 the site is deployed separately from the data. Helpers that filter or sum
-series (`artifactsOf`, `compareArtifacts`, `headlineArtifacts`) take
+series (`artifactsOf`, `productSeries`, `compareArtifacts`) take
 anything `Countable` (source, kind, series), so they work on both index
 groups and full artifacts.
 

@@ -46,8 +46,8 @@ Daily pulls of each image and OCI Helm chart under `quay.io/nebari`, from
 the Quay repository API with `includeStats=true`. Quay returns about 90
 days. Charts are told apart from images by `/charts/` in the path and are
 kept separate everywhere: GitOps controllers poll charts continuously, so
-chart pulls say nothing about adoption and are left out of headline numbers
-unless the chart type is selected explicitly. The collector also lists any
+chart pulls say nothing about adoption and the Downloads page starts with
+the chart type deselected. The collector also lists any
 public repo in the namespace that `sources.yaml` does not mention, in
 `data/untracked.json` and in the run log.
 
@@ -149,9 +149,10 @@ A daily snapshot of the 200 most viewed paths over the last 7 days.
   artifacts covering less than 90% of the current total have a previous
   period, so a source that started collecting mid-way never reads as a
   surge.
-- **Headline exclusion.** With no artifact type selected, Helm chart pulls
-  are excluded from the headline tiles, the leaderboard and the share
-  chart. The trend chart still draws them as their own band.
+- **Filters.** Kind, artifact type, source and docs site are
+  multi-selects, kept in the URL as comma-separated lists. Everything is
+  selected by default, except on Downloads, where Helm charts start
+  deselected; selecting them adds chart pulls to every number on the page.
 - **Anomalies.** A day more than three standard deviations above the
   trailing 28-day mean, at least three times that mean and at least 50 in
   absolute terms, is marked on the daily charts with a note. Values are

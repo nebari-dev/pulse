@@ -38,13 +38,14 @@ pulse-dashboard/
 │   │   └── format.ts
 │   ├── hooks/
 │   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id), useDocs over /data/*.json
-│   │   ├── useDashboardParams.ts # range/kind/type/source filters + search (q) in the URL
+│   │   ├── useDashboardParams.ts # range + multi-select kind/type/source/site + search (q) in the URL; per-page defaults
 │   ├── components/
 │   │   ├── ui/            # Nebari components (installed via shadcn — managed)
 │   │   ├── Header/        # brand, section nav, GitHub link, theme toggle; one hamburger below sm
 │   │   ├── PageHeader/    # title + description + page-wide controls row used by every page
 │   │   ├── TableCard/     # card around one table; that table's controls sit top right
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
+│   │   ├── MultiSelect/   # checkable dropdown used by every filter; never empty
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/

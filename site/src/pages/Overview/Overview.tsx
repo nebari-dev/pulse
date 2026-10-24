@@ -9,7 +9,10 @@ import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDashboardParams } from '@/hooks/useDashboardParams';
+import {
+  type DashboardParams,
+  useDashboardParams,
+} from '@/hooks/useDashboardParams';
 import { useSummary } from '@/hooks/useSummary';
 import { markersFor } from '@/lib/anomalies';
 import { formatCompact, formatDate } from '@/lib/format';
@@ -23,8 +26,8 @@ import {
   compareArtifacts,
   earliestDate,
   excludesCharts,
+  HEADLINE_KINDS,
   hasDataIn,
-  headlineArtifacts,
   latestDate,
   matchesKind,
   matchesQuery,
@@ -39,8 +42,16 @@ import {
   windowFor,
 } from '@/lib/summary';
 
+/** Helm chart pulls are mostly GitOps controllers polling, so Downloads
+ * starts without them; the type filter adds them back. */
+const DOWNLOADS_DEFAULTS: Partial<DashboardParams> = {
+  type: [...HEADLINE_KINDS],
+};
+
+const list = new Intl.ListFormat('en', { type: 'conjunction' });
+
 function useOverview(summary: Summary | undefined) {
-  const [params, setParams] = useDashboardParams();
+  const [params, setParams] = useDashboardParams(DOWNLOADS_DEFAULTS);
   const view = useMemo(() => {
     if (!summary) return null;
     const asOf = latestDate(summary);
@@ -51,14 +62,9 @@ function useOverview(summary: Summary | undefined) {
       matchesKind(p, params.kind),
     );
 
-    // Leaderboard and tiles: headline artifacts only (no chart polls unless
-    // the chart type is selected). The trend chart below still draws charts
-    // as their own band so the polling volume stays visible, apart.
+    // Tiles, leaderboard, share and trend all count the same selection.
     const rows: LeaderboardRow[] = products.map((product) => {
-      const counted = headlineArtifacts(
-        artifactsOf(product.groups, params),
-        params,
-      );
+      const counted = artifactsOf(product.groups, params);
       const series = sumSeries(counted.map((a) => a.series));
       return {
         product,
@@ -70,13 +76,13 @@ function useOverview(summary: Summary | undefined) {
     const grand = rows.reduce((acc, r) => acc + r.comparison.current, 0);
     for (const r of rows) r.share = grand ? r.comparison.current / grand : 0;
 
-    // Chart: stacked by artifact type (images vs charts vs ...) unless a
-    // type is selected, then by source. A single remaining series is drawn
-    // as a plain area.
+    // Chart: stacked by artifact type (images vs packages vs ...) when more
+    // than one type is selected, otherwise by source. A single remaining
+    // series is drawn as a plain area.
     const all = products.flatMap((p) => artifactsOf(p.groups, params));
     const byGroup: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
-    if (params.type === 'all') {
+    if (params.type.length > 1) {
       for (const kind of ARTIFACT_KINDS) {
         const series = sumSeries(
           all.filter((a) => a.kind === kind).map((a) => a.series),
@@ -104,21 +110,13 @@ function useOverview(summary: Summary | undefined) {
       }
     }
 
-    const overall = compareArtifacts(
-      headlineArtifacts(all, params),
-      start,
-      end,
-    );
+    const overall = compareArtifacts(all, start, end);
     const share = shareRows(
       products.map((p) => ({
         id: p.id,
         name: p.name,
         rank: p.totals.all,
-        series: sumSeries(
-          headlineArtifacts(artifactsOf(p.groups, params), params).map(
-            (g) => g.series,
-          ),
-        ),
+        series: sumSeries(artifactsOf(p.groups, params).map((g) => g.series)),
       })),
       start,
       end,
@@ -162,7 +160,7 @@ function Overview() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Downloads"
-        description="Image pulls and package downloads across the Nebari ecosystem. Helm chart pulls are mostly GitOps controllers polling, so they are charted apart and left out of the totals unless you select them."
+        description="Image pulls and package downloads across the Nebari ecosystem. Helm charts are left out by default: their pulls are mostly GitOps controllers polling, not new installs. Add them from the type filter."
       >
         <Filters params={params} onChange={setParams} />
       </PageHeader>
@@ -184,7 +182,7 @@ function Overview() {
                 (view.overall.delta === null
                   ? 'no full previous period yet'
                   : 'vs. previous period') +
-                (excludesCharts(params) ? ', excluding chart polls' : '')
+                (excludesCharts(params) ? ', Helm charts not included' : '')
               }
             />
             <StatTile
@@ -218,11 +216,11 @@ function Overview() {
             <CardHeader>
               <CardTitle>
                 {view.weekly ? 'Weekly' : 'Daily'}{' '}
-                {params.type === 'all'
+                {params.type.length > 1
                   ? 'downloads by type'
-                  : `${ARTIFACT_KIND_LABEL[params.type].toLowerCase()} by source`}
-                {params.source !== 'all' &&
-                  ` from ${SOURCE_LABEL[params.source]}`}
+                  : `${ARTIFACT_KIND_LABEL[params.type[0]].toLowerCase()} by source`}
+                {params.source.length < SOURCES.length &&
+                  ` from ${list.format(params.source.map((s) => SOURCE_LABEL[s]))}`}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -257,7 +255,7 @@ function Overview() {
                 <p className="text-muted-foreground text-xs">
                   The five largest products in the period get their own band;
                   the rest are "Other". Same counts as the leaderboard
-                  {excludesCharts(params) && ', chart polls excluded'}.
+                  {excludesCharts(params) && ', Helm charts not included'}.
                 </p>
               </CardContent>
             </Card>

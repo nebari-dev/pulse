@@ -53,9 +53,14 @@ export const ARTIFACT_KIND_COLOR: Record<ArtifactKind, string> = {
   package: 'var(--chart-4)',
   binary: 'var(--chart-5)',
 };
-export type ArtifactKindFilter = ArtifactKind | 'all';
+/** Artifact types the Downloads page counts by default: everything but
+ * Helm charts, whose pulls are mostly GitOps controllers polling. */
+export const HEADLINE_KINDS: readonly ArtifactKind[] = ARTIFACT_KINDS.filter(
+  (k) => k !== 'chart',
+);
 
 export type Kind = 'product' | 'pack';
+export const KINDS: readonly Kind[] = ['product', 'pack'];
 export const KIND_LABEL: Record<Kind, string> = {
   product: 'Product',
   pack: 'Pack',
@@ -274,9 +279,6 @@ export const RANGE_LABEL: Record<Range, string> = {
   all: 'All time',
 };
 
-export type SourceFilter = Source | 'all';
-export type KindFilter = Kind | 'all';
-
 // ---- dates -----------------------------------------------------------------
 
 export function addDays(iso: string, n: number): string {
@@ -376,13 +378,17 @@ export function windowFor(
 
 // ---- products --------------------------------------------------------------
 
-export function matchesKind(product: ProductBase, kind: KindFilter): boolean {
-  return kind === 'all' || product.kind === kind;
+export function matchesKind(
+  product: ProductBase,
+  kinds: readonly Kind[],
+): boolean {
+  return kinds.includes(product.kind);
 }
 
+/** The selected sources and artifact types; an artifact must match both. */
 export interface ArtifactFilter {
-  source: SourceFilter;
-  type: ArtifactKindFilter;
+  source: readonly Source[];
+  type: readonly ArtifactKind[];
 }
 
 /** The artifacts (or index groups) a source/type filter keeps. */
@@ -391,9 +397,7 @@ export function artifactsOf<T extends Countable>(
   { source, type }: ArtifactFilter,
 ): T[] {
   return items.filter(
-    (a) =>
-      (source === 'all' || a.source === source) &&
-      (type === 'all' || a.kind === type),
+    (a) => source.includes(a.source) && type.includes(a.kind),
   );
 }
 
@@ -404,24 +408,9 @@ export function productSeries(
   return sumSeries(artifactsOf(items, filter).map((a) => a.series));
 }
 
-/**
- * Artifacts that count towards a headline number. With no type selected,
- * Helm chart pulls are left out: GitOps controllers poll charts
- * continuously, so they dominate totals while saying nothing about
- * adoption. Selecting the chart type explicitly still shows them.
- */
-export function headlineArtifacts<T extends Countable>(
-  artifacts: T[],
-  filter: ArtifactFilter,
-): T[] {
-  return filter.type === 'all'
-    ? artifacts.filter((a) => a.kind !== 'chart')
-    : artifacts;
-}
-
-/** True when the filter leaves chart pulls out of headline numbers. */
+/** True when the filter leaves Helm chart pulls out. */
 export function excludesCharts(filter: ArtifactFilter): boolean {
-  return filter.type === 'all';
+  return !filter.type.includes('chart');
 }
 
 export interface Comparison {
