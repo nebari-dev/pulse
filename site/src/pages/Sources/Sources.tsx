@@ -95,7 +95,8 @@ const DOCS: Row[] = [
     name: 'Visits and page views',
     counts:
       'HTML page views to browsers on each documentation site, at the Cloudflare edge, so cookie consent and ad blockers do not hide them. A visit is a page view not preceded by another from the same visitor in 30 minutes. Bots excluded.',
-    history: 'Daily; the last 30 days are refetched each run.',
+    history:
+      'Cloudflare keeps about 30 days; Pulse keeps every day since. The last 30 days are refetched each run.',
   },
   {
     name: 'Top pages',
