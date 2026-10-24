@@ -82,7 +82,7 @@ describe('Docs', () => {
     // Nebi has no data in this file yet, so its tile shows a dash.
     expect(screen.getByText('Nebi docs, visits')).toBeInTheDocument();
     expect(screen.getByText('no data collected yet')).toBeInTheDocument();
-    expect(screen.getByText('Data through')).toBeInTheDocument();
+    expect(screen.getByText(/^Data through/)).toBeInTheDocument();
     // Classic is charted and listed but has no tile.
     expect(
       screen.queryByText('Nebari Classic docs, visits'),

@@ -6,6 +6,7 @@ import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import ShareChart from '@/components/ShareChart';
+import StatRow from '@/components/StatRow';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
@@ -407,7 +408,7 @@ function Product() {
         />
       </PageHeader>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <StatRow>
         <StatTile
           label={`Downloads, ${rangeLabel.toLowerCase()}`}
           value={formatCompact(view.overall.current)}
@@ -435,7 +436,7 @@ function Product() {
             'none for this source'
           }
         />
-      </div>
+      </StatRow>
 
       {view.chartSeries.length > 0 && (
         <ChartCard
@@ -655,7 +656,7 @@ function Product() {
           >
             Repositories
           </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <StatRow>
             <StatTile
               label="Latest release"
               value={view.cadence.latest?.tag ?? '—'}
@@ -686,7 +687,7 @@ function Product() {
                   : '')
               }
             />
-          </div>
+          </StatRow>
 
           {view.openWork && (
             <ChartCard
@@ -871,7 +872,9 @@ function Product() {
                 </ul>
               }
             >
-              <div className="grid gap-4 sm:grid-cols-4">
+              <StatRow
+                note={`${formatDate(view.traffic.windowStart)} – ${formatDate(view.traffic.end)}`}
+              >
                 <StatTile
                   label="Unique visitors, 14 days"
                   value={formatCompact(view.traffic.uniqueViews)}
@@ -882,12 +885,7 @@ function Product() {
                   value={formatCompact(view.traffic.uniqueClones)}
                   hint={`${formatCompact(view.traffic.clones)} clones, incl. CI`}
                 />
-                <StatTile
-                  label="Window"
-                  value={formatDate(view.traffic.windowStart)}
-                  hint={`to ${formatDate(view.traffic.end)}`}
-                />
-              </div>
+              </StatRow>
               <div className="grid gap-6 lg:grid-cols-2">
                 {view.traffic.charts.map((c) => (
                   <TrendChart

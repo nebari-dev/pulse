@@ -5,6 +5,7 @@ import Leaderboard, { type LeaderboardRow } from '@/components/Leaderboard';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import ShareChart from '@/components/ShareChart';
+import StatRow from '@/components/StatRow';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
@@ -190,14 +191,12 @@ function Overview() {
       </PageHeader>
 
       {isPending || !view ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {['a', 'b', 'c', 'd'].map((k) => (
-            <Skeleton key={k} className="h-24" shape="block" />
-          ))}
-        </div>
+        <Skeleton className="h-28" shape="block" />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatRow
+            note={`Data through ${formatDate(view.asOf)}, collected ${formatDate(data.generated_at, true)}`}
+          >
             <StatTile
               label={`Downloads, ${rangeLabel.toLowerCase()}`}
               value={formatCompact(view.overall.current)}
@@ -229,12 +228,7 @@ function Overview() {
               value={String(view.count)}
               hint={`${view.count - view.packs} products, ${view.packs} packs`}
             />
-            <StatTile
-              label="Data through"
-              value={formatDate(view.asOf)}
-              hint={`collected ${formatDate(data.generated_at, true)}`}
-            />
-          </div>
+          </StatRow>
 
           <ChartCard
             title={trendTitle}

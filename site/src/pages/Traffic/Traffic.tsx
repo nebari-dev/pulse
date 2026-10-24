@@ -6,6 +6,7 @@ import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
+import StatRow from '@/components/StatRow';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
@@ -247,7 +248,7 @@ function Traffic() {
         {controls}
       </PageHeader>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatRow>
         <StatTile
           label="Unique visitors, last 14 days"
           value={formatCompact(view.uniqueViews.current)}
@@ -278,7 +279,7 @@ function Traffic() {
           value={formatCompact(view.clones)}
           hint={`${windowLabel} · includes CI and mirrors`}
         />
-      </div>
+      </StatRow>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {view.charts.map((c) => (
