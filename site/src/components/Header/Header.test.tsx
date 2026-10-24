@@ -54,13 +54,15 @@ describe('Header', () => {
       'Repos',
       'Traffic',
       'Docs',
+      'Data sources',
       'View source on GitHub',
       'Switch to dark mode',
     ]);
     expect(items[2]).toHaveAttribute('aria-current', 'page');
     expect(items[3]).toHaveAttribute('href', '/traffic?kind=pack');
-    expect(items[5]).toHaveAttribute('href', REPO_URL);
-    await userEvent.click(items[6]);
+    expect(items[5]).toHaveAttribute('href', '/sources?kind=pack');
+    expect(items[6]).toHaveAttribute('href', REPO_URL);
+    await userEvent.click(items[7]);
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 

@@ -1,6 +1,7 @@
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
@@ -9,7 +10,6 @@ import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -22,6 +22,7 @@ import {
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useProduct, useSummary } from '@/hooks/useSummary';
 import { markersFor } from '@/lib/anomalies';
+import { coverageLines, partialNote } from '@/lib/coverage';
 import {
   formatAgo,
   formatCompact,
@@ -56,6 +57,7 @@ import {
   breakdownRows,
   chartRows,
   compareArtifacts,
+  coverage,
   earliestDate,
   excludesCharts,
   hasDataIn,
@@ -295,6 +297,7 @@ function useProductView(
       weekly,
       artifacts,
       overall: compareArtifacts(artifacts, start, end),
+      coverage: coverage(artifacts, start, end, weekly),
       allKnown: total(series),
       chartRows: chartRows(bySource, start, end, weekly),
       markers: weekly ? [] : markersFor(between(series, start, end)),
@@ -435,22 +438,47 @@ function Product() {
       </div>
 
       {view.chartSeries.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {view.weekly ? 'Weekly' : 'Daily'} downloads by source
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TrendChart
-              rows={view.chartRows}
-              series={view.chartSeries}
-              weekly={view.weekly}
-              markers={view.markers}
-              title={`${product.name} downloads by source, ${rangeLabel}`}
-            />
-          </CardContent>
-        </Card>
+        <ChartCard
+          title={`${view.weekly ? 'Weekly' : 'Daily'} downloads by source`}
+          info={
+            <>
+              <p>
+                This product's downloads per {view.weekly ? 'week' : 'day'},
+                stacked by source so the top edge is the total.
+              </p>
+              <ul>
+                <li>
+                  Quay counts image and Helm chart pulls. Chart pulls are mostly
+                  GitOps controllers polling; uncheck Helm charts in the type
+                  filter to leave them out.
+                </li>
+                <li>
+                  conda-forge and GitHub report running totals; daily counts are
+                  the change between snapshots.
+                </li>
+                <li>
+                  A dashed line marks where a source's data begins; the shaded
+                  tail is not complete yet.
+                </li>
+                <li>
+                  Yellow dots are spike days, usually CI or mirrors. They stay
+                  in the totals.
+                </li>
+              </ul>
+            </>
+          }
+        >
+          <TrendChart
+            rows={view.chartRows}
+            series={view.chartSeries}
+            weekly={view.weekly}
+            markers={view.markers}
+            lines={coverageLines(view.coverage)}
+            partialFrom={view.coverage.partialFrom}
+            partialNote={partialNote(view.coverage, view.weekly)}
+            title={`${product.name} downloads by source, ${rangeLabel}`}
+          />
+        </ChartCard>
       )}
 
       <TableCard
@@ -462,7 +490,19 @@ function Product() {
             label="Search artifacts"
           />
         }
-        footnote='"All recorded" sums the daily counts Pulse has collected. "Upstream total" is the cumulative counter reported by GitHub or conda-forge, which predates collection; Quay and PyPI do not expose one.'
+        info={
+          <ul>
+            <li>
+              "All recorded" sums the daily counts Pulse has collected since it
+              started tracking each artifact.
+            </li>
+            <li>
+              "Upstream total" is the running counter GitHub or conda-forge
+              reports, which predates collection. Quay and PyPI do not expose
+              one.
+            </li>
+          </ul>
+        }
       >
         <Table aria-label={`${product.name} artifacts`}>
           <TableHeader>
@@ -498,62 +538,83 @@ function Product() {
       </TableCard>
 
       {view.versionShare.series.length > 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Version share over time, weekly</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <ShareChart
-              rows={view.versionShare.rows}
-              series={view.versionShare.series}
-              title={`${product.name} version share by week, ${rangeLabel}`}
-            />
-            <p className="text-muted-foreground text-xs">
-              How quickly a new release displaces the previous one, from
-              conda-forge and GitHub Releases. The five largest versions in the
-              period get a band; the rest are "Other". PyPI and Quay do not
-              report per-version counts.
-            </p>
-          </CardContent>
-        </Card>
+        <ChartCard
+          title="Version share over time, weekly"
+          info={
+            <ul>
+              <li>
+                How quickly a new release displaces the previous one, from
+                conda-forge and GitHub Releases.
+              </li>
+              <li>
+                The five largest versions in the period get a band; the rest are
+                "Other".
+              </li>
+              <li>PyPI and Quay do not report per-version counts.</li>
+            </ul>
+          }
+        >
+          <ShareChart
+            rows={view.versionShare.rows}
+            series={view.versionShare.series}
+            title={`${product.name} version share by week, ${rangeLabel}`}
+          />
+        </ChartCard>
       )}
 
       {(view.releases.length > 0 || view.adoption.length > 0) && (
         <div className="grid gap-6 lg:grid-cols-2">
           {view.adoption.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Version adoption, last 30 days</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                <ReleaseTable rows={view.adoption} label="Version" />
-                <p className="text-muted-foreground text-xs">
-                  Share of downloads in the last 30 days by version, from
-                  conda-forge and GitHub Releases. PyPI and Quay do not report
-                  per-version counts.
-                </p>
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Version adoption, last 30 days"
+              info={
+                <ul>
+                  <li>
+                    Share of the last 30 days of downloads by version, from
+                    conda-forge and GitHub Releases.
+                  </li>
+                  <li>PyPI and Quay do not report per-version counts.</li>
+                </ul>
+              }
+            >
+              <ReleaseTable rows={view.adoption} label="Version" />
+            </ChartCard>
           )}
           {view.releases.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Downloads by release, all time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ReleaseTable rows={view.releases} label="Release" />
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Downloads by release, all time"
+              info={
+                <ul>
+                  <li>
+                    Downloads of each GitHub release's assets, from the running
+                    counter GitHub reports, so it includes downloads from before
+                    Pulse started collecting.
+                  </li>
+                  <li>The twelve largest releases are listed.</li>
+                </ul>
+              }
+            >
+              <ReleaseTable rows={view.releases} label="Release" />
+            </ChartCard>
           )}
           {view.platforms.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Downloads by platform</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ReleaseTable rows={view.platforms} label="Platform" />
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Downloads by platform"
+              info={
+                <ul>
+                  <li>
+                    GitHub release asset downloads, grouped by the operating
+                    system and architecture in each file name, all time.
+                  </li>
+                  <li>
+                    Assets without a platform in the name (checksums, source
+                    archives) are left out.
+                  </li>
+                </ul>
+              }
+            >
+              <ReleaseTable rows={view.platforms} label="Platform" />
+            </ChartCard>
           )}
         </div>
       )}
@@ -561,24 +622,24 @@ function Product() {
       {view.breakdowns.length > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
           {view.breakdowns.map((b) => (
-            <Card key={b.dimension}>
-              <CardHeader>
-                <CardTitle>
-                  PyPI downloads by {BREAKDOWN_LABEL[b.dimension].toLowerCase()}
-                  , {rangeLabel.toLowerCase()}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                <ReleaseTable
-                  rows={b.rows}
-                  label={BREAKDOWN_LABEL[b.dimension]}
-                />
-                <p className="text-muted-foreground text-xs">
-                  As reported by pypistats. "unknown" is downloads whose
-                  installer did not say.
-                </p>
-              </CardContent>
-            </Card>
+            <ChartCard
+              key={b.dimension}
+              title={`PyPI downloads by ${BREAKDOWN_LABEL[b.dimension].toLowerCase()}, ${rangeLabel.toLowerCase()}`}
+              info={
+                <ul>
+                  <li>
+                    As reported by pypistats, which reads PyPI's public download
+                    logs, mirrors excluded.
+                  </li>
+                  <li>"unknown" is downloads whose installer did not say.</li>
+                </ul>
+              }
+            >
+              <ReleaseTable
+                rows={b.rows}
+                label={BREAKDOWN_LABEL[b.dimension]}
+              />
+            </ChartCard>
           ))}
         </div>
       )}
@@ -628,55 +689,82 @@ function Product() {
           </div>
 
           {view.openWork && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Open issues and pull requests</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TrendChart
-                  rows={view.openWork}
-                  series={[
-                    {
-                      key: 'open_issues',
-                      label: 'Open issues',
-                      color: 'var(--chart-1)',
-                    },
-                    {
-                      key: 'open_prs',
-                      label: 'Open PRs',
-                      color: 'var(--chart-3)',
-                    },
-                  ]}
-                  stacked={false}
-                  title={`${product.name} open issues and pull requests, daily`}
-                />
-                <p className="mt-2 text-muted-foreground text-xs">
-                  Daily snapshots since{' '}
-                  {formatDate(view.openWork[0]?.date ?? view.asOf, true)},
-                  summed across the product's repos.
-                </p>
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Open issues and pull requests"
+              info={
+                <ul>
+                  <li>
+                    How many issues and pull requests were open on each day,
+                    summed across the product's repos. A rising line is a
+                    growing backlog.
+                  </li>
+                  <li>
+                    Each point is a daily snapshot, so the history starts when
+                    Pulse began collecting.
+                  </li>
+                </ul>
+              }
+              footnote={`Daily snapshots since ${formatDate(view.openWork[0]?.date ?? view.asOf, true)}.`}
+            >
+              <TrendChart
+                rows={view.openWork}
+                series={[
+                  {
+                    key: 'open_issues',
+                    label: 'Open issues',
+                    color: 'var(--chart-1)',
+                  },
+                  {
+                    key: 'open_prs',
+                    label: 'Open PRs',
+                    color: 'var(--chart-3)',
+                  },
+                ]}
+                stacked={false}
+                title={`${product.name} open issues and pull requests, daily`}
+              />
+            </ChartCard>
           )}
 
           {view.stars && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Stars over time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TrendChart
-                  rows={view.stars.rows}
-                  series={[
-                    { key: 'stars', label: 'Stars', color: 'var(--chart-1)' },
-                  ]}
-                  title={`${product.name} stars, ${rangeLabel}`}
-                />
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Stars over time"
+              info={
+                <ul>
+                  <li>
+                    Total stars across the product's repos. History comes from
+                    each star's own timestamp, so it reaches back before Pulse
+                    started.
+                  </li>
+                  <li>
+                    Stars that were later removed are not in the history; the
+                    latest point is the current count.
+                  </li>
+                </ul>
+              }
+            >
+              <TrendChart
+                rows={view.stars.rows}
+                series={[
+                  { key: 'stars', label: 'Stars', color: 'var(--chart-1)' },
+                ]}
+                title={`${product.name} stars, ${rangeLabel}`}
+              />
+            </ChartCard>
           )}
 
-          <TableCard title="Repositories">
+          <TableCard
+            title="Repositories"
+            info={
+              <ul>
+                <li>The latest daily snapshot of each repo.</li>
+                <li>
+                  "Merged, 30d" is pull requests merged in the last 30 days.
+                </li>
+                <li>A dash means GitHub did not answer, not zero.</li>
+              </ul>
+            }
+          >
             <Table aria-label={`${product.name} repositories`}>
               <TableHeader>
                 <TableRow>
@@ -716,81 +804,103 @@ function Product() {
           </TableCard>
 
           {view.feed.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent releases</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ol className="flex flex-col divide-y divide-border">
-                  {view.feed.map((r) => (
-                    <li
-                      key={`${r.repo}:${r.tag}`}
-                      className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm"
+            <ChartCard
+              title="Recent releases"
+              info={
+                <ul>
+                  <li>
+                    The latest eight GitHub releases across the product's repos.
+                  </li>
+                  <li>
+                    Prereleases are listed here but left out of the release
+                    counts and cadence.
+                  </li>
+                </ul>
+              }
+            >
+              <ol className="flex flex-col divide-y divide-border">
+                {view.feed.map((r) => (
+                  <li
+                    key={`${r.repo}:${r.tag}`}
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm"
+                  >
+                    <span className="w-24 shrink-0 text-muted-foreground tabular-nums">
+                      {formatDate(r.date, true)}
+                    </span>
+                    <a
+                      href={releaseUrl(r.repo, r.tag)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
                     >
-                      <span className="w-24 shrink-0 text-muted-foreground tabular-nums">
-                        {formatDate(r.date, true)}
+                      {r.tag}
+                      <ExternalLink className="size-3" aria-hidden="true" />
+                    </a>
+                    {product.repos.length > 1 && (
+                      <span className="text-muted-foreground text-xs">
+                        {repoName(r.repo)}
                       </span>
-                      <a
-                        href={releaseUrl(r.repo, r.tag)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-xs underline-offset-4 hover:underline"
-                      >
-                        {r.tag}
-                        <ExternalLink className="size-3" aria-hidden="true" />
-                      </a>
-                      {product.repos.length > 1 && (
-                        <span className="text-muted-foreground text-xs">
-                          {repoName(r.repo)}
-                        </span>
-                      )}
-                      {r.prerelease && (
-                        <Badge variant="secondary">prerelease</Badge>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </CardContent>
-            </Card>
+                    )}
+                    {r.prerelease && (
+                      <Badge variant="secondary">prerelease</Badge>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </ChartCard>
           )}
 
           {view.traffic && (
-            <Card>
-              <CardHeader>
-                <CardTitle>GitHub traffic</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="grid gap-4 sm:grid-cols-4">
-                  <StatTile
-                    label="Unique visitors, 14 days"
-                    value={formatCompact(view.traffic.uniqueViews)}
-                    hint={`${formatCompact(view.traffic.views)} views in all`}
+            <ChartCard
+              title="GitHub traffic"
+              info={
+                <ul>
+                  <li>
+                    Views and clones of the product's repos, as GitHub reports
+                    them. GitHub keeps only 14 days, so the tiles cover that
+                    window.
+                  </li>
+                  <li>
+                    Clones include CI checkouts and mirrors, so unique cloners
+                    is the better adoption signal.
+                  </li>
+                  <li>
+                    Unique counts are per day; GitHub does not dedupe across
+                    days.
+                  </li>
+                </ul>
+              }
+            >
+              <div className="grid gap-4 sm:grid-cols-4">
+                <StatTile
+                  label="Unique visitors, 14 days"
+                  value={formatCompact(view.traffic.uniqueViews)}
+                  hint={`${formatCompact(view.traffic.views)} views in all`}
+                />
+                <StatTile
+                  label="Unique cloners, 14 days"
+                  value={formatCompact(view.traffic.uniqueClones)}
+                  hint={`${formatCompact(view.traffic.clones)} clones, incl. CI`}
+                />
+                <StatTile
+                  label="Window"
+                  value={formatDate(view.traffic.windowStart)}
+                  hint={`to ${formatDate(view.traffic.end)}`}
+                />
+              </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                {view.traffic.charts.map((c) => (
+                  <TrendChart
+                    key={c.title}
+                    rows={c.rows}
+                    series={c.series}
+                    stacked={false}
+                    markers={c.markers}
+                    title={`${product.name} GitHub ${c.title.toLowerCase()}`}
                   />
-                  <StatTile
-                    label="Unique cloners, 14 days"
-                    value={formatCompact(view.traffic.uniqueClones)}
-                    hint={`${formatCompact(view.traffic.clones)} clones, incl. CI`}
-                  />
-                  <StatTile
-                    label="Window"
-                    value={formatDate(view.traffic.windowStart)}
-                    hint={`to ${formatDate(view.traffic.end)}`}
-                  />
-                </div>
-                <div className="grid gap-6 lg:grid-cols-2">
-                  {view.traffic.charts.map((c) => (
-                    <TrendChart
-                      key={c.title}
-                      rows={c.rows}
-                      series={c.series}
-                      stacked={false}
-                      markers={c.markers}
-                      title={`${product.name} GitHub ${c.title.toLowerCase()}`}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                ))}
+              </div>
+            </ChartCard>
           )}
         </section>
       )}

@@ -5,12 +5,15 @@ import {
   artifactsOf,
   breakdownRows,
   bucketWeekly,
+  type Countable,
   chartRows,
   compare,
   compareArtifacts,
+  coverage,
   excludesCharts,
   fillDaily,
   platformOf,
+  type Source,
   shareRows,
   sumSeries,
   versionShareInputs,
@@ -290,5 +293,56 @@ describe('versionShareInputs', () => {
         series: [{ date: '2026-10-05', count: 4 }],
       },
     ]);
+  });
+});
+
+describe('coverage', () => {
+  const art = (source: Source, from: string, to: string): Countable => ({
+    source,
+    kind: 'package',
+    series: [
+      { date: from, count: 1 },
+      { date: to, count: 1 },
+    ],
+  });
+
+  it('marks sources that start inside the window and lagging ones', () => {
+    const cov = coverage(
+      [
+        art('quay', '2026-07-01', '2026-10-23'),
+        art('pypi', '2026-10-01', '2026-10-23'),
+        art('conda', '2026-10-10', '2026-10-24'),
+        art('github_releases', '2026-10-10', '2026-10-24'),
+      ],
+      '2026-09-25',
+      '2026-10-24',
+    );
+    expect(cov.starts).toEqual([
+      { date: '2026-10-01', sources: ['pypi'] },
+      { date: '2026-10-10', sources: ['conda', 'github_releases'] },
+    ]);
+    expect(cov.lagging).toEqual(['quay', 'pypi']);
+    expect(cov.partialFrom).toBe('2026-10-24');
+  });
+
+  it('is complete when every source reaches the end', () => {
+    const cov = coverage(
+      [art('quay', '2026-07-01', '2026-10-24')],
+      '2026-09-25',
+      '2026-10-24',
+    );
+    expect(cov).toEqual({ starts: [], partialFrom: null, lagging: [] });
+  });
+
+  it('treats an unfinished week as incomplete when weekly', () => {
+    // 2026-10-24 is a Saturday.
+    const cov = coverage(
+      [art('quay', '2026-01-01', '2026-10-24')],
+      '2026-01-01',
+      '2026-10-24',
+      true,
+    );
+    expect(cov.partialFrom).toBe('2026-10-19');
+    expect(cov.lagging).toEqual([]);
   });
 });

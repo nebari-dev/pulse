@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
@@ -8,7 +9,6 @@ import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart from '@/components/TrendChart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -265,85 +265,101 @@ function Repos() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>New contributors per quarter</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TrendChart
-                  rows={view.charts.newByQuarter}
-                  series={[
-                    {
-                      key: 'count',
-                      label: 'First-time contributors',
-                      color: 'var(--chart-1)',
-                    },
-                  ]}
-                  bucket="quarter"
-                  title="First-time contributors per quarter across all tracked repos"
-                />
-                <p className="mt-2 text-muted-foreground text-xs">
-                  A person counts once, in the quarter of their first commit to
-                  any tracked repo. The current quarter is still filling.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Active contributors per month</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TrendChart
-                  rows={view.charts.monthly}
-                  series={[
-                    {
-                      key: 'authors',
-                      label: 'Authors',
-                      color: 'var(--chart-4)',
-                    },
-                  ]}
-                  bucket="month"
-                  title="Unique commit authors per month across all tracked repos"
-                />
-                <p className="mt-2 text-muted-foreground text-xs">
-                  Commit authors on each repo's default branch, bots excluded.
-                  The current month is still filling.
-                </p>
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="New contributors per quarter"
+              info={
+                <ul>
+                  <li>
+                    People committing to a tracked repo for the first time. A
+                    person counts once, in the quarter of their first commit to
+                    any tracked repo.
+                  </li>
+                  <li>Commits on each repo's default branch; bots excluded.</li>
+                  <li>The current quarter is still filling.</li>
+                </ul>
+              }
+            >
+              <TrendChart
+                rows={view.charts.newByQuarter}
+                series={[
+                  {
+                    key: 'count',
+                    label: 'First-time contributors',
+                    color: 'var(--chart-1)',
+                  },
+                ]}
+                bucket="quarter"
+                title="First-time contributors per quarter across all tracked repos"
+              />
+            </ChartCard>
+            <ChartCard
+              title="Active contributors per month"
+              info={
+                <ul>
+                  <li>
+                    Unique commit authors per month across all tracked repos, on
+                    each repo's default branch; bots excluded.
+                  </li>
+                  <li>
+                    Authors are matched by GitHub login, or by email when a
+                    commit is not linked to an account.
+                  </li>
+                  <li>The current month is still filling.</li>
+                </ul>
+              }
+            >
+              <TrendChart
+                rows={view.charts.monthly}
+                series={[
+                  {
+                    key: 'authors',
+                    label: 'Authors',
+                    color: 'var(--chart-4)',
+                  },
+                ]}
+                bucket="month"
+                title="Unique commit authors per month across all tracked repos"
+              />
+            </ChartCard>
           </div>
 
           {view.openWork && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Open issues and pull requests over time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TrendChart
-                  rows={view.openWork.rows}
-                  series={[
-                    {
-                      key: 'open_issues',
-                      label: 'Open issues',
-                      color: 'var(--chart-1)',
-                    },
-                    {
-                      key: 'open_prs',
-                      label: 'Open PRs',
-                      color: 'var(--chart-3)',
-                    },
-                  ]}
-                  stacked={false}
-                  title="Open issues and pull requests across all tracked repos, daily"
-                />
-                <p className="mt-2 text-muted-foreground text-xs">
-                  Daily snapshots since {formatDate(view.openWork.since, true)}
-                  {view.openWork.days < 14 &&
-                    ` (${view.openWork.days} ${view.openWork.days === 1 ? 'day' : 'days'} so far, so the line is short, not flat)`}
-                  . Each repo carries its last snapshot forward.
-                </p>
-              </CardContent>
-            </Card>
+            <ChartCard
+              title="Open issues and pull requests over time"
+              info={
+                <ul>
+                  <li>
+                    How many issues and pull requests were open on each day,
+                    summed across tracked repos. A rising line is a growing
+                    backlog.
+                  </li>
+                  <li>
+                    Each point is a daily snapshot, so the history starts when
+                    Pulse began collecting. Each repo carries its last snapshot
+                    forward.
+                  </li>
+                </ul>
+              }
+              footnote={`Daily snapshots since ${formatDate(view.openWork.since, true)}${view.openWork.days < 14 ? ` (${view.openWork.days} ${view.openWork.days === 1 ? 'day' : 'days'} so far, so the line is short, not flat)` : ''}.`}
+            >
+              <TrendChart
+                rows={view.openWork.rows}
+                series={[
+                  {
+                    key: 'open_issues',
+                    label: 'Open issues',
+                    color: 'var(--chart-1)',
+                  },
+                  {
+                    key: 'open_prs',
+                    label: 'Open PRs',
+                    color: 'var(--chart-3)',
+                  },
+                ]}
+                stacked={false}
+                title="Open issues and pull requests across all tracked repos, daily"
+              />
+            </ChartCard>
           )}
 
           <TableCard
@@ -355,7 +371,21 @@ function Repos() {
                 label="Search repos"
               />
             }
-            footnote={`Snapshot taken ${formatDate(view.asOf, true)}. "+30d" is stars gained in the last 30 days, from each star's own timestamp. Repos with no push in 90 days are marked.`}
+            info={
+              <ul>
+                <li>The latest daily snapshot of each repo.</li>
+                <li>
+                  "+30d" is stars gained in the last 30 days, from each star's
+                  own timestamp.
+                </li>
+                <li>
+                  "Merged, 30d" is pull requests merged in the last 30 days.
+                </li>
+                <li>Repos with no push in 90 days are marked.</li>
+                <li>A dash means GitHub did not answer, not zero.</li>
+              </ul>
+            }
+            footnote={`Snapshot taken ${formatDate(view.asOf, true)}.`}
           >
             <Table aria-label="Repository health">
               <TableHeader>

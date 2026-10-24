@@ -488,6 +488,66 @@ export function hasDataIn(
   return series.some((p) => p.date >= start && p.date <= end && p.count > 0);
 }
 
+export interface Coverage {
+  /** Sources whose data begins inside the window, grouped by that date. */
+  starts: Array<{ date: string; sources: Source[] }>;
+  /** First row (day, or week when weekly) that is not complete, or null. */
+  partialFrom: string | null;
+  /** Sources that have not reported the days from `partialFrom` on. */
+  lagging: Source[];
+}
+
+/**
+ * When each source's data begins and ends relative to the window, so a chart
+ * can mark where a band starts because collection did (not adoption) and
+ * which trailing days are still incomplete. When weekly, dates are week
+ * starts and a week that has not ended yet is incomplete too.
+ */
+export function coverage(
+  items: Countable[],
+  start: string,
+  end: string,
+  weekly = false,
+): Coverage {
+  const first = new Map<Source, string>();
+  const last = new Map<Source, string>();
+  for (const { source, series } of items) {
+    const a = series[0]?.date;
+    const b = series.at(-1)?.date;
+    if (!a || !b) continue;
+    if (a < (first.get(source) ?? '9999')) first.set(source, a);
+    if (b > (last.get(source) ?? '')) last.set(source, b);
+  }
+  const bucket = (d: string) => (weekly ? weekStart(d) : d);
+  const starts = new Map<string, Source[]>();
+  const lagging: Source[] = [];
+  let partial: string | null = null;
+  for (const source of SOURCES) {
+    const a = first.get(source);
+    const b = last.get(source);
+    if (!a || !b) continue;
+    if (a > start) {
+      const key = bucket(a);
+      starts.set(key, [...(starts.get(key) ?? []), source]);
+    }
+    if (b < end) {
+      lagging.push(source);
+      const next = addDays(b, 1);
+      if (!partial || next < partial) partial = next;
+    }
+  }
+  // A week that has not reached its Sunday is still filling.
+  const endsWeek = diffDays(weekStart(end), end) === 6;
+  if (weekly && !endsWeek && (!partial || end < partial)) partial = end;
+  return {
+    starts: [...starts]
+      .map(([date, sources]) => ({ date, sources }))
+      .sort((x, y) => (x.date < y.date ? -1 : 1)),
+    partialFrom: partial ? bucket(partial) : null,
+    lagging,
+  };
+}
+
 /** Rows for a multi-series chart: one row per bucket with a key per series. */
 export function chartRows(
   seriesByKey: Record<string, Point[]>,

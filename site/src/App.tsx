@@ -8,6 +8,7 @@ import Overview from '@/pages/Overview';
 import Product from '@/pages/Product';
 import Releases from '@/pages/Releases';
 import Repos from '@/pages/Repos';
+import Sources from '@/pages/Sources';
 import Traffic from '@/pages/Traffic';
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/repos" element={<Repos />} />
                 <Route path="/traffic" element={<Traffic />} />
                 <Route path="/docs" element={<Docs />} />
+                <Route path="/sources" element={<Sources />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

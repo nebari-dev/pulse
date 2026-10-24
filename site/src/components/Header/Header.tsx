@@ -1,4 +1,4 @@
-import { Activity, Github, Menu, Moon, Sun } from 'lucide-react';
+import { Activity, CircleHelp, Github, Menu, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import logoDark from '@/assets/nebari-logo_dark.svg';
 import logoLight from '@/assets/nebari-logo_light.svg';
@@ -82,6 +82,15 @@ function Header() {
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Data sources and how to read the charts"
+          aria-current={pathname === '/sources' ? 'page' : undefined}
+          render={<Link to={{ pathname: '/sources', search }} />}
+        >
+          <CircleHelp />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label="View source on GitHub"
           render={<a href={REPO_URL} target="_blank" rel="noreferrer" />}
         >
@@ -121,6 +130,14 @@ function Header() {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
+              <DropdownMenuItem
+                aria-current={pathname === '/sources' ? 'page' : undefined}
+                className="aria-[current=page]:font-semibold"
+                render={<Link to={{ pathname: '/sources', search }} />}
+              >
+                <CircleHelp aria-hidden="true" />
+                Data sources
+              </DropdownMenuItem>
               <DropdownMenuItem
                 render={<a href={REPO_URL} target="_blank" rel="noreferrer" />}
               >

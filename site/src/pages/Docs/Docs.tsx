@@ -1,12 +1,13 @@
 import { ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
+import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -229,31 +230,46 @@ function Docs() {
         />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {view.weekly ? 'Weekly' : 'Daily'} visits by site
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TrendChart
-            rows={view.chartRows}
-            series={view.chartSeries}
-            weekly={view.weekly}
-            stacked={false}
-            markers={view.markers}
-            title={`${view.weekly ? 'Weekly' : 'Daily'} docs visits by site, ${rangeLabel}`}
-          />
-          <p className="mt-2 text-muted-foreground text-xs">
-            A visit is a page view not preceded by another from the same visitor
-            within the last 30 minutes, as Cloudflare counts it. HTML responses
-            only, bots excluded.
-          </p>
-        </CardContent>
-      </Card>
+      <ChartCard
+        title={`${view.weekly ? 'Weekly' : 'Daily'} visits by site`}
+        info={
+          <ul>
+            <li>
+              Visits per {view.weekly ? 'week' : 'day'} to each documentation
+              site, counted by Cloudflare at the edge, so cookie consent and ad
+              blockers do not hide them.
+            </li>
+            <li>
+              A visit is a page view not preceded by another from the same
+              visitor in the last 30 minutes. HTML pages only, bots excluded.
+            </li>
+            <li>
+              Lines overlap rather than stack; hover for each site's number.
+            </li>
+          </ul>
+        }
+      >
+        <TrendChart
+          rows={view.chartRows}
+          series={view.chartSeries}
+          weekly={view.weekly}
+          stacked={false}
+          markers={view.markers}
+          title={`${view.weekly ? 'Weekly' : 'Daily'} docs visits by site, ${rangeLabel}`}
+        />
+      </ChartCard>
 
       <TableCard
         title="Top pages, last 7 days"
+        info={
+          <ul>
+            <li>
+              Page views per path over the last 7 days, the top 200 per site,
+              from a snapshot taken daily.
+            </li>
+            <li>Share is of the largest page in the list.</li>
+          </ul>
+        }
         controls={
           <SearchBox
             value={params.q}

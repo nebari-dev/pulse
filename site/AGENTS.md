@@ -35,6 +35,7 @@ pulse-dashboard/
 │   │   ├── summary.ts     # summary.json types + pure helpers (windows, series, deltas, search)
 │   │   ├── repos.ts       # release cadence, repo health and traffic helpers
 │   │   ├── anomalies.ts   # single-day spike detection + chart marker notes
+│   │   ├── coverage.ts    # captions for summary.coverage: source start lines, incomplete tail
 │   │   └── format.ts
 │   ├── hooks/
 │   │   ├── useSummary.ts         # useSummary (index), useRepos, useProduct(id), useDocs over /data/*.json
@@ -44,6 +45,8 @@ pulse-dashboard/
 │   │   ├── Header/        # brand, section nav, GitHub link, theme toggle; one hamburger below sm
 │   │   ├── PageHeader/    # title + description + page-wide controls row used by every page
 │   │   ├── TableCard/     # card around one table; that table's controls sit top right
+│   │   ├── ChartCard/     # card around one chart; title + (i) info popover + footnote
+│   │   ├── InfoPopover/   # the (i) next to a card title: how to read it, links to /sources
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── MultiSelect/   # checkable dropdown used by every filter; never empty
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
@@ -55,6 +58,7 @@ pulse-dashboard/
 │   │   ├── Repos/         # /repos — health table per repo
 │   │   ├── Traffic/       # /traffic — GitHub views/clones
 │   │   ├── Docs/          # /docs — documentation site visits and top pages (Cloudflare)
+│   │   ├── Sources/       # /sources — where each number comes from; linked from the header (?) and every info popover
 │   │   └── NotFound/
 │   │       ├── NotFound.tsx
 │   │       ├── NotFound.test.tsx
@@ -251,3 +255,13 @@ Claude Code skills for this project:
 | Fetch directly in components                                              | Create a hook in `src/hooks/` using TanStack Query                                                                                 |
 | Put a component in a flat file                                            | Give it its own PascalCase directory with a test file and `index.ts`                                                               |
 | Import from the component file directly                                   | Import from the folder (`@/components/UserCard`, not `@/components/UserCard/UserCard`)                                             |
+
+### Explaining charts
+
+Every chart and table card says how to read it behind an (i) next to its
+title: pass `info` to `ChartCard` or `TableCard`. Keep the visible
+`footnote` for the data's state (snapshot dates, "Showing 50 of 120"), and
+put definitions and caveats in `info`. Anything longer belongs on the Data
+sources page (`pages/Sources`). Charts of download sources pass
+`coverage(...)` to `TrendChart` (`lines`, `partialFrom`, `partialNote`) so
+missing history and incomplete days are drawn rather than explained.

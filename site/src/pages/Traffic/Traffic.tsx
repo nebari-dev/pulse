@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
@@ -8,7 +9,7 @@ import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -281,20 +282,35 @@ function Traffic() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {view.charts.map((c) => (
-          <Card key={c.title}>
-            <CardHeader>
-              <CardTitle>Daily {c.title.toLowerCase()}, all history</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TrendChart
-                rows={c.rows}
-                series={c.series}
-                stacked={false}
-                markers={c.markers}
-                title={`Daily GitHub ${c.title.toLowerCase()}`}
-              />
-            </CardContent>
-          </Card>
+          <ChartCard
+            key={c.title}
+            title={`Daily ${c.title.toLowerCase()}, all history`}
+            info={
+              <ul>
+                <li>
+                  Every day Pulse has collected, summed across tracked repos.
+                  GitHub keeps only 14 days, so history starts when collection
+                  did.
+                </li>
+                <li>
+                  "Unique" is unique per day; GitHub does not dedupe across
+                  days, so summing days overcounts people.
+                </li>
+                <li>
+                  Clones include CI checkouts and mirrors. Only repos Pulse's
+                  token can push to report traffic.
+                </li>
+              </ul>
+            }
+          >
+            <TrendChart
+              rows={c.rows}
+              series={c.series}
+              stacked={false}
+              markers={c.markers}
+              title={`Daily GitHub ${c.title.toLowerCase()}`}
+            />
+          </ChartCard>
         ))}
       </div>
 
@@ -307,7 +323,17 @@ function Traffic() {
             label="Search repos"
           />
         }
-        footnote={`Window ${windowLabel}. Clone counts include CI checkouts and mirrors, so unique cloners is the better adoption signal.`}
+        info={
+          <ul>
+            <li>The last 14 days GitHub reports for each repo.</li>
+            <li>
+              Clone counts include CI checkouts and mirrors, so unique cloners
+              is the better adoption signal.
+            </li>
+            <li>The trend is unique visitors per day.</li>
+          </ul>
+        }
+        footnote={`Window ${windowLabel}.`}
       >
         <Table aria-label="Traffic by repository, last 14 days">
           <TableHeader>
