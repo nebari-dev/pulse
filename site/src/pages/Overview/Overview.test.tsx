@@ -33,7 +33,9 @@ describe('Overview', () => {
     expect(
       screen.getByRole('combobox', { name: 'Artifact type' }),
     ).toHaveTextContent('All but Helm charts');
-    expect(screen.getByText(/^Data through/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'About: About these figures' }),
+    ).toBeInTheDocument();
   });
 
   it("charts each product's share of the weekly total", async () => {

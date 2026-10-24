@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { REPO_URL } from '@/components/Header';
 import PageHeader from '@/components/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -141,6 +140,11 @@ function countsFrom(summary: Summary): Partial<Record<Source, string>> {
   return from;
 }
 
+/** Each section leads with its heading; no card around it. */
+function SectionTitle({ children }: { children: ReactNode }) {
+  return <h2 className="font-semibold text-lg tracking-tight">{children}</h2>;
+}
+
 function SourceTable({
   title,
   rows,
@@ -151,11 +155,9 @@ function SourceTable({
   from?: Partial<Record<Source, string>>;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <section className="flex flex-col gap-3">
+      <SectionTitle>{title}</SectionTitle>
+      <div className="overflow-x-auto">
         <Table aria-label={title}>
           <TableHeader>
             <TableRow>
@@ -188,8 +190,8 @@ function SourceTable({
             ))}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 
@@ -201,27 +203,23 @@ function Sources() {
   const { data } = useSummary();
   const from = data ? countsFrom(data) : {};
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title="Data sources"
         description="Where every number comes from, how much history each source has, and how to read the charts. Pulse collects once a day at 06:20 UTC; all dates are UTC."
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Reading the charts</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[12rem_1fr]">
-            {READING.map(([term, text]) => (
-              <div key={term} className="contents">
-                <dt className="font-medium">{term}</dt>
-                <dd className="text-muted-foreground">{text}</dd>
-              </div>
-            ))}
-          </dl>
-        </CardContent>
-      </Card>
+      <section className="flex flex-col gap-3">
+        <SectionTitle>Reading the charts</SectionTitle>
+        <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[12rem_1fr]">
+          {READING.map(([term, text]) => (
+            <div key={term} className="contents">
+              <dt className="font-medium">{term}</dt>
+              <dd className="text-muted-foreground">{text}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <SourceTable title="Downloads" rows={DOWNLOADS} from={from} />
       <SourceTable title="GitHub repositories" rows={REPOS} />

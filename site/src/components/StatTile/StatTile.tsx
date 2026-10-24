@@ -29,22 +29,22 @@ function StatTile({ label, value, delta, hint, className }: StatTileProps) {
   return (
     <div
       className={cn(
-        'flex min-w-0 flex-col gap-1 border-border border-t border-l px-(--card-spacing) py-3',
+        'flex min-w-0 flex-col gap-0.5 border-border border-t border-l px-(--card-spacing) py-2.5',
         className,
       )}
     >
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="font-semibold text-2xl tracking-tight">{value}</p>
+      <p className="text-muted-foreground text-xs">{label}</p>
+      <p className="font-semibold text-xl tracking-tight">{value}</p>
       {direction !== null ? (
         <p
           className={cn(
-            'flex items-center gap-1 text-sm',
+            'flex items-center gap-1 text-xs',
             direction === 'up' && 'text-success-foreground',
             direction === 'down' && 'text-destructive-foreground',
             direction === 'flat' && 'text-muted-foreground',
           )}
         >
-          <Icon className="size-4 shrink-0" aria-hidden="true" />
+          <Icon className="size-3.5 shrink-0" aria-hidden="true" />
           <span>
             {formatDelta(delta ?? null)}
             <span className="sr-only">
@@ -58,7 +58,7 @@ function StatTile({ label, value, delta, hint, className }: StatTileProps) {
           </span>
         </p>
       ) : (
-        hint && <p className="text-muted-foreground text-sm">{hint}</p>
+        hint && <p className="text-muted-foreground text-xs">{hint}</p>
       )}
     </div>
   );

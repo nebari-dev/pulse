@@ -195,7 +195,12 @@ function Overview() {
       ) : (
         <>
           <StatRow
-            note={`Data through ${formatDate(view.asOf)}, collected ${formatDate(data.generated_at, true)}`}
+            info={
+              <p>
+                Data through {formatDate(view.asOf)}, collected{' '}
+                {formatDate(data.generated_at, true)}.
+              </p>
+            }
           >
             <StatTile
               label={`Downloads, ${rangeLabel.toLowerCase()}`}

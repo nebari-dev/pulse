@@ -873,7 +873,12 @@ function Product() {
               }
             >
               <StatRow
-                note={`${formatDate(view.traffic.windowStart)} – ${formatDate(view.traffic.end)}`}
+                info={
+                  <p>
+                    {formatDate(view.traffic.windowStart)} –{' '}
+                    {formatDate(view.traffic.end)}, the 14 days GitHub reports.
+                  </p>
+                }
               >
                 <StatTile
                   label="Unique visitors, 14 days"

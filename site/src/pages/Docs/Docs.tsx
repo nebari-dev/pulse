@@ -214,7 +214,12 @@ function Docs() {
       {header}
 
       <StatRow
-        note={`Data through ${formatDate(view.asOf)}, collected ${formatDate(data.generated_at, true)}`}
+        info={
+          <p>
+            Data through {formatDate(view.asOf)}, collected{' '}
+            {formatDate(data.generated_at, true)}.
+          </p>
+        }
       >
         {view.tiles.map(({ id, name, visits, pageviews }) =>
           visits && pageviews ? (

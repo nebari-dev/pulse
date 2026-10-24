@@ -73,7 +73,7 @@ const docs: DocsFile = {
 describe('Docs', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('shows four tiles: Nebari, Software Packs and Nebi docs, data through', async () => {
+  it('shows tiles for Nebari, Software Packs and Nebi docs, provenance behind (i)', async () => {
     stub(docs);
     renderPage();
     expect(await screen.findByText('Nebari docs, visits')).toBeInTheDocument();
@@ -82,7 +82,9 @@ describe('Docs', () => {
     // Nebi has no data in this file yet, so its tile shows a dash.
     expect(screen.getByText('Nebi docs, visits')).toBeInTheDocument();
     expect(screen.getByText('no data collected yet')).toBeInTheDocument();
-    expect(screen.getByText(/^Data through/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'About: About these figures' }),
+    ).toBeInTheDocument();
     // Classic is charted and listed but has no tile.
     expect(
       screen.queryByText('Nebari Classic docs, visits'),

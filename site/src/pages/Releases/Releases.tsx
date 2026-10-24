@@ -167,7 +167,11 @@ function Releases() {
       ) : (
         <>
           <StatRow
-            note={`Data through ${formatDate(view.asOf)}, release dates from GitHub`}
+            info={
+              <p>
+                Data through {formatDate(view.asOf)}, release dates from GitHub.
+              </p>
+            }
           >
             <StatTile
               label={`Releases, ${rangeLabel.toLowerCase()}`}
