@@ -59,7 +59,6 @@ import {
   earliestDate,
   excludesCharts,
   hasDataIn,
-  headlineArtifacts,
   KIND_LABEL,
   type LatestItem,
   latestDate,
@@ -295,11 +294,7 @@ function useProductView(
       end,
       weekly,
       artifacts,
-      overall: compareArtifacts(
-        headlineArtifacts(artifacts, params),
-        start,
-        end,
-      ),
+      overall: compareArtifacts(artifacts, start, end),
       allKnown: total(series),
       chartRows: chartRows(bySource, start, end, weekly),
       markers: weekly ? [] : markersFor(between(series, start, end)),
@@ -420,7 +415,7 @@ function Product() {
               : 'vs. previous period') +
             (excludesCharts(params) &&
             view.artifacts.some((a) => a.kind === 'chart')
-              ? ', excluding chart polls'
+              ? ', Helm charts not included'
               : '')
           }
         />

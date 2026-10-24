@@ -1,13 +1,15 @@
 import {
   type Artifact,
+  type ArtifactFilter,
   addDays,
+  artifactsOf,
   breakdownRows,
   bucketWeekly,
   chartRows,
   compare,
   compareArtifacts,
+  excludesCharts,
   fillDaily,
-  headlineArtifacts,
   platformOf,
   shareRows,
   sumSeries,
@@ -152,15 +154,22 @@ it('extracts a platform from release asset names', () => {
   expect(platformOf('checksums.txt')).toBeNull();
 });
 
-describe('headlineArtifacts', () => {
-  const image = { kind: 'image' } as Artifact;
-  const chart = { kind: 'chart' } as Artifact;
-  it('drops chart pulls unless charts are selected', () => {
+describe('artifactsOf', () => {
+  const image = { kind: 'image', source: 'quay' } as Artifact;
+  const chart = { kind: 'chart', source: 'quay' } as Artifact;
+  const pkg = { kind: 'package', source: 'pypi' } as Artifact;
+  it('keeps artifacts matching both the selected types and sources', () => {
+    const filter: ArtifactFilter = {
+      source: ['quay', 'pypi'],
+      type: ['image', 'package'],
+    };
+    expect(artifactsOf([image, chart, pkg], filter)).toEqual([image, pkg]);
+    expect(excludesCharts(filter)).toBe(true);
     expect(
-      headlineArtifacts([image, chart], { source: 'all', type: 'all' }),
-    ).toEqual([image]);
-    expect(
-      headlineArtifacts([image, chart], { source: 'all', type: 'chart' }),
+      artifactsOf([image, chart, pkg], {
+        source: ['quay'],
+        type: ['image', 'chart', 'package'],
+      }),
     ).toEqual([image, chart]);
   });
 });
