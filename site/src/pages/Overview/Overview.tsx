@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
 import Filters from '@/components/Filters';
 import Leaderboard, { type LeaderboardRow } from '@/components/Leaderboard';
+import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import ShareChart from '@/components/ShareChart';
 import StatTile from '@/components/StatTile';
+import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -158,17 +160,12 @@ function Overview() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-semibold text-2xl tracking-tight">Downloads</h1>
-          <p className="text-muted-foreground text-sm">
-            Image pulls and package downloads across the Nebari ecosystem. Helm
-            chart pulls are mostly GitOps controllers polling, so they are
-            charted apart and left out of the totals unless you select them.
-          </p>
-        </div>
+      <PageHeader
+        title="Downloads"
+        description="Image pulls and package downloads across the Nebari ecosystem. Helm chart pulls are mostly GitOps controllers polling, so they are charted apart and left out of the totals unless you select them."
+      >
         <Filters params={params} onChange={setParams} />
-      </div>
+      </PageHeader>
 
       {isPending || !view ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -266,12 +263,16 @@ function Overview() {
             </Card>
           )}
 
-          <div className="flex flex-col gap-3">
-            <SearchBox
-              value={params.q}
-              onChange={(q) => setParams({ q })}
-              label="Search products"
-            />
+          <TableCard
+            title={`Downloads by product, ${rangeLabel.toLowerCase()}`}
+            controls={
+              <SearchBox
+                value={params.q}
+                onChange={(q) => setParams({ q })}
+                label="Search products"
+              />
+            }
+          >
             <Leaderboard
               rows={view.rows.filter((r) =>
                 matchesQuery(params.q, r.product.name, r.product.id),
@@ -281,7 +282,7 @@ function Overview() {
                 params.q ? `No products match "${params.q}".` : undefined
               }
             />
-          </div>
+          </TableCard>
         </>
       )}
     </div>

@@ -1,8 +1,10 @@
 import { ExternalLink } from 'lucide-react';
 import { useMemo } from 'react';
+import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import StatTile from '@/components/StatTile';
+import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -21,7 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Tabs, TabsIndicator, TabsList, TabsTab } from '@/components/ui/tabs';
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useDocs } from '@/hooks/useSummary';
 import { markersFor } from '@/lib/anomalies';
@@ -35,13 +36,21 @@ import {
   matchesQuery,
   type Point,
   RANGE_LABEL,
-  RANGES,
-  type Range,
   windowFor,
 } from '@/lib/summary';
 
 /** Rows shown in the top-pages table before asking the reader to narrow down. */
 const PAGE_ROWS = 50;
+
+/**
+ * Sites that get a headline tile, in this order. The others (Classic, JHub
+ * Apps) still appear in the chart and the top-pages table.
+ */
+const TILE_SITES = [
+  { id: 'docs', name: 'Nebari docs' },
+  { id: 'packs-docs', name: 'Software Packs docs' },
+  { id: 'nebi-docs', name: 'Nebi docs' },
+];
 
 /** Fixed hue per site, consistent across the chart and the tiles. */
 const SITE_COLORS = [
@@ -73,18 +82,25 @@ function useDocsView(docs: DocsFile | undefined) {
     const weekly = days > 120;
     const bySite: Record<string, Point[]> = {};
     const chartSeries: TrendSeries[] = [];
-    const tiles = sites.map((site, i) => {
-      const visits = points(site, 'visits');
-      bySite[site.id] = visits;
+    sites.forEach((site, i) => {
+      bySite[site.id] = points(site, 'visits');
       chartSeries.push({
         key: site.id,
         label: site.name,
         color: SITE_COLORS[i % SITE_COLORS.length],
       });
+    });
+    const tiles = TILE_SITES.map(({ id, name }) => {
+      const site = sites.find((s) => s.id === id);
       return {
-        site,
-        visits: compare(visits, start, end, earliest),
-        pageviews: compare(points(site, 'pageviews'), start, end, earliest),
+        id,
+        name: site?.name ?? name,
+        visits: site
+          ? compare(points(site, 'visits'), start, end, earliest)
+          : null,
+        pageviews: site
+          ? compare(points(site, 'pageviews'), start, end, earliest)
+          : null,
       };
     });
     const all = Object.values(bySite).flat();
@@ -132,29 +148,12 @@ function Docs() {
     );
   }
 
-  const controls = (
-    <div className="flex flex-wrap items-center gap-3">
-      <Tabs
-        value={params.range}
-        onValueChange={(value) => setParams({ range: value as Range })}
-      >
-        <TabsList aria-label="Date range">
-          {RANGES.map((r) => (
-            <TabsTab key={r} value={r}>
-              {RANGE_LABEL[r]}
-            </TabsTab>
-          ))}
-          <TabsIndicator />
-        </TabsList>
-      </Tabs>
-    </div>
-  );
   const header = (
     <PageHeader
       title="Docs"
       description="Visits and page views of the documentation sites, counted at the Cloudflare edge so cookie consent does not hide them."
     >
-      {controls}
+      <Filters params={params} onChange={setParams} show={['range']} />
     </PageHeader>
   );
 
@@ -201,20 +200,29 @@ function Docs() {
       {header}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {view.tiles.map(({ site, visits, pageviews }) => (
-          <StatTile
-            key={site.id}
-            label={`${site.name}, visits`}
-            value={formatCompact(visits.current)}
-            delta={visits.delta}
-            hint={
-              (visits.delta === null
-                ? 'no full previous period yet'
-                : 'vs. previous period') +
-              ` · ${formatCompact(pageviews.current)} page views`
-            }
-          />
-        ))}
+        {view.tiles.map(({ id, name, visits, pageviews }) =>
+          visits && pageviews ? (
+            <StatTile
+              key={id}
+              label={`${name}, visits`}
+              value={formatCompact(visits.current)}
+              delta={visits.delta}
+              hint={
+                (visits.delta === null
+                  ? 'no full previous period yet'
+                  : 'vs. previous period') +
+                ` · ${formatCompact(pageviews.current)} page views`
+              }
+            />
+          ) : (
+            <StatTile
+              key={id}
+              label={`${name}, visits`}
+              value="—"
+              hint="no data collected yet"
+            />
+          ),
+        )}
         <StatTile
           label="Data through"
           value={formatDate(view.asOf)}
@@ -245,12 +253,10 @@ function Docs() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Top pages, last 7 days</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-3">
+      <TableCard
+        title="Top pages, last 7 days"
+        controls={
+          <>
             <Select
               items={siteItems}
               value={params.site}
@@ -272,66 +278,69 @@ function Docs() {
               onChange={(q) => setParams({ q })}
               label="Search pages"
             />
-          </div>
-          <Table aria-label="Top documentation pages, last 7 days">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Site</TableHead>
-                <TableHead>Path</TableHead>
-                <TableHead className="w-1/3">Share</TableHead>
-                <TableHead className="text-right">Page views</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-muted-foreground">
-                    {params.q
-                      ? `No pages match "${params.q}".`
-                      : 'No page data yet.'}
-                  </TableCell>
-                </TableRow>
-              )}
-              {rows.slice(0, PAGE_ROWS).map((r) => (
-                <TableRow key={`${r.site.id}:${r.path}`}>
-                  <TableCell className="whitespace-nowrap text-muted-foreground">
-                    {r.site.name}
-                  </TableCell>
-                  <TableCell className="font-mono text-xs">
-                    <a
-                      href={`https://${r.site.hosts[0]}${r.path}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                    >
-                      {r.path}
-                      <ExternalLink className="size-3" aria-hidden="true" />
-                    </a>
-                  </TableCell>
-                  <TableCell>
-                    <div className="h-2 w-full rounded-full bg-muted">
-                      <div
-                        className="h-2 rounded-full bg-chart-1"
-                        style={{ width: `${(r.pageviews / max) * 100}%` }}
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {formatNumber(r.pageviews)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <p className="text-muted-foreground text-xs">
+          </>
+        }
+        footnote={
+          <>
             {rows.length > PAGE_ROWS &&
               `Showing ${PAGE_ROWS} of ${rows.length} pages; narrow with the site filter or search. `}
             {view.pagesDate &&
               `Snapshot taken ${formatDate(view.pagesDate, true)}. `}
             HTML pages only, as counted at the Cloudflare edge.
-          </p>
-        </CardContent>
-      </Card>
+          </>
+        }
+      >
+        <Table aria-label="Top documentation pages, last 7 days">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Site</TableHead>
+              <TableHead>Path</TableHead>
+              <TableHead className="w-1/3">Share</TableHead>
+              <TableHead className="text-right">Page views</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-muted-foreground">
+                  {params.q
+                    ? `No pages match "${params.q}".`
+                    : 'No page data yet.'}
+                </TableCell>
+              </TableRow>
+            )}
+            {rows.slice(0, PAGE_ROWS).map((r) => (
+              <TableRow key={`${r.site.id}:${r.path}`}>
+                <TableCell className="whitespace-nowrap text-muted-foreground">
+                  {r.site.name}
+                </TableCell>
+                <TableCell className="font-mono text-xs">
+                  <a
+                    href={`https://${r.site.hosts[0]}${r.path}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                  >
+                    {r.path}
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </a>
+                </TableCell>
+                <TableCell>
+                  <div className="h-2 w-full rounded-full bg-muted">
+                    <div
+                      className="h-2 rounded-full bg-chart-1"
+                      style={{ width: `${(r.pageviews / max) * 100}%` }}
+                    />
+                  </div>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatNumber(r.pageviews)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableCard>
     </div>
   );
 }

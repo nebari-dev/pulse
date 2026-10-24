@@ -73,12 +73,26 @@ const docs: DocsFile = {
 describe('Docs', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('shows visits per site, the chart and top pages', async () => {
+  it('shows four tiles: Nebari, Software Packs and Nebi docs, data through', async () => {
     stub(docs);
     renderPage();
     expect(await screen.findByText('Nebari docs, visits')).toBeInTheDocument();
     expect(screen.getByText('400')).toBeInTheDocument(); // 10 days × 40
-    expect(screen.getByText('100')).toBeInTheDocument(); // classic 10 × 10
+    expect(screen.getByText('Software Packs docs, visits')).toBeInTheDocument();
+    // Nebi has no data in this file yet, so its tile shows a dash.
+    expect(screen.getByText('Nebi docs, visits')).toBeInTheDocument();
+    expect(screen.getByText('no data collected yet')).toBeInTheDocument();
+    expect(screen.getByText('Data through')).toBeInTheDocument();
+    // Classic is charted and listed but has no tile.
+    expect(
+      screen.queryByText('Nebari Classic docs, visits'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the chart and every site in the top-pages table', async () => {
+    stub(docs);
+    renderPage();
+    await screen.findByText('Nebari docs, visits');
     expect(
       screen.getByRole('figure', { name: /Daily docs visits by site/ }),
     ).toBeInTheDocument();

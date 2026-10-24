@@ -18,7 +18,7 @@ interface SearchBoxProps {
  */
 function SearchBox({ value, onChange, label, className }: SearchBoxProps) {
   return (
-    <div className={cn('relative w-full max-w-xs', className)}>
+    <div className={cn('relative w-full sm:w-64', className)}>
       <Search
         className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 z-10 size-4 text-muted-foreground"
         aria-hidden="true"

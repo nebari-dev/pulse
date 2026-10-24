@@ -1,19 +1,14 @@
 import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
 import StatTile from '@/components/StatTile';
+import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -41,7 +36,6 @@ import {
   addDays,
   chartRows,
   compare,
-  type KindFilter,
   matchesKind,
   matchesQuery,
   type Point,
@@ -62,11 +56,6 @@ interface Row {
 
 type SortKey = 'repo' | 'views' | 'uniqueViews' | 'clones' | 'uniqueClones';
 const RIGHT = 'text-right [&>button]:justify-end';
-const KIND_ITEMS: Array<{ value: KindFilter; label: string }> = [
-  { value: 'all', label: 'Products and packs' },
-  { value: 'product', label: 'Products' },
-  { value: 'pack', label: 'Packs' },
-];
 /** Two charts: totals and uniques overlap, so they are drawn unstacked. */
 const CHARTS: Array<{
   title: string;
@@ -204,24 +193,7 @@ function Traffic() {
   }
 
   const controls = (
-    <div className="flex flex-wrap items-center gap-3">
-      <Select
-        items={KIND_ITEMS}
-        value={params.kind}
-        onValueChange={(value) => setParams({ kind: value as KindFilter })}
-      >
-        <SelectTrigger aria-label="Kind" className="w-48">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {KIND_ITEMS.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Filters params={params} onChange={setParams} show={['kind']} />
   );
 
   if (isPending || !view) {
@@ -326,79 +298,82 @@ function Traffic() {
         ))}
       </div>
 
-      <SearchBox
-        value={params.q}
-        onChange={(q) => setParams({ q })}
-        label="Search repos"
-      />
-      <Table aria-label="Traffic by repository, last 14 days">
-        <TableHeader>
-          <TableRow>
-            {head('repo', 'Repository')}
-            <TableHead>Product</TableHead>
-            {head('uniqueViews', 'Unique visitors', RIGHT)}
-            {head('uniqueClones', 'Unique cloners', RIGHT)}
-            {head('views', 'Views', RIGHT)}
-            {head('clones', 'Clones', RIGHT)}
-            <TableHead>Visitors trend</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.length === 0 && (
+      <TableCard
+        title="Traffic by repository, last 14 days"
+        controls={
+          <SearchBox
+            value={params.q}
+            onChange={(q) => setParams({ q })}
+            label="Search repos"
+          />
+        }
+        footnote={`Window ${windowLabel}. Clone counts include CI checkouts and mirrors, so unique cloners is the better adoption signal.`}
+      >
+        <Table aria-label="Traffic by repository, last 14 days">
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={7} className="text-muted-foreground">
-                {params.q ? `No repos match "${params.q}".` : 'No repos.'}
-              </TableCell>
+              {head('repo', 'Repository')}
+              <TableHead>Product</TableHead>
+              {head('uniqueViews', 'Unique visitors', RIGHT)}
+              {head('uniqueClones', 'Unique cloners', RIGHT)}
+              {head('views', 'Views', RIGHT)}
+              {head('clones', 'Clones', RIGHT)}
+              <TableHead>Visitors trend</TableHead>
             </TableRow>
-          )}
-          {rows.map((r) => (
-            <TableRow key={r.repo.repo}>
-              <TableCell className="font-medium">
-                <a
-                  href={repoUrl(r.repo.repo)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-                  title={r.repo.repo}
-                >
-                  {repoName(r.repo.repo)}
-                  <ExternalLink className="size-3" aria-hidden="true" />
-                </a>
-              </TableCell>
-              <TableCell>
-                <Link
-                  to={`/product/${r.product.id}`}
-                  className="text-muted-foreground underline-offset-4 hover:underline"
-                >
-                  {r.product.name}
-                </Link>
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {formatNumber(r.uniqueViews)}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {formatNumber(r.uniqueClones)}
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground tabular-nums">
-                {formatNumber(r.views)}
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground tabular-nums">
-                {formatNumber(r.clones)}
-              </TableCell>
-              <TableCell>
-                <Sparkline
-                  points={r.points}
-                  label={`${r.repo.repo} unique visitors, last 14 days`}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <p className="text-muted-foreground text-xs">
-        Window {windowLabel}. Clone counts include CI checkouts and mirrors, so
-        unique cloners is the better adoption signal.
-      </p>
+          </TableHeader>
+          <TableBody>
+            {rows.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="text-muted-foreground">
+                  {params.q ? `No repos match "${params.q}".` : 'No repos.'}
+                </TableCell>
+              </TableRow>
+            )}
+            {rows.map((r) => (
+              <TableRow key={r.repo.repo}>
+                <TableCell className="font-medium">
+                  <a
+                    href={repoUrl(r.repo.repo)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                    title={r.repo.repo}
+                  >
+                    {repoName(r.repo.repo)}
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </a>
+                </TableCell>
+                <TableCell>
+                  <Link
+                    to={`/product/${r.product.id}`}
+                    className="text-muted-foreground underline-offset-4 hover:underline"
+                  >
+                    {r.product.name}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatNumber(r.uniqueViews)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatNumber(r.uniqueClones)}
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground tabular-nums">
+                  {formatNumber(r.views)}
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground tabular-nums">
+                  {formatNumber(r.clones)}
+                </TableCell>
+                <TableCell>
+                  <Sparkline
+                    points={r.points}
+                    label={`${r.repo.repo} unique visitors, last 14 days`}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableCard>
     </div>
   );
 }
