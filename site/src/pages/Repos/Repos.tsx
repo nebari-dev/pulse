@@ -6,6 +6,7 @@ import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
+import StatRow from '@/components/StatRow';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart from '@/components/TrendChart';
@@ -241,7 +242,7 @@ function Repos() {
         <Skeleton className="h-64" shape="block" />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatRow>
             <StatTile
               label="Stars"
               value={formatNumber(view.totals.stars)}
@@ -262,7 +263,7 @@ function Repos() {
               value={formatNumber(view.contributors.active_30d)}
               hint={`${view.quiet} quiet ${view.quiet === 1 ? 'repo' : 'repos'}, no push in 90 days`}
             />
-          </div>
+          </StatRow>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <ChartCard

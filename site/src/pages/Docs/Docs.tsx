@@ -4,6 +4,7 @@ import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
+import StatRow from '@/components/StatRow';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import TrendChart, { type TrendSeries } from '@/components/TrendChart';
@@ -212,7 +213,9 @@ function Docs() {
     <div className="flex flex-col gap-6">
       {header}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatRow
+        note={`Data through ${formatDate(view.asOf)}, collected ${formatDate(data.generated_at, true)}`}
+      >
         {view.tiles.map(({ id, name, visits, pageviews }) =>
           visits && pageviews ? (
             <StatTile
@@ -236,12 +239,7 @@ function Docs() {
             />
           ),
         )}
-        <StatTile
-          label="Data through"
-          value={formatDate(view.asOf)}
-          hint={`collected ${formatDate(data.generated_at, true)}`}
-        />
-      </div>
+      </StatRow>
 
       <ChartCard
         title={`${view.weekly ? 'Weekly' : 'Daily'} visits by site`}

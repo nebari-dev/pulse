@@ -50,6 +50,7 @@ pulse-dashboard/
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── MultiSelect/   # checkable dropdown used by every filter; never empty
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
+│   │   ├── StatRow/       # one surface for a page's headline figures (StatTiles) + provenance note
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
 │   │   ├── Overview/      # / — filters, stat tiles, trend chart, share chart, searchable leaderboard

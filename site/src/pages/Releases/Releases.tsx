@@ -6,6 +6,7 @@ import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
+import StatRow from '@/components/StatRow';
 import StatTile from '@/components/StatTile';
 import TableCard from '@/components/TableCard';
 import { Badge } from '@/components/ui/badge';
@@ -165,7 +166,9 @@ function Releases() {
         <Skeleton className="h-64" shape="block" />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <StatRow
+            note={`Data through ${formatDate(view.asOf)}, release dates from GitHub`}
+          >
             <StatTile
               label={`Releases, ${rangeLabel.toLowerCase()}`}
               value={String(view.recent)}
@@ -176,12 +179,7 @@ function Releases() {
               value={`${view.active} of ${view.rows.length}`}
               hint={`at least one release, ${rangeLabel.toLowerCase()}`}
             />
-            <StatTile
-              label="Data through"
-              value={formatDate(view.asOf)}
-              hint="release dates from GitHub"
-            />
-          </div>
+          </StatRow>
 
           <TableCard
             title={`Release cadence by product, ${rangeLabel.toLowerCase()}`}
