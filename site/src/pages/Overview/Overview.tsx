@@ -194,23 +194,25 @@ function Overview() {
         <Skeleton className="h-28" shape="block" />
       ) : (
         <>
-          <StatRow
-            info={
-              <p>
-                Data through {formatDate(view.asOf)}, collected{' '}
-                {formatDate(data.generated_at, true)}.
-              </p>
-            }
-          >
+          <StatRow>
             <StatTile
               label={`Downloads, ${rangeLabel.toLowerCase()}`}
               value={formatCompact(view.overall.current)}
               delta={view.overall.delta}
-              hint={
-                (view.overall.delta === null
-                  ? 'no full previous period yet'
-                  : 'vs. previous period') +
-                (excludesCharts(params) ? ', Helm charts not included' : '')
+              info={
+                <>
+                  <p>
+                    Downloads across the selected products, sources and types
+                    {excludesCharts(params) && ', Helm charts not included'}.{' '}
+                    {view.overall.delta === null
+                      ? 'No full previous period to compare yet.'
+                      : 'The change is against the period before.'}
+                  </p>
+                  <p>
+                    Data through {formatDate(view.asOf)}, collected{' '}
+                    {formatDate(data.generated_at, true)}.
+                  </p>
+                </>
               }
             />
             <StatTile
@@ -226,12 +228,22 @@ function Overview() {
                     ),
                 ),
               )}
-              hint={`${formatDate(view.start)} – ${formatDate(view.end)}`}
+              info={
+                <p>
+                  Downloads divided by the days in the range,{' '}
+                  {formatDate(view.start)} – {formatDate(view.end)}.
+                </p>
+              }
             />
             <StatTile
               label="Tracked"
               value={String(view.count)}
-              hint={`${view.count - view.packs} products, ${view.packs} packs`}
+              info={
+                <p>
+                  {view.count - view.packs} products and {view.packs} packs
+                  matching the filters, each with its own page.
+                </p>
+              }
             />
           </StatRow>
 

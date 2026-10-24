@@ -40,8 +40,9 @@ describe('Repos', () => {
       .getByRole('link', { name: /nebari-infrastructure-core/ })
       .closest('tr') as HTMLElement;
     expect(within(nic).getAllByText('—').length).toBeGreaterThan(3);
+    await userEvent.click(screen.getByRole('button', { name: 'About: Stars' }));
     expect(
-      screen.getByText('across 1 repos, +12 in 30 days'),
+      await screen.findByText(/Across 1 repos; \+12 in the last 30 days/),
     ).toBeInTheDocument();
     // Contributors: ecosystem tile and per-repo authors column.
     expect(screen.getByText('Contributors, 30 days')).toBeInTheDocument();

@@ -213,14 +213,7 @@ function Docs() {
     <div className="flex flex-col gap-6">
       {header}
 
-      <StatRow
-        info={
-          <p>
-            Data through {formatDate(view.asOf)}, collected{' '}
-            {formatDate(data.generated_at, true)}.
-          </p>
-        }
-      >
+      <StatRow>
         {view.tiles.map(({ id, name, visits, pageviews }) =>
           visits && pageviews ? (
             <StatTile
@@ -228,11 +221,20 @@ function Docs() {
               label={`${name}, visits`}
               value={formatCompact(visits.current)}
               delta={visits.delta}
-              hint={
-                (visits.delta === null
-                  ? 'no full previous period yet'
-                  : 'vs. previous period') +
-                ` · ${formatCompact(pageviews.current)} page views`
+              info={
+                <>
+                  <p>
+                    Visits in the range, {formatCompact(pageviews.current)} page
+                    views in all.{' '}
+                    {visits.delta === null
+                      ? 'No full previous period to compare yet.'
+                      : 'The change is against the period before.'}
+                  </p>
+                  <p>
+                    Data through {formatDate(view.asOf)}, collected{' '}
+                    {formatDate(data.generated_at, true)}.
+                  </p>
+                </>
               }
             />
           ) : (
@@ -240,7 +242,7 @@ function Docs() {
               key={id}
               label={`${name}, visits`}
               value="—"
-              hint="no data collected yet"
+              info={<p>No data collected for this site yet.</p>}
             />
           ),
         )}

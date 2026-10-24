@@ -35,6 +35,10 @@ describe('Releases', () => {
     // NIC has a repo but no releases; Chat Pack has no repos at all.
     expect(screen.getByText('no releases')).toBeInTheDocument();
     expect(within(table).queryByText('Chat Pack')).not.toBeInTheDocument();
+    // The newest stable release of any product, in its own tile.
+    expect(
+      screen.getByRole('button', { name: 'About: Latest release' }),
+    ).toBeInTheDocument();
     // The feed lists the prerelease too.
     expect(screen.getByText('v1.2.0-rc1')).toBeInTheDocument();
     expect(screen.getByText('prerelease')).toBeInTheDocument();

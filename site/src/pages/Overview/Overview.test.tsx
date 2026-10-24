@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { stubSummaryFetch } from '@/test/fixtures';
 import Overview from './Overview';
@@ -29,13 +30,17 @@ describe('Overview', () => {
     // operator 550 + nic 6 + 15 = 571 over the 90d window; Chat Pack's 10
     // chart pulls are polling and Helm charts start deselected.
     expect(screen.getByText('571')).toBeInTheDocument();
-    expect(screen.getAllByText(/Helm charts not included/)).not.toHaveLength(0);
     expect(
       screen.getByRole('combobox', { name: 'Artifact type' }),
     ).toHaveTextContent('All but Helm charts');
+    // The tile's (i) says what it covers and when the data was collected.
+    await userEvent.click(
+      screen.getByRole('button', { name: /^About: Downloads,/ }),
+    );
     expect(
-      screen.getByRole('button', { name: 'About: About these figures' }),
+      await screen.findByText(/Helm charts not included/),
     ).toBeInTheDocument();
+    expect(screen.getByText(/^Data through/)).toBeInTheDocument();
   });
 
   it("charts each product's share of the weekly total", async () => {
@@ -86,6 +91,10 @@ describe('Overview', () => {
     ).toBeInTheDocument();
     // Selecting charts explicitly counts them: Chat Pack's 10 pulls.
     expect(screen.getAllByText('10').length).toBeGreaterThan(0);
+    await userEvent.click(
+      screen.getByRole('button', { name: /^About: Downloads,/ }),
+    );
+    expect(await screen.findByText(/^Data through/)).toBeInTheDocument();
     expect(
       screen.queryByText(/Helm charts not included/),
     ).not.toBeInTheDocument();

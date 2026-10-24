@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { nic, stubSummaryFetch } from '@/test/fixtures';
 import Product from './Product';
@@ -43,8 +44,11 @@ describe('Product', () => {
     // v0.15.0 had no downloads in the window, so adoption leaves it out.
     expect(screen.getAllByText('v0.15.0')).toHaveLength(1);
     expect(screen.getByText('linux/x86_64')).toBeInTheDocument();
-    // A repo without a health snapshot shows dashes, and no release tiles.
-    expect(screen.getByText('no GitHub releases')).toBeInTheDocument();
+    // A repo without a health snapshot shows dashes, and no latest release.
+    await userEvent.click(
+      screen.getByRole('button', { name: 'About: Latest release' }),
+    );
+    expect(await screen.findByText('No GitHub releases.')).toBeInTheDocument();
     // PyPI breakdown for the window: 3.12 = 12, unknown = 3, Linux = 15.
     expect(
       screen.getByRole('table', { name: 'Downloads by python version' }),
@@ -65,13 +69,19 @@ describe('Product', () => {
     expect(screen.getByText('Latest release')).toBeInTheDocument();
     // In the latest-release tile and in the recent releases list.
     expect(screen.getAllByText('v1.2.0')).toHaveLength(2);
-    expect(screen.getByText('median 30 days apart')).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'About: Releases, 90 days' }),
+    );
+    expect(await screen.findByText(/Median 30 days apart/)).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /^nebari-operator/ }),
     ).toHaveAttribute('href', 'https://github.com/nebari-dev/nebari-operator');
     expect(screen.getByText('Unique visitors, 14 days')).toBeInTheDocument();
     expect(screen.getByText('30')).toBeInTheDocument();
-    expect(screen.getByText('60 views in all')).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'About: Unique visitors, 14 days' }),
+    );
+    expect(await screen.findByText(/60 views in all/)).toBeInTheDocument();
     expect(screen.getByText('Recent releases')).toBeInTheDocument();
     expect(screen.getByText('Stars over time')).toBeInTheDocument();
     expect(
@@ -80,7 +90,10 @@ describe('Product', () => {
       }),
     ).toBeInTheDocument();
     // 90-day window ending Oct 11 starts Jul 14: 0 → 42 stars.
-    expect(screen.getByText('1 repo, +42 90 days')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'About: Stars' }));
+    expect(
+      await screen.findByText(/Across 1 repo; \+42 90 days/),
+    ).toBeInTheDocument();
     expect(screen.getByText('prerelease')).toBeInTheDocument();
   });
 

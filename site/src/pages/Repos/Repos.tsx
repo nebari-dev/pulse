@@ -246,22 +246,40 @@ function Repos() {
             <StatTile
               label="Stars"
               value={formatNumber(view.totals.stars)}
-              hint={`across ${view.totals.repos} repos, ${view.gained >= 0 ? '+' : ''}${formatNumber(view.gained)} in 30 days`}
+              info={
+                <p>
+                  Across {view.totals.repos} repos;{' '}
+                  {view.gained >= 0 ? '+' : ''}
+                  {formatNumber(view.gained)} in the last 30 days.
+                </p>
+              }
             />
             <StatTile
               label="Open issues"
               value={formatNumber(view.totals.open_issues)}
-              hint={`${formatNumber(view.totals.open_prs)} open pull requests`}
+              info={
+                <p>
+                  Open issues across all tracked repos, plus{' '}
+                  {formatNumber(view.totals.open_prs)} open pull requests.
+                </p>
+              }
             />
             <StatTile
               label="PRs merged, 30 days"
               value={formatNumber(view.totals.merged_prs_30d)}
-              hint="all tracked repos"
+              info={<p>Pull requests merged across all tracked repos.</p>}
             />
             <StatTile
               label="Contributors, 30 days"
               value={formatNumber(view.contributors.active_30d)}
-              hint={`${view.quiet} quiet ${view.quiet === 1 ? 'repo' : 'repos'}, no push in 90 days`}
+              info={
+                <p>
+                  People who committed to a tracked repo in the last 30 days,
+                  bots excluded. {view.quiet} quiet{' '}
+                  {view.quiet === 1 ? 'repo has' : 'repos have'} had no push in
+                  90 days.
+                </p>
+              }
             />
           </StatRow>
 

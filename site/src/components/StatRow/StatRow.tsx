@@ -1,14 +1,10 @@
 import { Children, type ReactNode } from 'react';
-import InfoPopover from '@/components/InfoPopover';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface StatRowProps {
-  /** StatTiles. */
+  /** StatTiles; each carries its own (i). */
   children: ReactNode;
-  /** Provenance (data through, collected, window), behind an (i) in the
-   * corner so it never takes a line of its own. */
-  info?: ReactNode;
   className?: string;
 }
 
@@ -26,10 +22,10 @@ const COLUMNS: Record<number, string> = {
  * the grid is shifted up and left by one pixel so the outer ones fall under
  * the card edge, which works for any wrap.
  */
-function StatRow({ children, info, className }: StatRowProps) {
+function StatRow({ children, className }: StatRowProps) {
   const count = Children.count(children);
   return (
-    <Card size="sm" className={cn('relative gap-0 py-0', className)}>
+    <Card size="sm" className={cn('gap-0 py-0', className)}>
       <div
         className={cn(
           '-mt-px -ml-px grid',
@@ -38,11 +34,6 @@ function StatRow({ children, info, className }: StatRowProps) {
       >
         {children}
       </div>
-      {info && (
-        <div className="absolute top-1 right-1">
-          <InfoPopover topic="About these figures">{info}</InfoPopover>
-        </div>
-      )}
     </Card>
   );
 }
