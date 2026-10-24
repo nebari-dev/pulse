@@ -14,6 +14,7 @@ import {
   fillDaily,
   platformOf,
   type Source,
+  seriesCoverage,
   shareRows,
   sumSeries,
   versionShareInputs,
@@ -318,8 +319,8 @@ describe('coverage', () => {
       '2026-10-24',
     );
     expect(cov.starts).toEqual([
-      { date: '2026-10-01', sources: ['pypi'] },
-      { date: '2026-10-10', sources: ['conda', 'github_releases'] },
+      { date: '2026-10-01', keys: ['pypi'] },
+      { date: '2026-10-10', keys: ['conda', 'github_releases'] },
     ]);
     expect(cov.lagging).toEqual(['quay', 'pypi']);
     expect(cov.partialFrom).toBe('2026-10-24');
@@ -331,7 +332,29 @@ describe('coverage', () => {
       '2026-09-25',
       '2026-10-24',
     );
-    expect(cov).toEqual({ starts: [], partialFrom: null, lagging: [] });
+    expect(cov).toEqual({
+      starts: [],
+      partialFrom: null,
+      lagging: [],
+      keys: ['quay'],
+    });
+  });
+
+  it('merges starts within a week into one line at the earliest', () => {
+    const series = (from: string) => [
+      { date: from, count: 1 },
+      { date: '2026-10-23', count: 1 },
+    ];
+    const cov = seriesCoverage(
+      [
+        { key: 'a', series: series('2026-09-24') },
+        { key: 'b', series: series('2026-09-23') },
+        { key: 'c', series: series('2026-09-28') },
+      ],
+      '2026-07-26',
+      '2026-10-23',
+    );
+    expect(cov.starts).toEqual([{ date: '2026-09-23', keys: ['b', 'a', 'c'] }]);
   });
 
   it('treats an unfinished week as incomplete when weekly', () => {

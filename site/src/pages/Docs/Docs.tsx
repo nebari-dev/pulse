@@ -20,6 +20,7 @@ import {
 import { useDashboardParams } from '@/hooks/useDashboardParams';
 import { useDocs } from '@/hooks/useSummary';
 import { markersFor } from '@/lib/anomalies';
+import { coverageLines, partialNote } from '@/lib/coverage';
 import { formatCompact, formatDate, formatNumber } from '@/lib/format';
 import {
   between,
@@ -30,6 +31,7 @@ import {
   matchesQuery,
   type Point,
   RANGE_LABEL,
+  seriesCoverage,
   windowFor,
 } from '@/lib/summary';
 
@@ -52,6 +54,7 @@ const SITE_COLORS = [
   'var(--chart-3)',
   'var(--chart-4)',
   'var(--chart-5)',
+  'var(--chart-2)',
 ];
 
 function points(site: DocsSite, metric: 'visits' | 'pageviews'): Point[] {
@@ -104,6 +107,13 @@ function useDocsView(docs: DocsFile | undefined) {
       };
     });
     const all = Object.values(bySite).flat();
+    const cov = seriesCoverage(
+      sites.map((site) => ({ key: site.id, series: points(site, 'visits') })),
+      start,
+      end,
+      weekly,
+    );
+    const siteName = (id: string) => sites.find((s) => s.id === id)?.name ?? id;
     const pages = sites
       .flatMap((site) =>
         site.top_pages.map((p) => ({
@@ -119,6 +129,9 @@ function useDocsView(docs: DocsFile | undefined) {
       .at(-1);
     return {
       empty: false as const,
+      lines: coverageLines(cov, siteName),
+      partialFrom: cov.partialFrom,
+      partialNote: partialNote(cov, weekly, siteName),
       pages,
       pagesDate: pagesDate || null,
       asOf,
@@ -246,6 +259,10 @@ function Docs() {
             <li>
               Lines overlap rather than stack; hover for each site's number.
             </li>
+            <li>
+              A dashed line marks where the data begins: Cloudflare keeps about
+              30 days, so history starts from Pulse's first collection.
+            </li>
           </ul>
         }
       >
@@ -255,6 +272,9 @@ function Docs() {
           weekly={view.weekly}
           stacked={false}
           markers={view.markers}
+          lines={view.lines}
+          partialFrom={view.partialFrom}
+          partialNote={view.partialNote}
           title={`${view.weekly ? 'Weekly' : 'Daily'} docs visits by site, ${rangeLabel}`}
         />
       </ChartCard>
