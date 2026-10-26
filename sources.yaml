@@ -89,7 +89,6 @@ downloads:
         - nebari-dev/nebari-infrastructure-core
         - nebari-dev/nebari-keycloak-theme
         - nebari-dev/deploy-nebari-action
-      pypi: [nic]
       github_releases:
         - nebari-dev/nebari-infrastructure-core
         - nebari-dev/nebari-keycloak-theme   # theme JARs, selectable per realm
