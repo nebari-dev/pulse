@@ -44,7 +44,7 @@ downloads:
   products:
     # Nebari Classic: the original platform (nebari-dev/nebari) and the
     # images it deploys (nebari-docker-images, workflow controller, ...).
-    # Does not include the Keycloak theme (NIC) or jhub-apps (shared).
+    # Does not include the Keycloak theme (NIC) or jhub-apps (Jupyter Tools).
     - id: nebari-classic
       name: Nebari Classic
       kind: product
@@ -120,6 +120,20 @@ downloads:
         - nebari/nebari-landing
         - nebari/charts/nebari-landing
 
+    # JupyterHub/JupyterLab extensions published from nebari-dev.
+    - id: jupyter-tools
+      name: Jupyter Tools
+      kind: product
+      repos:
+        - nebari-dev/jhub-apps
+        - nebari-dev/jupyterlab-launchpad
+        - nebari-dev/jupyterlab-gallery
+      pypi: [jhub-apps, jupyterlab-launchpad, jupyterlab-gallery]
+      conda:
+        - conda-forge/jhub-apps
+        - conda-forge/jupyterlab-launchpad
+        - conda-forge/jupyterlab-gallery
+
     # ---- Software packs -------------------------------------------------
 
     - id: apps-pack
@@ -148,12 +162,6 @@ downloads:
         - nebari/charts/ravnar
         - nebari/ravnar
         - nebari/ravnar-nebari
-
-    - id: collab-hub-pack
-      name: Collab Hub Pack
-      kind: pack
-      quay:
-        - nebari/charts/collab-hub
 
     - id: data-science-pack
       name: Data Science Pack
@@ -264,6 +272,8 @@ downloads:
     # Nexus Pack is archived (nebari-dev/nebari-nexus-pack is no longer public).
     - nebari/charts/nebari-nexus
     - nebari/nebari-nexus-api
+    # Collab Hub Pack was dropped from the dashboard.
+    - nebari/charts/collab-hub
     - nebari/charts/my-pack
     - nebari/datascience-spin-poc
     - nebari/datascience-spin-poc_render-applications
