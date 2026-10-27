@@ -808,10 +808,10 @@ date,tag,asset,cumulative
 2026-10-27,v0.11,nebi-desktop-macos-universal.zip,4
 2026-10-27,v0.11,nebi-desktop-windows-amd64.exe,2
 2026-10-27,v0.11,nebi_0.11_linux_arm64.tar.gz,3
-2026-10-27,v0.11,nebi_0.11_linux_x86_64.tar.gz,762
-2026-10-27,v0.11,nebi_0.11_macOS_arm64.tar.gz,812
+2026-10-27,v0.11,nebi_0.11_linux_x86_64.tar.gz,763
+2026-10-27,v0.11,nebi_0.11_macOS_arm64.tar.gz,813
 2026-10-27,v0.11,nebi_0.11_macOS_x86_64.tar.gz,2
-2026-10-27,v0.11,nebi_0.11_windows_x86_64.zip,695
+2026-10-27,v0.11,nebi_0.11_windows_x86_64.zip,696
 2026-10-27,v0.12,nebi-desktop-linux-amd64.tar.gz,2
 2026-10-27,v0.12,nebi-desktop-macos-universal.zip,2
 2026-10-27,v0.12,nebi-desktop-windows-amd64.exe,2
