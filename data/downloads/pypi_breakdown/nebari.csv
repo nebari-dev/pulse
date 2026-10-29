@@ -633,3 +633,7 @@ date,dimension,category,count
 2026-10-26,system,null,12
 2026-10-27,python_minor,null,12
 2026-10-27,system,null,12
+2026-10-28,python_minor,3.12,11
+2026-10-28,python_minor,null,13
+2026-10-28,system,Linux,11
+2026-10-28,system,null,13
