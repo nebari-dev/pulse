@@ -1,3 +1,6 @@
 {
- "quay": []
+ "quay": [
+  "nebari/charts/javo",
+  "nebari/javo"
+ ]
 }
