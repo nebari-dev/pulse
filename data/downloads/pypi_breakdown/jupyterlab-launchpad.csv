@@ -1052,3 +1052,10 @@ date,dimension,category,count
 2026-11-03,python_minor,null,3
 2026-11-03,system,Linux,13
 2026-11-03,system,null,3
+2026-11-04,python_minor,3.10,1
+2026-11-04,python_minor,3.11,1
+2026-11-04,python_minor,3.12,3
+2026-11-04,python_minor,3.13,4
+2026-11-04,python_minor,null,1
+2026-11-04,system,Linux,9
+2026-11-04,system,null,1
