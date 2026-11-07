@@ -1065,3 +1065,11 @@ date,dimension,category,count
 2026-11-05,python_minor,null,2
 2026-11-05,system,Linux,13
 2026-11-05,system,null,2
+2026-11-06,python_minor,3.11,8
+2026-11-06,python_minor,3.12,5
+2026-11-06,python_minor,3.13,8
+2026-11-06,python_minor,null,2
+2026-11-06,system,Darwin,1
+2026-11-06,system,Linux,19
+2026-11-06,system,Windows,1
+2026-11-06,system,null,2
