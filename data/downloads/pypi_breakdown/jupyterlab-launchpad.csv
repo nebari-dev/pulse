@@ -1073,3 +1073,8 @@ date,dimension,category,count
 2026-11-06,system,Linux,19
 2026-11-06,system,Windows,1
 2026-11-06,system,null,2
+2026-11-07,python_minor,3.11,1
+2026-11-07,python_minor,3.13,1
+2026-11-07,python_minor,null,1
+2026-11-07,system,Linux,2
+2026-11-07,system,null,1
