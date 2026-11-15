@@ -103,9 +103,9 @@ const DOCS: Row[] = [
     history: 'Only the latest snapshot is shown.',
   },
   {
-    name: 'Referrers and countries',
+    name: 'Countries',
     counts:
-      "The same page views by the host that linked to them and by the visitor's country. Clicks between pages of the same site are left out of referrers, so they count arrivals; no referrer shows as Direct or unknown.",
+      "The same page views by the visitor's country, as Cloudflare places them from the IP address.",
     history:
       'Refetched for the last 30 days each run, like visits, so history starts 30 days before Pulse began collecting them.',
   },
