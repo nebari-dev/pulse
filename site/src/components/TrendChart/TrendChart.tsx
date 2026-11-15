@@ -1,4 +1,4 @@
-import { Clock, TriangleAlert } from 'lucide-react';
+import { Clock, Tag, TriangleAlert } from 'lucide-react';
 import {
   Area,
   AreaChart,
@@ -20,6 +20,7 @@ import {
   formatNumber,
   formatQuarter,
 } from '@/lib/format';
+import type { ReleaseMark } from '@/lib/repos';
 
 export type Bucket = 'day' | 'week' | 'month' | 'quarter';
 
@@ -78,6 +79,11 @@ interface TrendChartProps {
   partialFrom?: string | null;
   /** Tooltip note on incomplete rows, e.g. which sources are missing. */
   partialNote?: string;
+  /**
+   * Releases, one mark per row (day, or week's Monday). Drawn as thin lines
+   * in the primary hue and named in the tooltip.
+   */
+  releases?: ReleaseMark[];
   title: string;
 }
 
@@ -89,17 +95,20 @@ function ChartTooltip({
   notes,
   parts,
   partial,
+  released,
 }: TooltipProps<number, string> & {
   bucket: Bucket;
   notes: Map<string, string>;
   parts: Map<string, TrendSeries['parts']>;
   partial: ((date: string) => string | null) | null;
+  released: Map<string, string[]>;
 }) {
   if (!active || !payload?.length) return null;
   const items = [...payload].reverse(); // top of the stack first
   const sum = items.reduce((acc, p) => acc + (p.value ?? 0), 0);
   const note = notes.get(String(label));
   const partialNote = partial?.(String(label));
+  const tags = released.get(String(label));
   return (
     <div className="max-w-xs rounded-md border bg-popover px-3 py-2 text-popover-foreground text-sm shadow-md">
       <p className="mb-1 font-medium">
@@ -142,6 +151,17 @@ function ChartTooltip({
           </span>
         </p>
       )}
+      {tags && (
+        <p className="mt-1 flex items-start gap-1.5 border-t pt-1 text-xs">
+          <Tag
+            className="mt-0.5 size-3.5 shrink-0 text-primary"
+            aria-hidden="true"
+          />
+          <span>
+            Released <span className="font-mono">{tags.join(', ')}</span>
+          </span>
+        </p>
+      )}
       {partialNote && (
         <p className="mt-1 flex items-start gap-1.5 border-t pt-1 text-muted-foreground text-xs">
           <Clock className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
@@ -178,6 +198,7 @@ function TrendChart({
   lines = [],
   partialFrom = null,
   partialNote,
+  releases = [],
 }: TrendChartProps) {
   const stacked = stackedProp ?? series.length > 1;
   const bucket: Bucket = bucketProp ?? (weekly ? 'week' : 'day');
@@ -198,6 +219,10 @@ function TrendChart({
             : null
       : null;
   const shown = lines.filter((l) => rows.some((r) => r.date === l.date));
+  const releaseRows = releases.filter((m) =>
+    rows.some((r) => r.date === m.date),
+  );
+  const released = new Map(releaseRows.map((m) => [m.date, m.tags]));
   const rightHalf = (date: string) =>
     rows.findIndex((r) => r.date === date) > rows.length / 2;
   // Marker height: the top of the stack (or the tallest series) that day.
@@ -217,7 +242,19 @@ function TrendChart({
             .join(' ')}
         </p>
       )}
-      {(series.length > 1 || partialStart) && (
+      {releaseRows.length > 0 && (
+        <p className="sr-only">
+          Releases:{' '}
+          {releaseRows
+            .map(
+              (m) =>
+                `${m.tags.join(', ')} (${bucketLabel(m.date, bucket, true)})`,
+            )
+            .join('; ')}
+          .
+        </p>
+      )}
+      {(series.length > 1 || partialStart || releaseRows.length > 0) && (
         <ul
           className="flex flex-wrap gap-x-4 gap-y-1 text-sm"
           aria-label="Legend"
@@ -233,6 +270,15 @@ function TrendChart({
                 {s.label}
               </li>
             ))}
+          {releaseRows.length > 0 && (
+            <li className="flex items-center gap-1.5 text-muted-foreground">
+              <span
+                className="inline-block h-3 w-0.5 rounded-full bg-primary"
+                aria-hidden="true"
+              />
+              Release
+            </li>
+          )}
           {partialStart && (
             <li className="flex items-center gap-1.5 text-muted-foreground">
               <span
@@ -277,6 +323,7 @@ function TrendChart({
                   notes={notes}
                   parts={parts}
                   partial={partial}
+                  released={released}
                 />
               }
               cursor={{
@@ -309,6 +356,16 @@ function TrendChart({
                 ifOverflow="hidden"
               />
             )}
+            {releaseRows.map((m) => (
+              <ReferenceLine
+                key={`release-${m.date}`}
+                x={m.date}
+                stroke="var(--primary)"
+                strokeOpacity={0.55}
+                strokeWidth={1.5}
+                ifOverflow="hidden"
+              />
+            ))}
             {shown.map((l, i) => (
               <ReferenceLine
                 key={l.date}

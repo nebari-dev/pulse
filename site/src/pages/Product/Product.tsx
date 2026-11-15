@@ -4,6 +4,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
+import ReleaseImpact from '@/components/ReleaseImpact';
 import SearchBox from '@/components/SearchBox';
 import ShareChart from '@/components/ShareChart';
 import StatRow from '@/components/StatRow';
@@ -37,6 +38,8 @@ import {
   laterDate,
   openWorkSeries,
   productReleases,
+  releaseImpact,
+  releaseMarks,
   releaseUrl,
   repoName,
   repoUrl,
@@ -82,6 +85,9 @@ import {
   windowFor,
 } from '@/lib/summary';
 import NotFound from '@/pages/NotFound';
+
+/** Days on each side of a release in the downloads-around-releases table. */
+const IMPACT_DAYS = 14;
 
 interface ReleaseRow {
   tag: string;
@@ -187,6 +193,20 @@ function useProductView(
 
     const stable = productReleases(product);
     const feed = productReleases(product, { includePrereleases: true });
+    // Days every selected source covers, so release windows never compare
+    // a source's absence with its presence.
+    let fullFrom = '';
+    let completeThrough = '';
+    for (const source of SOURCES) {
+      const own = sumSeries(
+        artifacts.filter((a) => a.source === source).map((a) => a.series),
+      );
+      const first = own[0]?.date;
+      const last = own.at(-1)?.date;
+      if (!first || !last) continue;
+      if (first > fullFrom) fullFrom = first;
+      if (!completeThrough || last < completeThrough) completeThrough = last;
+    }
     const traffic = trafficRange(product.repos);
     const trafficStart = traffic
       ? laterDate(addDays(traffic.end, -13), traffic.start)
@@ -302,6 +322,14 @@ function useProductView(
       allKnown: total(series),
       chartRows: chartRows(bySource, start, end, weekly),
       markers: weekly ? [] : markersFor(between(series, start, end)),
+      releaseMarks: releaseMarks(stable, start, end, weekly),
+      impacts: releaseImpact(
+        stable,
+        series,
+        fullFrom,
+        completeThrough,
+        IMPACT_DAYS,
+      ),
       chartSeries,
       releases: releaseRows(releases),
       platforms: platformRows(releases),
@@ -475,6 +503,10 @@ function Product() {
                   Yellow dots are spike days, usually CI or mirrors. They stay
                   in the totals.
                 </li>
+                <li>
+                  Thin lines in the primary color are stable releases; hover for
+                  the tag.
+                </li>
               </ul>
             </>
           }
@@ -487,9 +519,18 @@ function Product() {
             lines={coverageLines(view.coverage)}
             partialFrom={view.coverage.partialFrom}
             partialNote={partialNote(view.coverage, view.weekly)}
+            releases={view.releaseMarks}
             title={`${product.name} downloads by source, ${rangeLabel}`}
           />
         </ChartCard>
+      )}
+
+      {view.chartSeries.length > 0 && view.impacts.length > 0 && (
+        <ReleaseImpact
+          impacts={view.impacts}
+          days={IMPACT_DAYS}
+          showRepo={product.repos.length > 1}
+        />
       )}
 
       <TableCard

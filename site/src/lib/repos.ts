@@ -12,6 +12,7 @@ import {
   type Repo,
   type StarPoint,
   type TrafficPoint,
+  weekStart,
 } from '@/lib/summary';
 
 export function repoUrl(repo: string): string {
@@ -23,6 +24,95 @@ export function releaseUrl(repo: string, tag: string): string {
 }
 
 // ---- releases ----------------------------------------------------------------
+
+/** Releases that fall on one chart row (a day, or a week's Monday). */
+export interface ReleaseMark {
+  date: string;
+  tags: string[];
+}
+
+/**
+ * Chart marks for releases inside [start, end], grouped by chart row: the
+ * day, or the Monday of its week on weekly charts. Oldest first.
+ */
+export function releaseMarks(
+  releases: Release[],
+  start: string,
+  end: string,
+  weekly = false,
+): ReleaseMark[] {
+  const by = new Map<string, string[]>();
+  for (const r of [...releases].sort((a, b) => a.date.localeCompare(b.date))) {
+    if (r.date < start || r.date > end) continue;
+    const date = weekly ? weekStart(r.date) : r.date;
+    by.set(date, [...(by.get(date) ?? []), r.tag]);
+  }
+  return [...by]
+    .map(([date, tags]) => ({ date, tags }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+export interface ReleaseImpact {
+  release: ReleaseWithRepo;
+  /** Downloads in the `days` days before the release day; null if not all collected. */
+  before: number | null;
+  /** Downloads from the release day on, for `days` days; null if not complete yet. */
+  after: number | null;
+  /** after / before - 1, as a fraction; null when either side is unknown or before is 0. */
+  change: number | null;
+  /** Why `before` / `after` is null. */
+  beforeGap: ImpactGap | null;
+  afterGap: ImpactGap | null;
+}
+
+/** "uncollected": the window starts before every source was collected; "filling": it has not ended. */
+export type ImpactGap = 'uncollected' | 'filling';
+
+/**
+ * Downloads in the window before each release and the same-length window
+ * starting on its day, newest release first. Releases with neither window
+ * known are left out. A window that reaches before
+ * `fullFrom` (the first day every source was collected) or past
+ * `completeThrough` (the last day every source has reported) is unknown,
+ * not zero, so a source that started later does not read as growth.
+ */
+export function releaseImpact(
+  releases: ReleaseWithRepo[],
+  series: Point[],
+  fullFrom: string,
+  completeThrough: string,
+  days = 14,
+  limit = 10,
+): ReleaseImpact[] {
+  const sum = (from: string, to: string) =>
+    series.reduce(
+      (n, p) => (p.date >= from && p.date <= to ? n + p.count : n),
+      0,
+    );
+  const gap = (from: string, to: string): ImpactGap | null =>
+    !fullFrom || from < fullFrom
+      ? 'uncollected'
+      : !completeThrough || to > completeThrough
+        ? 'filling'
+        : null;
+  return releases
+    .map((release) => {
+      const beforeFrom = addDays(release.date, -days);
+      const beforeTo = addDays(release.date, -1);
+      const afterTo = addDays(release.date, days - 1);
+      const beforeGap = gap(beforeFrom, beforeTo);
+      const afterGap = gap(release.date, afterTo);
+      const before = beforeGap ? null : sum(beforeFrom, beforeTo);
+      const after = afterGap ? null : sum(release.date, afterTo);
+      const change =
+        before !== null && after !== null && before > 0
+          ? after / before - 1
+          : null;
+      return { release, before, after, change, beforeGap, afterGap };
+    })
+    .filter((i) => i.before !== null || i.after !== null)
+    .slice(0, limit);
+}
 
 export interface ReleaseWithRepo extends Release {
   repo: string;

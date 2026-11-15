@@ -69,6 +69,15 @@ describe('Product', () => {
     expect(screen.getByText('Latest release')).toBeInTheDocument();
     // In the latest-release tile and in the recent releases list.
     expect(screen.getAllByText('v1.2.0')).toHaveLength(2);
+    // Only 10 days of downloads: neither 14-day window around v1.2.0 is
+    // known, so the downloads-around-releases table stays hidden.
+    expect(
+      screen.queryByRole('table', { name: /days before and after/ }),
+    ).not.toBeInTheDocument();
+    // The release is still marked on the downloads chart.
+    expect(
+      screen.getByRole('figure', { name: /downloads by source/ }),
+    ).toHaveTextContent(/v1\.2\.0 \(Oct 8, 2026\)/);
     await userEvent.click(
       screen.getByRole('button', { name: 'About: Releases, 90 days' }),
     );

@@ -53,6 +53,7 @@ pulse-dashboard/
 │   │   ├── OriginTable/   # ranked referrers or countries with share bars (Docs page)
 │   │   ├── ReleaseCadence/ # cadence per product, on the Repos page
 │   │   ├── RedirectTo/    # retired paths (/releases) to their new home, query kept
+│   │   ├── ReleaseImpact/ # downloads 14 days before and after each release (Product page)
 │   │   ├── StatRow/       # one slim surface for a page's headline figures; each StatTile has its own (i)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
