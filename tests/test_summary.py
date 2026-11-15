@@ -327,5 +327,52 @@ def test_docs_summary_sums_hosts_and_takes_latest_pages(tmp_path: Path):
     ]
     assert site["top_pages"] == [{"path": "/faq/", "pageviews": 70}, {"path": "/", "pageviews": 50}]
     assert site["top_pages_date"] == "2026-10-23"
+    # No referrer or country files yet: empty ranges, no start date.
+    assert site["referrers"]["30d"] == {"top": [], "other": 0, "total": 0}
+    assert site["origins_since"] is None
     path = summary.write_docs(out, tmp_path)
     assert path.name == "docs.json" and json.loads(path.read_text())["sites"][0]["id"] == "docs"
+
+
+def test_docs_origins_rank_per_range_and_sum_the_rest(tmp_path: Path, monkeypatch):
+    from nebari_pulse.config import DocsConfig, DocsSite
+
+    monkeypatch.setattr(summary, "ORIGINS_TOP", 2)
+    cfg = DocsConfig(
+        cloudflare_zone="nebari.dev", sites=(DocsSite("docs", "Docs", ("nebari.dev",)),)
+    )
+    store.upsert(
+        store.path_for(tmp_path, "docs", "traffic", "docs"),
+        ["date", "host", "pageviews", "visits"],
+        ["date", "host"],
+        [{"date": "2026-10-22", "host": "nebari.dev", "pageviews": 1, "visits": 1}],
+    )
+    store.upsert(
+        store.path_for(tmp_path, "docs", "referrers", "docs"),
+        ["date", "referrer", "pageviews"],
+        ["date", "referrer"],
+        [
+            # Old enough to fall outside 30d but inside 90d.
+            {"date": "2026-08-01", "referrer": "news.ycombinator.com", "pageviews": 500},
+            {"date": "2026-10-21", "referrer": "github.com", "pageviews": 30},
+            {"date": "2026-10-22", "referrer": "github.com", "pageviews": 10},
+            {"date": "2026-10-22", "referrer": "(direct)", "pageviews": 20},
+            {"date": "2026-10-22", "referrer": "google.com", "pageviews": 5},
+        ],
+    )
+    store.upsert(
+        store.path_for(tmp_path, "docs", "countries", "docs"),
+        ["date", "country", "pageviews"],
+        ["date", "country"],
+        [{"date": "2026-10-22", "country": "US", "pageviews": 9}],
+    )
+    site = summary.build_docs(cfg, tmp_path, TODAY)["sites"][0]
+    assert site["referrers"]["30d"] == {
+        "top": [{"name": "github.com", "pageviews": 40}, {"name": "(direct)", "pageviews": 20}],
+        "other": 5,
+        "total": 65,
+    }
+    assert site["referrers"]["90d"]["top"][0] == {"name": "news.ycombinator.com", "pageviews": 500}
+    assert site["referrers"]["all"]["total"] == 565
+    assert site["countries"]["30d"]["top"] == [{"name": "US", "pageviews": 9}]
+    assert site["origins_since"] == "2026-08-01"

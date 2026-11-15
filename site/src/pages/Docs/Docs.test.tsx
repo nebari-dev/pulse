@@ -42,6 +42,24 @@ const docs: DocsFile = {
         { path: '/get-started/', pageviews: 120 },
       ],
       top_pages_date: '2026-10-11',
+      referrers: {
+        '90d': {
+          top: [
+            { name: 'github.com', pageviews: 60 },
+            { name: '(direct)', pageviews: 30 },
+          ],
+          other: 10,
+          total: 100,
+        },
+      },
+      countries: {
+        '90d': {
+          top: [{ name: 'DE', pageviews: 80 }],
+          other: 20,
+          total: 100,
+        },
+      },
+      origins_since: '2026-10-01',
     },
     {
       id: 'classic-docs',
@@ -110,6 +128,33 @@ describe('Docs', () => {
     expect(
       within(table).getByRole('link', { name: /get-started/ }),
     ).toHaveAttribute('href', 'https://nebari.dev/get-started/');
+  });
+
+  it('ranks referrers and countries for the range', async () => {
+    stub(docs);
+    renderPage();
+    const referrers = await screen.findByRole('table', {
+      name: /Where readers come from/,
+    });
+    const names = within(referrers)
+      .getAllByRole('row')
+      .slice(1)
+      .map((r) => within(r).getAllByRole('cell')[0].textContent);
+    expect(names).toEqual(['github.com', 'Direct or unknown', 'Other']);
+    const countries = screen.getByRole('table', { name: /Readers by country/ });
+    expect(within(countries).getByText('Germany')).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Collected since Oct 1, 2026/).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('explains empty referrer data for a site without it', async () => {
+    stub(docs);
+    renderPage('/docs?site=classic-docs');
+    const referrers = await screen.findByRole('table', {
+      name: /Where readers come from/,
+    });
+    expect(referrers).toHaveTextContent('No referrer data yet.');
   });
 
   it('filters the table by site from the URL', async () => {

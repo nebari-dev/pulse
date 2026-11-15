@@ -12,6 +12,7 @@ import {
   coverage,
   excludesCharts,
   fillDaily,
+  mergeOrigins,
   platformOf,
   type Source,
   seriesCoverage,
@@ -367,5 +368,40 @@ describe('coverage', () => {
     );
     expect(cov.partialFrom).toBe('2026-10-19');
     expect(cov.lagging).toEqual([]);
+  });
+});
+
+describe('mergeOrigins', () => {
+  it('sums names across sites, re-cuts to the limit and keeps the rest', () => {
+    const merged = mergeOrigins(
+      [
+        {
+          top: [
+            { name: 'github.com', pageviews: 10 },
+            { name: 'google.com', pageviews: 4 },
+          ],
+          other: 3,
+          total: 17,
+        },
+        undefined,
+        {
+          top: [
+            { name: 'google.com', pageviews: 8 },
+            { name: 'bing.com', pageviews: 1 },
+          ],
+          other: 0,
+          total: 9,
+        },
+      ],
+      2,
+    );
+    expect(merged).toEqual({
+      top: [
+        { name: 'google.com', pageviews: 12 },
+        { name: 'github.com', pageviews: 10 },
+      ],
+      other: 4,
+      total: 26,
+    });
   });
 });
