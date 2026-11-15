@@ -162,7 +162,7 @@ so each page loads only what it shows:
 |---|---|---|
 | `summary.json` | Downloads page (`useSummary`) | every product: totals + series grouped by (source, artifact kind), with `since` per group |
 | `docs.json` | Docs page (`useDocs`) | per documentation site: daily visits and page views, top pages snapshot |
-| `repos.json` | Releases, Repos, Traffic (`useRepos`) | every product's repos: latest health, health series, traffic, stars, contributors, releases; plus ecosystem contributors (active, monthly, new per quarter) |
+| `repos.json` | Repos, Traffic (`useRepos`) | every product's repos: latest health, health series, traffic, stars, contributors, releases; plus ecosystem contributors (active, monthly, new per quarter) |
 | `products/<id>.json` | product page (`useProduct`) | one product in full: each artifact's series and latest items (with per-item totals, for version adoption), plus repos |
 
 The index is ~15% of the full data, and grows per group rather than per

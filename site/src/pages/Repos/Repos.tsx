@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ChartCard from '@/components/ChartCard';
 import Filters from '@/components/Filters';
 import PageHeader from '@/components/PageHeader';
+import ReleaseCadence from '@/components/ReleaseCadence';
 import SearchBox from '@/components/SearchBox';
 import Sparkline from '@/components/Sparkline';
 import StatRow from '@/components/StatRow';
@@ -117,8 +118,12 @@ function useRepos(summary: ReposFile | undefined) {
           ),
         }
       : null;
+    const products = summary.products.filter((p) =>
+      matchesKind(p, params.kind),
+    );
     return {
       asOf,
+      products,
       rows,
       totals,
       quiet,
@@ -233,7 +238,7 @@ function Repos() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Repositories"
-        description="Stars, open work and throughput for every GitHub repo behind a product or pack."
+        description="Stars, open work, throughput and release cadence for every GitHub repo behind a product or pack."
       >
         <Filters params={params} onChange={setParams} show={['kind']} />
       </PageHeader>
@@ -512,6 +517,8 @@ function Repos() {
               </TableBody>
             </Table>
           </TableCard>
+
+          <ReleaseCadence products={view.products} asOf={view.asOf} />
         </>
       )}
     </div>

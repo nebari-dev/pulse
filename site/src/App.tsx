@@ -1,12 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Header from '@/components/Header';
+import RedirectTo from '@/components/RedirectTo';
 import { ThemeProvider } from '@/hooks/theme-provider';
 import Docs from '@/pages/Docs';
 import NotFound from '@/pages/NotFound';
 import Overview from '@/pages/Overview';
 import Product from '@/pages/Product';
-import Releases from '@/pages/Releases';
 import Repos from '@/pages/Repos';
 import Sources from '@/pages/Sources';
 import Traffic from '@/pages/Traffic';
@@ -24,7 +24,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Overview />} />
                 <Route path="/product/:id" element={<Product />} />
-                <Route path="/releases" element={<Releases />} />
+                {/* Release cadence moved to the Repos page. */}
+                <Route path="/releases" element={<RedirectTo to="/repos" />} />
                 <Route path="/repos" element={<Repos />} />
                 <Route path="/traffic" element={<Traffic />} />
                 <Route path="/docs" element={<Docs />} />

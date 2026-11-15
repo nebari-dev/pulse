@@ -30,11 +30,6 @@ export const NAV = [
     match: (p: string) => p === '/' || p.startsWith('/product/'),
   },
   {
-    to: '/releases',
-    label: 'Releases',
-    match: (p: string) => p.startsWith('/releases'),
-  },
-  {
     to: '/repos',
     label: 'Repos',
     match: (p: string) => p.startsWith('/repos'),
