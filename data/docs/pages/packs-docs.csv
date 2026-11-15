@@ -4766,6 +4766,7 @@ date,path,pageviews
 2026-11-15,/skillsctl/cli/reference/skillsctl/,12
 2026-11-15,/skillsctl/cli/reference/skillsctl_auth/,12
 2026-11-15,/skillsctl/cli/reference/skillsctl_auth_login/,15
+2026-11-15,/skillsctl/cli/reference/skillsctl_auth_logout/,11
 2026-11-15,/skillsctl/cli/reference/skillsctl_auth_status/,13
 2026-11-15,/skillsctl/cli/reference/skillsctl_config/,14
 2026-11-15,/skillsctl/cli/reference/skillsctl_config_get/,12

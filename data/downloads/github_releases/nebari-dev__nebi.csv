@@ -4678,9 +4678,9 @@ date,tag,asset,cumulative
 2026-11-15,v0.16,nebi-desktop-windows-amd64.exe.release.json,1
 2026-11-15,v0.16,nebi-desktop-windows-amd64.exe.sbom.spdx.json,1
 2026-11-15,v0.16,nebi_0.16_linux_arm64.tar.gz,13
-2026-11-15,v0.16,nebi_0.16_linux_x86_64.tar.gz,308
+2026-11-15,v0.16,nebi_0.16_linux_x86_64.tar.gz,309
 2026-11-15,v0.16,nebi_0.16_macOS_arm64.tar.gz,98
-2026-11-15,v0.16,nebi_0.16_macOS_x86_64.tar.gz,3
+2026-11-15,v0.16,nebi_0.16_macOS_x86_64.tar.gz,4
 2026-11-15,v0.16,nebi_0.16_windows_x86_64.zip,108
 2026-11-15,v0.2,darb_0.2_linux_arm64.tar.gz,2
 2026-11-15,v0.2,darb_0.2_linux_x86_64.tar.gz,3
