@@ -154,7 +154,7 @@ describe('Docs', () => {
     const referrers = await screen.findByRole('table', {
       name: /Where readers come from/,
     });
-    expect(referrers).toHaveTextContent('No referrer data yet.');
+    expect(referrers).toHaveTextContent('No referrer data.');
   });
 
   it('filters the table by site from the URL', async () => {

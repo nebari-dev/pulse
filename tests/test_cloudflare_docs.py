@@ -135,44 +135,145 @@ def test_parse_origins_drops_internal_navigation():
     assert cloudflare_docs.parse_origins({"data": {"viewer": {"zones": []}}}, ()) == ([], [])
 
 
-def test_origins_failure_keeps_traffic(tmp_path, monkeypatch):
+TRAFFIC_PAYLOAD = {
+    "data": {
+        "viewer": {
+            "zones": [
+                {
+                    "traffic": [
+                        {
+                            "count": 3,
+                            "sum": {"visits": 1},
+                            "dimensions": {
+                                "date": "2026-10-22",
+                                "clientRequestHTTPHost": "nebari.dev",
+                            },
+                        }
+                    ],
+                    "pages": [],
+                }
+            ]
+        }
+    }
+}
+
+COUNTRIES_PAYLOAD = {
+    "data": {
+        "viewer": {
+            "zones": [
+                {
+                    "countries": [
+                        {
+                            "count": 4,
+                            "dimensions": {"date": "2026-10-22", "clientCountryName": "DE"},
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+REFERRERS_PAYLOAD = {
+    "data": {
+        "viewer": {
+            "zones": [
+                {
+                    "referrers": [
+                        {
+                            "count": 2,
+                            "dimensions": {
+                                "date": "2026-10-22",
+                                "clientRefererHost": "github.com",
+                            },
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+
+def run_docs(tmp_path, monkeypatch, responses):
+    """Collect one site with post_json answered per query from `responses`."""
     from nebari_pulse.config import DocsConfig, DocsSite
-    from nebari_pulse.http import HttpError
 
     monkeypatch.setenv("CLOUDFLARE_ANALYTICS_TOKEN", "t")
     monkeypatch.setattr(cloudflare_docs, "zone_id", lambda name: "zone")
 
     def fake_post(url, body, headers):
-        if body["query"] is cloudflare_docs.ORIGINS_QUERY:
-            raise HttpError(url, 400, "unknown field clientRefererHost")
-        return {
-            "data": {
-                "viewer": {
-                    "zones": [
-                        {
-                            "traffic": [
-                                {
-                                    "count": 3,
-                                    "sum": {"visits": 1},
-                                    "dimensions": {
-                                        "date": "2026-10-22",
-                                        "clientRequestHTTPHost": "nebari.dev",
-                                    },
-                                }
-                            ],
-                            "pages": [],
-                        }
-                    ]
-                }
-            }
-        }
+        answer = responses[body["query"]]
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
 
     monkeypatch.setattr(cloudflare_docs, "post_json", fake_post)
     cfg = DocsConfig(
         cloudflare_zone="nebari.dev", sites=(DocsSite("docs", "Docs", ("nebari.dev",)),)
     )
-    res = cloudflare_docs.collect(cfg, tmp_path, TODAY)
+    return cloudflare_docs.collect(cfg, tmp_path, TODAY)
+
+
+def test_origins_failure_keeps_traffic(tmp_path, monkeypatch):
+    from nebari_pulse.http import HttpError
+
+    failure = HttpError("url", 500, "boom")
+    res = run_docs(
+        tmp_path,
+        monkeypatch,
+        {
+            cloudflare_docs.QUERY: TRAFFIC_PAYLOAD,
+            cloudflare_docs.REFERRERS_QUERY: failure,
+            cloudflare_docs.COUNTRIES_QUERY: failure,
+        },
+    )
     assert res.artifacts == 1
-    assert len(res.errors) == 1 and "referrers/countries" in res.errors[0]
+    assert len(res.errors) == 2
     assert (tmp_path / "docs" / "traffic" / "docs.csv").exists()
     assert not (tmp_path / "docs" / "referrers" / "docs.csv").exists()
+    assert not (tmp_path / "docs" / "countries" / "docs.csv").exists()
+
+
+def test_referrer_field_denied_is_a_note_and_keeps_countries(tmp_path, monkeypatch):
+    denied = {
+        "data": None,
+        "errors": [
+            {
+                "message": "zone 'abc' does not have access to the field "
+                "'clientrefererhost' from the path"
+            }
+        ],
+    }
+    res = run_docs(
+        tmp_path,
+        monkeypatch,
+        {
+            cloudflare_docs.QUERY: TRAFFIC_PAYLOAD,
+            cloudflare_docs.REFERRERS_QUERY: denied,
+            cloudflare_docs.COUNTRIES_QUERY: COUNTRIES_PAYLOAD,
+        },
+    )
+    assert res.errors == []
+    assert "referrers_unavailable" in res.notes
+    assert not (tmp_path / "docs" / "referrers" / "docs.csv").exists()
+    rows = (tmp_path / "docs" / "countries" / "docs.csv").read_text().splitlines()
+    assert rows == ["date,country,pageviews", "2026-10-22,DE,4"]
+
+
+def test_country_failure_keeps_referrers(tmp_path, monkeypatch):
+    from nebari_pulse.http import HttpError
+
+    res = run_docs(
+        tmp_path,
+        monkeypatch,
+        {
+            cloudflare_docs.QUERY: TRAFFIC_PAYLOAD,
+            cloudflare_docs.REFERRERS_QUERY: REFERRERS_PAYLOAD,
+            cloudflare_docs.COUNTRIES_QUERY: HttpError("url", 500, "boom"),
+        },
+    )
+    assert len(res.errors) == 1 and "countries" in res.errors[0]
+    rows = (tmp_path / "docs" / "referrers" / "docs.csv").read_text().splitlines()
+    assert rows == ["date,referrer,pageviews", "2026-10-22,github.com,2"]
+    assert not (tmp_path / "docs" / "countries" / "docs.csv").exists()

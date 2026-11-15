@@ -94,7 +94,7 @@ site/                        see site/AGENTS.md
 | repos/stars | `date,stars` | cumulative; backfilled once from the stargazers API (timestamp per star), then today's count from the health snapshot |
 | docs/traffic | `date,host,pageviews,visits` | daily, HTML 200s to browsers at the Cloudflare edge; refetched for 30 days each run |
 | docs/pages | `date,path,pageviews` | daily snapshot of the top 200 paths over the last 7 days |
-| docs/referrers | `date,referrer,pageviews` | daily, page views by referrer host; the site's own hosts dropped, `(direct)` for none; refetched for 30 days |
+| docs/referrers | `date,referrer,pageviews` | daily, page views by referrer host; the site's own hosts dropped, `(direct)` for none; refetched for 30 days; skipped with a note when the zone plan does not expose referrers |
 | docs/countries | `date,country,pageviews` | daily, page views by visitor country (ISO code); refetched for 30 days |
 | repos/contributors | `date,author,commits` | per author per day on the default branch; bots excluded; author is a login or `email:<address>`; backfilled once, then the latest month refetched |
 
