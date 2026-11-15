@@ -50,9 +50,9 @@ pulse-dashboard/
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── MultiSelect/   # checkable dropdown used by every filter; never empty
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
-│   │   ├── ReleaseImpact/ # downloads 14 days before and after each release (Product page)
 │   │   ├── ReleaseCadence/ # cadence per product, on the Repos page
 │   │   ├── RedirectTo/    # retired paths (/releases) to their new home, query kept
+│   │   ├── ReleaseImpact/ # downloads 14 days before and after each release (Product page)
 │   │   ├── StatRow/       # one slim surface for a page's headline figures; each StatTile has its own (i)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
