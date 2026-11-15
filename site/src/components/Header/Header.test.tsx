@@ -34,9 +34,9 @@ describe('Header', () => {
     const downloads = screen.getByRole('link', { name: 'Downloads' });
     expect(nav).toContainElement(downloads);
     expect(downloads).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Releases' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Traffic' })).toHaveAttribute(
       'href',
-      '/releases?range=30d',
+      '/traffic?range=30d',
     );
     expect(screen.getByRole('link', { name: 'Repos' })).not.toHaveAttribute(
       'aria-current',
@@ -50,7 +50,6 @@ describe('Header', () => {
     const items = within(menu).getAllByRole('menuitem');
     expect(items.map((i) => i.textContent)).toEqual([
       'Downloads',
-      'Releases',
       'Repos',
       'Traffic',
       'Docs',
@@ -58,11 +57,11 @@ describe('Header', () => {
       'View source on GitHub',
       'Switch to dark mode',
     ]);
-    expect(items[2]).toHaveAttribute('aria-current', 'page');
-    expect(items[3]).toHaveAttribute('href', '/traffic?kind=pack');
-    expect(items[5]).toHaveAttribute('href', '/sources?kind=pack');
-    expect(items[6]).toHaveAttribute('href', REPO_URL);
-    await userEvent.click(items[7]);
+    expect(items[1]).toHaveAttribute('aria-current', 'page');
+    expect(items[2]).toHaveAttribute('href', '/traffic?kind=pack');
+    expect(items[4]).toHaveAttribute('href', '/sources?kind=pack');
+    expect(items[5]).toHaveAttribute('href', REPO_URL);
+    await userEvent.click(items[6]);
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 

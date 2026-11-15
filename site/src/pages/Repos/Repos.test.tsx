@@ -61,6 +61,9 @@ describe('Repos', () => {
     ).toBeInTheDocument();
     expect(
       within(row).getByRole('img', { name: /open issues, last 90 days/ }),
+    ).toBeInTheDocument(); // Release cadence per product, below the repo table.
+    expect(
+      screen.getByRole('table', { name: /Release cadence by product/ }),
     ).toBeInTheDocument();
   });
 

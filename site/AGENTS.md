@@ -50,13 +50,14 @@ pulse-dashboard/
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── MultiSelect/   # checkable dropdown used by every filter; never empty
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
+│   │   ├── ReleaseCadence/ # cadence per product, on the Repos page
+│   │   ├── RedirectTo/    # retired paths (/releases) to their new home, query kept
 │   │   ├── StatRow/       # one slim surface for a page's headline figures; each StatTile has its own (i)
 │   │   ├── Filters/, Leaderboard/, StatTile/, TrendChart/, Sparkline/
 │   ├── pages/
 │   │   ├── Overview/      # / — filters, stat tiles, trend chart, share chart, searchable leaderboard
 │   │   ├── Product/       # /product/:id — artifacts, version adoption, releases, repos, traffic
-│   │   ├── Releases/      # /releases — cadence per product + release feed
-│   │   ├── Repos/         # /repos — health table per repo
+│   │   ├── Repos/         # /repos — health table per repo + release cadence; /releases redirects here
 │   │   ├── Traffic/       # /traffic — GitHub views/clones
 │   │   ├── Docs/          # /docs — documentation site visits and top pages (Cloudflare)
 │   │   ├── Sources/       # /sources — where each number comes from; linked from the header (?) and every info popover
@@ -165,7 +166,7 @@ The only data source is the JSON the Python collector writes under
 | File                 | Hook             | Page                                                       |
 | -------------------- | ---------------- | ---------------------------------------------------------- |
 | `summary.json`       | `useSummary()`   | Downloads: products with series grouped by source and type |
-| `repos.json`         | `useRepos()`     | Releases, Repos, Traffic                                   |
+| `repos.json`         | `useRepos()`     | Repos (incl. release cadence), Traffic                     |
 | `products/<id>.json` | `useProduct(id)` | one product in full; `null` on 404                         |
 
 Each is fetched once and never refetched. Everything on screen is derived
