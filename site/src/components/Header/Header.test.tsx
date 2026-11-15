@@ -50,15 +50,15 @@ describe('Header', () => {
     const items = within(menu).getAllByRole('menuitem');
     expect(items.map((i) => i.textContent)).toEqual([
       'Downloads',
-      'Repos',
       'Traffic',
+      'Repos',
       'Docs',
       'Data sources',
       'View source on GitHub',
       'Switch to dark mode',
     ]);
-    expect(items[1]).toHaveAttribute('aria-current', 'page');
-    expect(items[2]).toHaveAttribute('href', '/traffic?kind=pack');
+    expect(items[2]).toHaveAttribute('aria-current', 'page');
+    expect(items[1]).toHaveAttribute('href', '/traffic?kind=pack');
     expect(items[4]).toHaveAttribute('href', '/sources?kind=pack');
     expect(items[5]).toHaveAttribute('href', REPO_URL);
     await userEvent.click(items[6]);
