@@ -144,12 +144,15 @@ The same HTML page views, per referrer host per day. Referrers that are
 the site's own hosts (clicks from one page to another) are dropped, so a
 row counts arrivals from elsewhere. `(direct)` is no referrer at all:
 typed links, bookmarks, and apps like Slack that hide the referrer.
+Cloudflare only exposes the referrer field on some zone plans. The
+nebari.dev zone refuses it today, so the collector skips referrers with a
+note and this file is not written.
 
 **Countries** (`docs/countries/<site>.csv`, `date,country,pageviews`)
 The same page views per visitor country, as an ISO code (`XX` is
-unknown, `T1` is Tor). Referrers and countries come from a second query
-and are refetched for 30 days like traffic; if that query fails, traffic
-and top pages are still kept.
+unknown, `T1` is Tor). Referrers and countries are one query each,
+separate from traffic, and are refetched for 30 days like traffic. If one
+fails, the other and traffic and top pages are still kept.
 
 ### Derived numbers
 

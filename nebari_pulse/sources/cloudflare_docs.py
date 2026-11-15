@@ -18,8 +18,10 @@ gated and undercounts). Two CSV families under data/docs/:
                         visitor country (ISO code) per day.
                         Both refetched for the last 30 days like traffic.
 
-Referrers and countries come from a second query, so a failure there is
-reported without losing traffic and top pages.
+Referrers and countries are one query each, separate from traffic, so a
+failure in one is reported without losing the others. Cloudflare only
+exposes the referrer field on some zone plans; when the zone refuses it,
+referrers are skipped with a note instead of an error on every run.
 
 Needs an API token with Zone:Read (to resolve the zone id by name) and
 Analytics:Read on the zone: CLOUDFLARE_ANALYTICS_TOKEN, or the deploy
@@ -91,11 +93,11 @@ query ($zone: String!, $hosts: [String!], $start: Date!, $end: Date!, $pagesStar
 """
 
 
-ORIGINS_QUERY = """
+ORIGIN_QUERY = """
 query ($zone: String!, $hosts: [String!], $start: Date!, $end: Date!) {
   viewer {
     zones(filter: { zoneTag: $zone }) {
-      referrers: httpRequestsAdaptiveGroups(
+      %s: httpRequestsAdaptiveGroups(
         limit: 10000
         orderBy: [count_DESC]
         filter: {
@@ -107,26 +109,17 @@ query ($zone: String!, $hosts: [String!], $start: Date!, $end: Date!) {
         }
       ) {
         count
-        dimensions { date clientRefererHost }
-      }
-      countries: httpRequestsAdaptiveGroups(
-        limit: 10000
-        orderBy: [count_DESC]
-        filter: {
-          date_geq: $start, date_leq: $end
-          requestSource: "eyeball"
-          clientRequestHTTPHost_in: $hosts
-          edgeResponseContentTypeName: "html"
-          edgeResponseStatus: 200
-        }
-      ) {
-        count
-        dimensions { date clientCountryName }
+        dimensions { date %s }
       }
     }
   }
 }
 """
+
+REFERRERS_QUERY = ORIGIN_QUERY % ("referrers", "clientRefererHost")
+COUNTRIES_QUERY = ORIGIN_QUERY % ("countries", "clientCountryName")
+# Text of the GraphQL error when the zone plan does not expose a field.
+FIELD_DENIED = "does not have access to the field"
 
 
 def token() -> str | None:
@@ -205,42 +198,50 @@ def collect(cfg: DocsConfig, data_dir: Path, today: date) -> CollectResult:
 def collect_origins(
     zone: str, site: DocsSite, start: date, end: date, data_dir: Path, result: CollectResult
 ) -> int:
-    """Referrer and country rows for one site; a failure is a partial error."""
-    try:
-        payload = post_json(
-            GRAPHQL,
-            {
-                "query": ORIGINS_QUERY,
-                "variables": {
-                    "zone": zone,
-                    "hosts": list(site.hosts),
-                    "start": start.isoformat(),
-                    "end": end.isoformat(),
-                },
-            },
-            headers=headers(),
+    """Referrer and country rows for one site. Each is its own query, so one
+    failing keeps the other; a failure is a partial error, except a field the
+    zone plan does not expose, which is a note."""
+    variables = {
+        "zone": zone,
+        "hosts": list(site.hosts),
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+    }
+    zone_data: dict[str, list] = {}
+    for key, query in (("referrers", REFERRERS_QUERY), ("countries", COUNTRIES_QUERY)):
+        try:
+            payload = post_json(
+                GRAPHQL, {"query": query, "variables": variables}, headers=headers()
+            )
+        except HttpError as e:
+            result.errors.append(f"{site.id} {key}: {e}")
+            continue
+        if payload.get("errors"):
+            message = payload["errors"][0].get("message") or ""
+            if FIELD_DENIED in message:
+                result.notes[f"{key}_unavailable"] = message
+            else:
+                result.errors.append(f"{site.id} {key}: {message}")
+            continue
+        zones = (payload.get("data") or {}).get("viewer", {}).get("zones") or []
+        if zones:
+            zone_data[key] = zones[0].get(key) or []
+    referrers, countries = parse_origins({"data": {"viewer": {"zones": [zone_data]}}}, site.hosts)
+    changed = 0
+    if "referrers" in zone_data:
+        changed += store.upsert(
+            store.path_for(data_dir, "docs", "referrers", site.id),
+            REFERRER_COLUMNS,
+            ["date", "referrer"],
+            referrers,
         )
-    except HttpError as e:
-        result.errors.append(f"{site.id} referrers/countries: {e}")
-        return 0
-    if payload.get("errors"):
-        result.errors.append(
-            f"{site.id} referrers/countries: {payload['errors'][0].get('message')}"
+    if "countries" in zone_data:
+        changed += store.upsert(
+            store.path_for(data_dir, "docs", "countries", site.id),
+            COUNTRY_COLUMNS,
+            ["date", "country"],
+            countries,
         )
-        return 0
-    referrers, countries = parse_origins(payload, site.hosts)
-    changed = store.upsert(
-        store.path_for(data_dir, "docs", "referrers", site.id),
-        REFERRER_COLUMNS,
-        ["date", "referrer"],
-        referrers,
-    )
-    changed += store.upsert(
-        store.path_for(data_dir, "docs", "countries", site.id),
-        COUNTRY_COLUMNS,
-        ["date", "country"],
-        countries,
-    )
     log.info("docs %s: %d referrer-days, %d country-days", site.id, len(referrers), len(countries))
     return changed
 

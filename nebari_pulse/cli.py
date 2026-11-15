@@ -119,6 +119,8 @@ def _collect(cfg: config.Config, args: argparse.Namespace, today) -> int:
     for res in results:
         if res.source == "cloudflare_docs" and res.notes.get("skipped"):
             print(f"docs traffic skipped: {res.notes['skipped']}")
+        if res.source == "cloudflare_docs" and res.notes.get("referrers_unavailable"):
+            print("docs referrers skipped: the zone's Cloudflare plan does not expose them")
         if res.source == "github_repos" and res.notes.get("traffic_denied"):
             denied = res.notes["traffic_denied"]
             print(

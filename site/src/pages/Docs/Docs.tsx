@@ -311,7 +311,7 @@ function Docs() {
           column="Referrer"
           rank={view.referrers}
           label={(name) => (name === '(direct)' ? 'Direct or unknown' : name)}
-          empty="No referrer data yet. It fills in from the next daily run."
+          empty="No referrer data. Cloudflare does not report referrers on this zone's plan."
           info={
             <ul>
               <li>
