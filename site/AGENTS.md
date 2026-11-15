@@ -50,7 +50,7 @@ pulse-dashboard/
 │   │   ├── SearchBox/     # text filter for tables; value lives in the URL (?q=)
 │   │   ├── MultiSelect/   # checkable dropdown used by every filter; never empty
 │   │   ├── ShareChart/    # 100% stacked weekly share by product (lib/summary.ts shareRows)
-│   │   ├── OriginTable/   # ranked referrers or countries with share bars (Docs page)
+│   │   ├── OriginTable/   # ranked names with share bars (Docs page countries)
 │   │   ├── ReleaseCadence/ # cadence per product, on the Repos page
 │   │   ├── RedirectTo/    # retired paths (/releases) to their new home, query kept
 │   │   ├── ReleaseImpact/ # downloads 14 days before and after each release (Product page)
@@ -61,7 +61,7 @@ pulse-dashboard/
 │   │   ├── Product/       # /product/:id — artifacts, version adoption, releases, repos, traffic
 │   │   ├── Repos/         # /repos — health table per repo + release cadence; /releases redirects here
 │   │   ├── Traffic/       # /traffic — GitHub views/clones
-│   │   ├── Docs/          # /docs — documentation site visits, referrers, countries and top pages (Cloudflare)
+│   │   ├── Docs/          # /docs — documentation site visits, top pages and countries (Cloudflare)
 │   │   ├── Sources/       # /sources — where each number comes from; linked from the header (?) and every info popover
 │   │   └── NotFound/
 │   │       ├── NotFound.tsx

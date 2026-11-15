@@ -148,7 +148,6 @@ function useDocsView(docs: DocsFile | undefined) {
         .sort()[0] ?? null;
     return {
       empty: false as const,
-      referrers: mergeOrigins(sites.map((s) => s.referrers?.[params.range])),
       countries: mergeOrigins(sites.map((s) => s.countries?.[params.range])),
       originsSince,
       lines: coverageLines(cov, siteName),
@@ -305,50 +304,6 @@ function Docs() {
         />
       </ChartCard>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <OriginTable
-          title={`Where readers come from, ${rangeLabel.toLowerCase()}`}
-          column="Referrer"
-          rank={view.referrers}
-          label={(name) => (name === '(direct)' ? 'Direct or unknown' : name)}
-          empty="No referrer data. Cloudflare does not report referrers on this zone's plan."
-          info={
-            <ul>
-              <li>
-                Page views that arrived from another site, by the host that
-                linked to them. Clicks between pages of the same docs site are
-                left out, so each row counts arrivals.
-              </li>
-              <li>
-                Direct or unknown means no referrer: typed or bookmarked links,
-                and apps such as Slack or email that hide where a click came
-                from.
-              </li>
-              <li>The top 20 are listed; the rest are summed in Other.</li>
-            </ul>
-          }
-          footnote={originsFootnote(view.originsSince)}
-        />
-        <OriginTable
-          title={`Readers by country, ${rangeLabel.toLowerCase()}`}
-          column="Country"
-          rank={view.countries}
-          label={countryName}
-          empty="No country data yet. It fills in from the next daily run."
-          info={
-            <ul>
-              <li>
-                Page views by the visitor's country, as Cloudflare places them
-                from the IP address. VPNs and corporate proxies show up where
-                they exit.
-              </li>
-              <li>The top 20 are listed; the rest are summed in Other.</li>
-            </ul>
-          }
-          footnote={originsFootnote(view.originsSince)}
-        />
-      </div>
-
       <TableCard
         title="Top pages, last 7 days"
         info={
@@ -428,6 +383,25 @@ function Docs() {
           </TableBody>
         </Table>
       </TableCard>
+
+      <OriginTable
+        title={`Readers by country, ${rangeLabel.toLowerCase()}`}
+        column="Country"
+        rank={view.countries}
+        label={countryName}
+        empty="No country data yet. It fills in from the next daily run."
+        info={
+          <ul>
+            <li>
+              Page views by the visitor's country, as Cloudflare places them
+              from the IP address. VPNs and corporate proxies show up where they
+              exit.
+            </li>
+            <li>The top 20 are listed; the rest are summed in Other.</li>
+          </ul>
+        }
+        footnote={originsFootnote(view.originsSince)}
+      />
     </div>
   );
 }

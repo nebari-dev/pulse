@@ -130,31 +130,40 @@ describe('Docs', () => {
     ).toHaveAttribute('href', 'https://nebari.dev/get-started/');
   });
 
-  it('ranks referrers and countries for the range', async () => {
+  it('ranks countries for the range', async () => {
     stub(docs);
     renderPage();
-    const referrers = await screen.findByRole('table', {
-      name: /Where readers come from/,
+    const countries = await screen.findByRole('table', {
+      name: /Readers by country/,
     });
-    const names = within(referrers)
-      .getAllByRole('row')
-      .slice(1)
-      .map((r) => within(r).getAllByRole('cell')[0].textContent);
-    expect(names).toEqual(['github.com', 'Direct or unknown', 'Other']);
-    const countries = screen.getByRole('table', { name: /Readers by country/ });
     expect(within(countries).getByText('Germany')).toBeInTheDocument();
     expect(
       screen.getAllByText(/Collected since Oct 1, 2026/).length,
     ).toBeGreaterThan(0);
   });
 
-  it('explains empty referrer data for a site without it', async () => {
+  it('does not show a referrer table', async () => {
     stub(docs);
-    renderPage('/docs?site=classic-docs');
-    const referrers = await screen.findByRole('table', {
-      name: /Where readers come from/,
+    renderPage();
+    await screen.findByRole('table', { name: /Readers by country/ });
+    expect(
+      screen.queryByRole('table', { name: /Where readers come from/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('puts the country table below top pages', async () => {
+    stub(docs);
+    renderPage();
+    const countries = await screen.findByRole('table', {
+      name: /Readers by country/,
     });
-    expect(referrers).toHaveTextContent('No referrer data.');
+    const pages = screen.getByRole('table', {
+      name: 'Top documentation pages, last 7 days',
+    });
+    expect(
+      pages.compareDocumentPosition(countries) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('filters the table by site from the URL', async () => {
