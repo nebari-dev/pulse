@@ -56,3 +56,25 @@ export function formatQuarter(iso: string): string {
   const [y, m] = iso.split('-').map(Number);
   return `Q${Math.floor((m - 1) / 3) + 1} ${y}`;
 }
+
+const REGIONS = (() => {
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' });
+  } catch {
+    return null;
+  }
+})();
+
+/**
+ * A country name for Cloudflare's ISO code. "XX" is unknown and "T1" is Tor;
+ * any code the browser cannot name is shown as is.
+ */
+export function countryName(code: string): string {
+  if (code === 'XX') return 'Unknown';
+  if (code === 'T1') return 'Tor network';
+  try {
+    return REGIONS?.of(code) ?? code;
+  } catch {
+    return code;
+  }
+}

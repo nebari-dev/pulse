@@ -102,6 +102,13 @@ const DOCS: Row[] = [
     counts: 'Page views per path over the last 7 days, top 200 per site.',
     history: 'Only the latest snapshot is shown.',
   },
+  {
+    name: 'Referrers and countries',
+    counts:
+      "The same page views by the host that linked to them and by the visitor's country. Clicks between pages of the same site are left out of referrers, so they count arrivals; no referrer shows as Direct or unknown.",
+    history:
+      'Refetched for the last 30 days each run, like visits, so history starts 30 days before Pulse began collecting them.',
+  },
 ];
 
 const READING: Array<[string, ReactNode]> = [

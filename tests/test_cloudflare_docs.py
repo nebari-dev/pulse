@@ -69,3 +69,110 @@ def test_falls_back_to_the_deploy_token(monkeypatch):
     assert cloudflare_docs.token() == "deploy"
     monkeypatch.setenv("CLOUDFLARE_ANALYTICS_TOKEN", "analytics")
     assert cloudflare_docs.token() == "analytics"
+
+
+def test_parse_origins_drops_internal_navigation():
+    payload = {
+        "data": {
+            "viewer": {
+                "zones": [
+                    {
+                        "referrers": [
+                            {
+                                "count": 50,
+                                "dimensions": {
+                                    "date": "2026-10-21",
+                                    "clientRefererHost": "nebari.dev",
+                                },
+                            },
+                            {
+                                "count": 7,
+                                "dimensions": {
+                                    "date": "2026-10-21",
+                                    "clientRefererHost": "WWW.nebari.dev",
+                                },
+                            },
+                            {
+                                "count": 12,
+                                "dimensions": {
+                                    "date": "2026-10-21",
+                                    "clientRefererHost": "github.com",
+                                },
+                            },
+                            {
+                                "count": 9,
+                                "dimensions": {"date": "2026-10-21", "clientRefererHost": ""},
+                            },
+                            {
+                                "count": 1,
+                                "dimensions": {"date": "2026-10-21", "clientRefererHost": None},
+                            },
+                        ],
+                        "countries": [
+                            {
+                                "count": 40,
+                                "dimensions": {"date": "2026-10-21", "clientCountryName": "US"},
+                            },
+                            {
+                                "count": 3,
+                                "dimensions": {"date": "2026-10-21", "clientCountryName": ""},
+                            },
+                        ],
+                    }
+                ]
+            }
+        }
+    }
+    referrers, countries = cloudflare_docs.parse_origins(payload, ("nebari.dev", "www.nebari.dev"))
+    assert sorted(referrers, key=lambda r: r["referrer"]) == [
+        {"date": "2026-10-21", "referrer": "(direct)", "pageviews": 10},
+        {"date": "2026-10-21", "referrer": "github.com", "pageviews": 12},
+    ]
+    assert countries == [
+        {"date": "2026-10-21", "country": "US", "pageviews": 40},
+        {"date": "2026-10-21", "country": "XX", "pageviews": 3},
+    ]
+    assert cloudflare_docs.parse_origins({"data": {"viewer": {"zones": []}}}, ()) == ([], [])
+
+
+def test_origins_failure_keeps_traffic(tmp_path, monkeypatch):
+    from nebari_pulse.config import DocsConfig, DocsSite
+    from nebari_pulse.http import HttpError
+
+    monkeypatch.setenv("CLOUDFLARE_ANALYTICS_TOKEN", "t")
+    monkeypatch.setattr(cloudflare_docs, "zone_id", lambda name: "zone")
+
+    def fake_post(url, body, headers):
+        if body["query"] is cloudflare_docs.ORIGINS_QUERY:
+            raise HttpError(url, 400, "unknown field clientRefererHost")
+        return {
+            "data": {
+                "viewer": {
+                    "zones": [
+                        {
+                            "traffic": [
+                                {
+                                    "count": 3,
+                                    "sum": {"visits": 1},
+                                    "dimensions": {
+                                        "date": "2026-10-22",
+                                        "clientRequestHTTPHost": "nebari.dev",
+                                    },
+                                }
+                            ],
+                            "pages": [],
+                        }
+                    ]
+                }
+            }
+        }
+
+    monkeypatch.setattr(cloudflare_docs, "post_json", fake_post)
+    cfg = DocsConfig(
+        cloudflare_zone="nebari.dev", sites=(DocsSite("docs", "Docs", ("nebari.dev",)),)
+    )
+    res = cloudflare_docs.collect(cfg, tmp_path, TODAY)
+    assert res.artifacts == 1
+    assert len(res.errors) == 1 and "referrers/countries" in res.errors[0]
+    assert (tmp_path / "docs" / "traffic" / "docs.csv").exists()
+    assert not (tmp_path / "docs" / "referrers" / "docs.csv").exists()

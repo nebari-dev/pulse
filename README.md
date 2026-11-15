@@ -25,7 +25,7 @@ Pulse snapshots it.
 | `/product/:id` | One product: every artifact with its own counts, version adoption over the last 30 days and version share over time, PyPI downloads by Python version and OS, release cadence, repository health, stars over time, open issues and PRs, recent releases, GitHub traffic. |
 | `/traffic` | GitHub traffic: unique visitors and cloners for the last 14 days with change vs. the 14 before, totals, and daily history for all tracked repos. |
 | `/repos` | Repository health: stars and stars gained, open issues and PRs, PRs merged in 30 days, authors in 30 days, last push, with new and active contributors over time, open issues and PRs over time, and release cadence per product (latest release and age, releases in the last 90 days, median gap over the last year, releases per week). `/releases` redirects here. |
-| `/docs` | Documentation traffic for the docs sites (Nebari, Nebari Classic, Software Packs, Nebi, JHub Apps): visits per site with change vs. the previous period, visits over time by site, and one table of the top pages over the last 7 days across all sites, with a site filter and search. |
+| `/docs` | Documentation traffic for the docs sites (Nebari, Nebari Classic, Software Packs, Nebi, JHub Apps): visits per site with change vs. the previous period, visits over time by site, one table of the top pages over the last 7 days across all sites, and where readers come from (referrer hosts and countries) for the selected range, with a site filter and search. |
 
 Filters (range, product or pack, artifact type, source) and the table
 search live in the URL, so any view can be shared as a link.
@@ -139,6 +139,18 @@ zone retains.
 **Top pages** (`docs/pages/<site>.csv`, `date,path,pageviews`)
 A daily snapshot of the 200 most viewed paths over the last 7 days.
 
+**Referrers** (`docs/referrers/<site>.csv`, `date,referrer,pageviews`)
+The same HTML page views, per referrer host per day. Referrers that are
+the site's own hosts (clicks from one page to another) are dropped, so a
+row counts arrivals from elsewhere. `(direct)` is no referrer at all:
+typed links, bookmarks, and apps like Slack that hide the referrer.
+
+**Countries** (`docs/countries/<site>.csv`, `date,country,pageviews`)
+The same page views per visitor country, as an ISO code (`XX` is
+unknown, `T1` is Tor). Referrers and countries come from a second query
+and are refetched for 30 days like traffic; if that query fails, traffic
+and top pages are still kept.
+
 ### Derived numbers
 
 - **Windows and change.** Totals are shown for the selected range (30
@@ -208,7 +220,7 @@ nebari_pulse/           collector (Python 3.12, stdlib + pyyaml)
 data/
   downloads/<source>/<artifact>.csv
   repos/health|releases|stars|contributors|traffic/<owner>__<repo>.csv
-  docs/traffic|pages/<site>.csv
+  docs/traffic|pages|referrers|countries/<site>.csv
   summary.json          index: every product with totals and series per source and type
   repos.json            every product's repos; ecosystem contributors
   docs.json             docs sites: daily series and top pages

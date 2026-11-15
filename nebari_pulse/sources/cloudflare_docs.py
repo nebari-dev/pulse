@@ -10,6 +10,16 @@ gated and undercounts). Two CSV families under data/docs/:
                         zone retains about that much) and upserted.
     pages/<site>.csv    date,path,pageviews            top paths over the
                         last 7 days, snapshotted daily.
+    referrers/<site>.csv  date,referrer,pageviews      page views arriving
+                        from another host, per referrer host per day.
+                        Clicks between the site's own hosts are dropped,
+                        so this counts arrivals; "(direct)" is no referrer.
+    countries/<site>.csv  date,country,pageviews       page views per
+                        visitor country (ISO code) per day.
+                        Both refetched for the last 30 days like traffic.
+
+Referrers and countries come from a second query, so a failure there is
+reported without losing traffic and top pages.
 
 Needs an API token with Zone:Read (to resolve the zone id by name) and
 Analytics:Read on the zone: CLOUDFLARE_ANALYTICS_TOKEN, or the deploy
@@ -27,7 +37,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from .. import store
-from ..config import DocsConfig
+from ..config import DocsConfig, DocsSite
 from ..http import HttpError, get_json, post_json
 from . import CollectResult
 
@@ -37,6 +47,9 @@ API = "https://api.cloudflare.com/client/v4"
 GRAPHQL = f"{API}/graphql"
 TRAFFIC_COLUMNS = ["date", "host", "pageviews", "visits"]
 PAGES_COLUMNS = ["date", "path", "pageviews"]
+REFERRER_COLUMNS = ["date", "referrer", "pageviews"]
+COUNTRY_COLUMNS = ["date", "country", "pageviews"]
+DIRECT = "(direct)"
 TRAFFIC_DAYS = 30
 PAGES_DAYS = 7
 
@@ -71,6 +84,44 @@ query ($zone: String!, $hosts: [String!], $start: Date!, $end: Date!, $pagesStar
       ) {
         count
         dimensions { clientRequestPath }
+      }
+    }
+  }
+}
+"""
+
+
+ORIGINS_QUERY = """
+query ($zone: String!, $hosts: [String!], $start: Date!, $end: Date!) {
+  viewer {
+    zones(filter: { zoneTag: $zone }) {
+      referrers: httpRequestsAdaptiveGroups(
+        limit: 10000
+        orderBy: [count_DESC]
+        filter: {
+          date_geq: $start, date_leq: $end
+          requestSource: "eyeball"
+          clientRequestHTTPHost_in: $hosts
+          edgeResponseContentTypeName: "html"
+          edgeResponseStatus: 200
+        }
+      ) {
+        count
+        dimensions { date clientRefererHost }
+      }
+      countries: httpRequestsAdaptiveGroups(
+        limit: 10000
+        orderBy: [count_DESC]
+        filter: {
+          date_geq: $start, date_leq: $end
+          requestSource: "eyeball"
+          clientRequestHTTPHost_in: $hosts
+          edgeResponseContentTypeName: "html"
+          edgeResponseStatus: 200
+        }
+      ) {
+        count
+        dimensions { date clientCountryName }
       }
     }
   }
@@ -147,7 +198,51 @@ def collect(cfg: DocsConfig, data_dir: Path, today: date) -> CollectResult:
             )
         result.artifacts += 1
         log.info("docs %s: %d host-days, %d top paths", site.id, len(traffic), len(pages))
+        result.rows_changed += collect_origins(zone, site, start, end, data_dir, result)
     return result
+
+
+def collect_origins(
+    zone: str, site: DocsSite, start: date, end: date, data_dir: Path, result: CollectResult
+) -> int:
+    """Referrer and country rows for one site; a failure is a partial error."""
+    try:
+        payload = post_json(
+            GRAPHQL,
+            {
+                "query": ORIGINS_QUERY,
+                "variables": {
+                    "zone": zone,
+                    "hosts": list(site.hosts),
+                    "start": start.isoformat(),
+                    "end": end.isoformat(),
+                },
+            },
+            headers=headers(),
+        )
+    except HttpError as e:
+        result.errors.append(f"{site.id} referrers/countries: {e}")
+        return 0
+    if payload.get("errors"):
+        result.errors.append(
+            f"{site.id} referrers/countries: {payload['errors'][0].get('message')}"
+        )
+        return 0
+    referrers, countries = parse_origins(payload, site.hosts)
+    changed = store.upsert(
+        store.path_for(data_dir, "docs", "referrers", site.id),
+        REFERRER_COLUMNS,
+        ["date", "referrer"],
+        referrers,
+    )
+    changed += store.upsert(
+        store.path_for(data_dir, "docs", "countries", site.id),
+        COUNTRY_COLUMNS,
+        ["date", "country"],
+        countries,
+    )
+    log.info("docs %s: %d referrer-days, %d country-days", site.id, len(referrers), len(countries))
+    return changed
 
 
 def zone_id(name: str) -> str:
@@ -182,3 +277,32 @@ def parse(payload: dict, today: date) -> tuple[list[store.Row], list[store.Row]]
         for g in zone.get("pages") or []
     ]
     return traffic, pages
+
+
+def parse_origins(
+    payload: dict, own_hosts: tuple[str, ...]
+) -> tuple[list[store.Row], list[store.Row]]:
+    """Referrer and country rows from one origins response. Referrers that
+    are the site's own hosts are internal navigation and are dropped; a
+    blank referrer becomes DIRECT. Rows with the same key are summed."""
+    zones = (payload.get("data") or {}).get("viewer", {}).get("zones") or []
+    if not zones:
+        return [], []
+    zone = zones[0]
+    own = {h.lower() for h in own_hosts}
+    referrers: dict[tuple[str, str], int] = {}
+    for g in zone.get("referrers") or []:
+        host = (g["dimensions"].get("clientRefererHost") or "").lower()
+        if host in own:
+            continue
+        key = (g["dimensions"]["date"], host or DIRECT)
+        referrers[key] = referrers.get(key, 0) + int(g.get("count") or 0)
+    countries: dict[tuple[str, str], int] = {}
+    for g in zone.get("countries") or []:
+        code = g["dimensions"].get("clientCountryName") or "XX"
+        key = (g["dimensions"]["date"], code)
+        countries[key] = countries.get(key, 0) + int(g.get("count") or 0)
+    return (
+        [{"date": d, "referrer": r, "pageviews": n} for (d, r), n in referrers.items()],
+        [{"date": d, "country": c, "pageviews": n} for (d, c), n in countries.items()],
+    )

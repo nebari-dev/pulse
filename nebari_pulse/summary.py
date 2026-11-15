@@ -64,7 +64,16 @@ Docs shape (docs.json), from Cloudflare zone analytics:
      "sites": [{"id", "name", "hosts",
                 "series": [{"date", "pageviews", "visits"}],   # summed over hosts
                 "top_pages": [{"path", "pageviews"}],           # latest 7-day snapshot
-                "top_pages_date": "YYYY-MM-DD" | null}]}
+                "top_pages_date": "YYYY-MM-DD" | null,
+                "referrers": {<range>: {"top": [{"name", "pageviews"}],
+                                        "other": N, "total": N}},
+                "countries": {<range>: {"top": [{"name", "pageviews"}],
+                                        "other": N, "total": N}},
+                "origins_since": "YYYY-MM-DD" | null}]}
+    <range> is "30d", "90d", "1y" or "all", each ending on the site's last
+    traffic day. Referrers are hosts that sent page views from outside the
+    site ("(direct)" is no referrer); countries are ISO codes. Each keeps
+    its top ORIGINS_TOP, with the rest summed in "other".
 
 Daily sources (quay, pypi) contribute their rows directly. Cumulative
 sources (conda, github_releases) contribute the day-over-day delta
@@ -447,6 +456,32 @@ def window_start(today: date, days: int) -> date:
 
 
 DOCS_FILE = "docs.json"
+ORIGINS_TOP = 20
+ORIGIN_RANGES = {"30d": 30, "90d": 90, "1y": 365, "all": None}
+
+
+def _origins(rows: list[dict], column: str, last: str | None) -> dict:
+    """Top-N per range for one referrers or countries file."""
+    out = {}
+    for name, days in ORIGIN_RANGES.items():
+        since = (
+            (date.fromisoformat(last) - timedelta(days=days - 1)).isoformat()
+            if last and days
+            else ""
+        )
+        by: dict[str, int] = defaultdict(int)
+        for r in rows:
+            if r["date"] >= since and (not last or r["date"] <= last):
+                by[r[column]] += int(r["pageviews"] or 0)
+        ranked = sorted(by.items(), key=lambda kv: (-kv[1], kv[0]))
+        top = ranked[:ORIGINS_TOP]
+        total = sum(by.values())
+        out[name] = {
+            "top": [{"name": k, "pageviews": v} for k, v in top],
+            "other": total - sum(v for _, v in top),
+            "total": total,
+        }
+    return out
 
 
 def build_docs(cfg: DocsConfig, data_dir: Path, today: date) -> dict:
@@ -466,6 +501,9 @@ def build_docs(cfg: DocsConfig, data_dir: Path, today: date) -> dict:
             ),
             key=lambda r: -r["pageviews"],
         )
+        last = max(by_date, default=None)
+        referrers = store.read(store.path_for(data_dir, "docs", "referrers", site.id))
+        countries = store.read(store.path_for(data_dir, "docs", "countries", site.id))
         sites.append(
             {
                 "id": site.id,
@@ -474,6 +512,9 @@ def build_docs(cfg: DocsConfig, data_dir: Path, today: date) -> dict:
                 "series": [{"date": d, **v} for d, v in sorted(by_date.items())],
                 "top_pages": top,
                 "top_pages_date": latest,
+                "referrers": _origins(referrers, "referrer", last),
+                "countries": _origins(countries, "country", last),
+                "origins_since": min((r["date"] for r in referrers + countries), default=None),
             }
         )
     return {"generated_at": today.isoformat(), "sites": sites}

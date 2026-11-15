@@ -248,6 +248,21 @@ export interface DocsSite {
   /** Top paths over the last 7 days, biggest first. */
   top_pages: Array<{ path: string; pageviews: number }>;
   top_pages_date: string | null;
+  /**
+   * Page views by referrer host (from outside the site; "(direct)" is no
+   * referrer) and by country (ISO code), top 20 per range plus the rest.
+   * Optional: docs.json written before this field existed lacks it.
+   */
+  referrers?: Partial<Record<Range, OriginRank>>;
+  countries?: Partial<Record<Range, OriginRank>>;
+  /** First day with referrer or country data. */
+  origins_since?: string | null;
+}
+export interface OriginRank {
+  top: Array<{ name: string; pageviews: number }>;
+  /** Page views outside `top`. */
+  other: number;
+  total: number;
 }
 export interface DocsFile {
   generated_at: string;
@@ -764,4 +779,32 @@ export function versionShareInputs(artifacts: Artifact[]): ShareInput[] {
     rank,
     series: sumSeries(series),
   }));
+}
+
+/**
+ * One ranking from several sites' rankings for a range: page views summed
+ * by name, re-cut to `limit`, with everything below it (and each site's own
+ * remainder) in `other`.
+ */
+export function mergeOrigins(
+  ranks: Array<OriginRank | undefined>,
+  limit = 20,
+): OriginRank {
+  const by = new Map<string, number>();
+  let other = 0;
+  let total = 0;
+  for (const r of ranks) {
+    if (!r) continue;
+    for (const { name, pageviews } of r.top) {
+      by.set(name, (by.get(name) ?? 0) + pageviews);
+    }
+    other += r.other;
+    total += r.total;
+  }
+  const ranked = [...by]
+    .map(([name, pageviews]) => ({ name, pageviews }))
+    .sort((a, b) => b.pageviews - a.pageviews || a.name.localeCompare(b.name));
+  const top = ranked.slice(0, limit);
+  for (const r of ranked.slice(limit)) other += r.pageviews;
+  return { top, other, total };
 }
