@@ -692,3 +692,8 @@ date,dimension,category,count
 2026-11-16,python_minor,null,24
 2026-11-16,system,Linux,1
 2026-11-16,system,null,24
+2026-11-17,python_minor,3.12,1
+2026-11-17,python_minor,3.7,2
+2026-11-17,python_minor,null,11
+2026-11-17,system,Linux,3
+2026-11-17,system,null,11
