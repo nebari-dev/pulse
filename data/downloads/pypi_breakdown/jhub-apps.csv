@@ -680,3 +680,6 @@ date,dimension,category,count
 2026-11-16,system,null,6
 2026-11-17,python_minor,null,3
 2026-11-17,system,null,3
+2026-11-18,python_minor,3.12,2
+2026-11-18,python_minor,3.13,1
+2026-11-18,system,Linux,3
