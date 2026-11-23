@@ -474,3 +474,17 @@ date,path,pageviews
 2026-11-22,/registry-setup/,34
 2026-11-22,/server-setup/,44
 2026-11-22,/ui/,48
+2026-11-23,/,350
+2026-11-23,/cli-local/,20
+2026-11-23,/cli-reference/,10
+2026-11-23,/cli-team/,70
+2026-11-23,/examples/version-rollback/,60
+2026-11-23,/installation/,80
+2026-11-23,/introduction/,70
+2026-11-23,/maintainers-conda-forge/,30
+2026-11-23,/nebi-components/,60
+2026-11-23,/pixi-essentials/,70
+2026-11-23,/quick-start/,20
+2026-11-23,/registry-setup/,30
+2026-11-23,/server-setup/,40
+2026-11-23,/ui/,50
