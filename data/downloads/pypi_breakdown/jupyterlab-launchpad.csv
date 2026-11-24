@@ -1162,3 +1162,11 @@ date,dimension,category,count
 2026-11-22,python_minor,null,2
 2026-11-22,system,Linux,1
 2026-11-22,system,null,2
+2026-11-23,python_minor,3.11,6
+2026-11-23,python_minor,3.12,4
+2026-11-23,python_minor,3.14,1
+2026-11-23,python_minor,3.9,1
+2026-11-23,python_minor,null,68
+2026-11-23,system,Darwin,4
+2026-11-23,system,Linux,8
+2026-11-23,system,null,68
