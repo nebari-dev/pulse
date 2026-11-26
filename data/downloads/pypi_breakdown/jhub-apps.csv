@@ -700,3 +700,9 @@ date,dimension,category,count
 2026-11-24,python_minor,null,6
 2026-11-24,system,Linux,2
 2026-11-24,system,null,6
+2026-11-25,python_minor,3.12,1
+2026-11-25,python_minor,3.13,1
+2026-11-25,python_minor,null,1
+2026-11-25,system,Darwin,1
+2026-11-25,system,Linux,1
+2026-11-25,system,null,1

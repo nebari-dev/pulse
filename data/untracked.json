@@ -1,9 +1,13 @@
 {
  "quay": [
   "nebari/charts/javo",
+  "nebari/charts/nebari-mem0",
   "nebari/javo",
   "nebari/llm-serving-pack-openmeter-setup",
   "nebari/llm-serving-pack-usage-console",
-  "nebari/openmeter"
+  "nebari/mem0-pack-server",
+  "nebari/mem0-pack-tools",
+  "nebari/openmeter",
+  "nebari/pack-testbed-app"
  ]
 }
